@@ -1,7 +1,8 @@
 from math import remainder
 from rest_framework import status
 from rest_framework.response import Response
-
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
 
 def custom_success_response(
     serialized_data,
@@ -21,3 +22,8 @@ def custom_success_response(
     data["message"] = message
     data["status"] = "1"
     return Response(data, status=status, headers=headers)
+
+def custom_send_email(_from,_to,subject,cc,bcc,data,template):
+    msg = EmailMultiAlternatives(subject, "", _from, _to,bcc=bcc,cc=cc)
+    msg.attach_alternative(get_template(template).render(data), "text/html")
+    msg.send(fail_silently=True)

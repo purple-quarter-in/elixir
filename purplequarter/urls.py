@@ -26,6 +26,8 @@ from campaign.urls import router as campaign_router
 router = DefaultRouter()
 router.registry.extend(campaign_router.registry)
 urlpatterns = [
+    path('jet/', include('jet.urls', 'jet')),
+    path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     path("admin/", admin.site.urls),
     path("v1/api/", include(router.urls)),
 ]

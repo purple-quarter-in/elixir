@@ -29,15 +29,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# # Email setup
-# EMAIL_HOST = ENV.str('EMAIL_HOST')
-# EMAIL_HOST_USER = ENV.str('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = ENV.str('EMAIL_HOST_PASSWORD')
-# EMAIL_PORT = ENV.str('EMAIL_PORT')
-# EMAIL_USE_TLS = ENV.str('EMAIL_USE_TLS')
+# Email setup
+EMAIL_HOST = ENV.str('EMAIL_HOST')
+EMAIL_HOST_USER = ENV.str('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = ENV.str('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = ENV.str('EMAIL_PORT')
+EMAIL_USE_TLS = ENV.str('EMAIL_USE_TLS')
 # Application definition
 
 INSTALLED_APPS = [
+    'jet.dashboard',
+    "jet",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -66,7 +68,7 @@ ROOT_URLCONF = "purplequarter.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": ['templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -142,3 +144,5 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+JET_DEFAULT_THEME = 'light-violet'
+

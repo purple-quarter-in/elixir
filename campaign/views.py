@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from campaign.models import ContactLead
 from campaign.serializer import ContactLeadSerializer
-from purplequarter.utils import custom_success_response
+from purplequarter.utils import custom_send_email, custom_success_response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 
@@ -16,7 +16,7 @@ class ContactLeadViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
+        custom_send_email("info@purplequarter.com",[serializer.validated_data['company_email']],"",[],["anmol.goel@purplequarter.com","abhinav.pandey@purplequarter.com"],{"message":"You have been registered as lead."},"email/test.html")
         return custom_success_response(serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, pk):
