@@ -78,6 +78,6 @@ venv.bak
 __pycache__
 db.sqlite3
 media
-
+static
 # *.settings.py
 */migrations/*

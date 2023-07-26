@@ -7,4 +7,5 @@ djangorestframework-simplejwt==5.1.0
 django-cors-headers
 boto3==1.24.94
 django-environ==0.4.5
-mysqlclient==2.2.0
+mysqlclient==2.0.3
+django-jet-reboot
