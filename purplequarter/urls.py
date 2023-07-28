@@ -32,5 +32,6 @@ urlpatterns = [
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     path("admin/", admin.site.urls),
     path("v1/api/", include(router.urls)),
+    path("",include("campaign.urls"), name="home")
 ]
 urlpatterns+= static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -6,7 +6,8 @@ from purplequarter.utils import custom_send_email, custom_success_response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 
-
+def say_hello(request):
+    return render(request=request, template_name="email/contact.html")
 # Create your views here.
 class ContactLeadViewSet(ModelViewSet):
     queryset = ContactLead.objects.all()
