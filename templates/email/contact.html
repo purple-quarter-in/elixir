@@ -1,0 +1,481 @@
+{% load static %}
+<!DOCTYPE html>
+<html style="box-sizing: border-box">
+  <head style="box-sizing: border-box">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+  </head>
+  <body
+    style="
+      box-sizing: border-box;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #241c35;
+      font-family: Gotham, sans-serif;
+    "
+  >
+    <div
+      class="body"
+      style="
+        box-sizing: border-box;
+        display: flex;
+        padding: 40px 67px;
+        align-items: flex-start;
+        gap: 10px;
+        height: 100vh;
+      "
+    >
+      <div
+        class="parent"
+        style="
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 36px;
+          width: 100%;
+          height: 100%;
+        "
+      >
+        <div
+          class="first-container"
+          style="
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 24px;
+          "
+        >
+          <div
+            class="header"
+            style="
+              box-sizing: border-box;
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            <img
+              src="{% static 'assets/images/pqlogo.svg' %}"
+              style="box-sizing: border-box"
+            /><img
+              src="{% static 'assets/images/purplequarter.svg' %}"
+              style="box-sizing: border-box"
+            />
+          </div>
+          <p
+            class="message"
+            style="
+              box-sizing: border-box;
+              margin: 0;
+              color: #fff;
+              font-family: Gotham;
+              font-size: 1rem;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 130%;
+            "
+          >
+            Thank you for reaching out, we got your message.
+          </p>
+          <p
+            class="message"
+            style="
+              box-sizing: border-box;
+              margin: 0;
+              color: #fff;
+              font-family: Gotham;
+              font-size: 1rem;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 130%;
+            "
+          >
+            To better understand your queries and assist you, a member of our
+            team will contact you within 24 business hours.
+          </p>
+          <p
+            class="message"
+            style="
+              box-sizing: border-box;
+              margin: 0;
+              color: #fff;
+              font-family: Gotham;
+              font-size: 1rem;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 130%;
+            "
+          >
+            Please expect a delayed response on weekends.Cheers!Team Purple
+            Quarter !
+          </p>
+        </div>
+        <div
+          class="second-container"
+          style="
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+          "
+        >
+          <p
+            class="overview"
+            style="
+              box-sizing: border-box;
+              margin: 0;
+              color: #fff;
+              font-family: Gotham;
+              font-size: 0.75rem;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 130%;
+            "
+          >
+            Overview of your Data Submission
+          </p>
+          <div
+            class="part-one"
+            style="
+              box-sizing: border-box;
+              display: flex;
+              padding: 24px 26px;
+              align-items: flex-start;
+              gap: 10px;
+              border-radius: 8px;
+              border: 1px solid #353260;
+              background: linear-gradient(
+                  0deg,
+                  rgba(0, 0, 0, 0.2) 0%,
+                  rgba(0, 0, 0, 0.2) 100%
+                ),
+                radial-gradient(
+                  114.84% 79.72% at -0% 0%,
+                  #353260 0%,
+                  rgba(36, 28, 53, 0) 100%
+                ),
+                radial-gradient(
+                  102.49% 80.55% at 97.79% 107.66%,
+                  #353260 0%,
+                  rgba(36, 28, 53, 0) 100%
+                ),
+                #241c35;
+              box-shadow: 0px 24px 44px -20px rgba(0, 0, 0, 0.15);
+            "
+          >
+            <div
+              class="inner"
+              style="
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 24px;
+              "
+            >
+              <div
+                class="section-one"
+                style="
+                  box-sizing: border-box;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-start;
+                  gap: 16px;
+                "
+              >
+                <p
+                  class="details"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.75rem;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: normal;
+                    text-decoration-line: underline;
+                  "
+                >
+                  Your details
+                </p>
+                <p
+                  class="name"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                  "
+                >
+                  Name: {{name}}
+                </p>
+                <div
+                  class="email-flex"
+                  style="
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                  "
+                >
+                  <p
+                    class="email"
+                    style="
+                      box-sizing: border-box;
+                      margin: 0;
+                      color: #fff;
+                      font-family: Gotham;
+                      font-size: 0.875rem;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: 130%;
+                    "
+                  >
+                    Email:
+                  </p>
+                  <p
+                    class="email-content"
+                    style="
+                      box-sizing: border-box;
+                      margin: 0;
+                      font-family: Gotham;
+                      font-size: 0.875rem;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: normal;
+                      background: linear-gradient(
+                        140deg,
+                        #f5cec4 0%,
+                        #dab4a6 4%,
+                        #c8a291 8%,
+                        #bc9784 11%,
+                        #b99480 15%,
+                        #e0aa93 45%,
+                        #9e6d53 84%,
+                        #99674e 100%
+                      );
+                      background-clip: text;
+                      -webkit-background-clip: text;
+                      -webkit-text-fill-color: transparent;
+                    "
+                  >
+                    {{company_email}}
+                  </p>
+                </div>
+                <p
+                  class="phone"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                  "
+                >
+                  Phone: {{std_code}}-{{phone}}
+                </p>
+                <p
+                  class="desig"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                  "
+                >
+                  Designation: {{designation}}
+                </p>
+              </div>
+              <div
+                class="line"
+                style="
+                  box-sizing: border-box;
+                  height: 0px;
+                  align-self: stretch;
+                  stroke-width: 1px;
+                  stroke: #2a274b;
+                "
+              ></div>
+              <div
+                class="section-two"
+                style="
+                  box-sizing: border-box;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-start;
+                  gap: 16px;
+                "
+              >
+                <p
+                  class="role"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.75rem;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: normal;
+                    text-decoration-line: underline;
+                  "
+                >
+                  Role Detials
+                </p>
+                <p
+                  class="region"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                  "
+                >
+                  Region: {{region}}
+                </p>
+                <p
+                  class="budget"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                  "
+                >
+                  Budget: {{budget}}
+                </p>
+                <p
+                  class="hiring"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                  "
+                >
+                  Role you&rsquo;re Hiring for: {{role}}
+                </p>
+                <p
+                  class="heard"
+                  style="
+                    box-sizing: border-box;
+                    margin: 0;
+                    color: #fff;
+                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                  "
+                >
+                  Heard about us from: {{source}}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="third-container"
+          style="
+            box-sizing: border-box;
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+          "
+        >
+          <img
+            src="{% static 'assets/images/awards.svg' %}"
+            style="box-sizing: border-box"
+          />
+          <div
+            class="right"
+            style="
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 24px;
+            "
+          >
+            <div
+              class="first"
+              style="
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+              "
+            >
+              <p
+                class="findus"
+                style="
+                  box-sizing: border-box;
+                  margin: 0;
+                  color: #fff;
+                  font-family: Gotham;
+                  font-size: 1rem;
+                  font-style: normal;
+                  font-weight: 400;
+                  line-height: 130%;
+                "
+              >
+                Find us on Social Platforms
+              </p>
+              <img
+                src="{% static 'assets/images/platforms.svg' %}"
+                style="box-sizing: border-box"
+              />
+              <p
+                class="locations"
+                style="
+                  box-sizing: border-box;
+                  margin: 0;
+                  color: #fff;
+                  font-family: Gotham;
+                  font-size: 1rem;
+                  font-style: normal;
+                  font-weight: 400;
+                  line-height: 150%;
+                  opacity: 0.699999988079071;
+                "
+              >
+                Bangalore | Santa Clara | London<br
+                  style="box-sizing: border-box"
+                />Singapore | Dubai
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
