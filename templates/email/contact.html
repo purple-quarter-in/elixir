@@ -4,71 +4,43 @@
   <head style="box-sizing: border-box">
     <!-- <link rel="stylesheet" href="styles.css"> -->
   </head>
-  <body
-    style="
-      box-sizing: border-box;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: #241c35;
-      font-family: Gotham, sans-serif;
-    "
-  >
+  <body style="background: #241c35; font-family: Gotham, sans-serif">
     <div
-      class="body"
       style="
-        box-sizing: border-box;
-        display: flex;
+        display: block;
         padding: 40px 67px;
-        align-items: flex-start;
+        align-items: block-start;
         gap: 10px;
         height: 100vh;
       "
     >
       <div
-        class="parent"
         style="
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
+          display: block;
+          block-direction: column;
+          align-items: block-start;
           gap: 36px;
           width: 100%;
           height: 100%;
         "
       >
         <div
-          class="first-container"
           style="
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
+            display: block;
+            block-direction: column;
             justify-content: center;
-            align-items: flex-start;
+            align-items: block-start;
             gap: 24px;
           "
         >
-          <div
-            class="header"
-            style="
-              box-sizing: border-box;
-              display: flex;
-              align-items: center;
-              gap: 12px;
-            "
-          >
+          <div style="display: block; align-items: center; gap: 12px">
             <img
-              src="{% static 'assets/images/pqlogo.png' %}"
-              style="box-sizing: border-box"
-            /><img
-              src="{% static 'assets/images/purplequarter.png' %}"
+              src="https://api.purplequarter.co/static/assets/images/purplequarter.png"
               style="box-sizing: border-box"
             />
           </div>
           <p
-            class="message"
             style="
-              box-sizing: border-box;
               margin: 0;
               color: #fff;
               font-family: Gotham;
@@ -81,9 +53,7 @@
             Thank you for reaching out, we got your message.
           </p>
           <p
-            class="message"
             style="
-              box-sizing: border-box;
               margin: 0;
               color: #fff;
               font-family: Gotham;
@@ -97,9 +67,7 @@
             team will contact you within 24 business hours.
           </p>
           <p
-            class="message"
             style="
-              box-sizing: border-box;
               margin: 0;
               color: #fff;
               font-family: Gotham;
@@ -114,19 +82,15 @@
           </p>
         </div>
         <div
-          class="second-container"
           style="
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            display: block;
+            block-direction: column;
+            align-items: block-start;
             gap: 15px;
           "
         >
           <p
-            class="overview"
             style="
-              box-sizing: border-box;
               margin: 0;
               color: #fff;
               font-family: Gotham;
@@ -139,12 +103,10 @@
             Overview of your Data Submission
           </p>
           <div
-            class="part-one"
             style="
-              box-sizing: border-box;
-              display: flex;
+              display: block;
               padding: 24px 26px;
-              align-items: flex-start;
+              align-items: block-start;
               gap: 10px;
               border-radius: 8px;
               border: 1px solid #353260;
@@ -168,29 +130,23 @@
             "
           >
             <div
-              class="inner"
               style="
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
+                display: block;
+                block-direction: column;
+                align-items: block-start;
                 gap: 24px;
               "
             >
               <div
-                class="section-one"
                 style="
-                  box-sizing: border-box;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: flex-start;
+                  display: block;
+                  block-direction: column;
+                  align-items: block-start;
                   gap: 16px;
                 "
               >
                 <p
-                  class="details"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -204,9 +160,7 @@
                   Your details
                 </p>
                 <p
-                  class="name"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -218,19 +172,9 @@
                 >
                   Name: {{name}}
                 </p>
-                <div
-                  class="email-flex"
-                  style="
-                    box-sizing: border-box;
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                  "
-                >
+                <div style="display: block; align-items: center; gap: 6px">
                   <p
-                    class="email"
                     style="
-                      box-sizing: border-box;
                       margin: 0;
                       color: #fff;
                       font-family: Gotham;
@@ -243,9 +187,7 @@
                     Email:
                   </p>
                   <p
-                    class="email-content"
                     style="
-                      box-sizing: border-box;
                       margin: 0;
                       font-family: Gotham;
                       font-size: 0.875rem;
@@ -272,9 +214,7 @@
                   </p>
                 </div>
                 <p
-                  class="phone"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -287,9 +227,7 @@
                   Phone: {{std_code}}-{{phone}}
                 </p>
                 <p
-                  class="desig"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -303,9 +241,7 @@
                 </p>
               </div>
               <div
-                class="line"
                 style="
-                  box-sizing: border-box;
                   height: 0px;
                   align-self: stretch;
                   stroke-width: 1px;
@@ -313,19 +249,15 @@
                 "
               ></div>
               <div
-                class="section-two"
                 style="
-                  box-sizing: border-box;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: flex-start;
+                  display: block;
+                  block-direction: column;
+                  align-items: block-start;
                   gap: 16px;
                 "
               >
                 <p
-                  class="role"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -339,9 +271,7 @@
                   Role Detials
                 </p>
                 <p
-                  class="region"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -351,12 +281,10 @@
                     line-height: 130%;
                   "
                 >
-                  Region: {{region}}
+                  Region: {{location}}
                 </p>
                 <p
-                  class="budget"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -369,9 +297,7 @@
                   Budget: {{budget}}
                 </p>
                 <p
-                  class="hiring"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -384,9 +310,7 @@
                   Role you&rsquo;re Hiring for: {{role}}
                 </p>
                 <p
-                  class="heard"
                   style="
-                    box-sizing: border-box;
                     margin: 0;
                     color: #fff;
                     font-family: Gotham;
@@ -402,43 +326,29 @@
             </div>
           </div>
         </div>
-        <div
-          class="third-container"
-          style="
-            box-sizing: border-box;
-            display: flex;
-            align-items: flex-start;
-            gap: 24px;
-          "
-        >
+        <div style="display: block; align-items: block-start; gap: 24px">
           <img
-            src="{% static 'assets/images/awards.png' %}"
+            src="https://api.purplequarter.co/static/assets/images/awards.png"
             style="box-sizing: border-box"
           />
           <div
-            class="right"
             style="
-              box-sizing: border-box;
-              display: flex;
-              flex-direction: column;
-              align-items: flex-start;
+              display: block;
+              block-direction: column;
+              align-items: block-start;
               gap: 24px;
             "
           >
             <div
-              class="first"
               style="
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
+                display: block;
+                block-direction: column;
+                align-items: block-start;
                 gap: 16px;
               "
             >
               <p
-                class="findus"
                 style="
-                  box-sizing: border-box;
                   margin: 0;
                   color: #fff;
                   font-family: Gotham;
@@ -451,13 +361,11 @@
                 Find us on Social Platforms
               </p>
               <img
-                src="{% static 'assets/images/platforms.png' %}"
+                src="https://api.purplequarter.co/static/assets/images/platforms.png"
                 style="box-sizing: border-box"
               />
               <p
-                class="locations"
                 style="
-                  box-sizing: border-box;
                   margin: 0;
                   color: #fff;
                   font-family: Gotham;

@@ -37,7 +37,16 @@ EMAIL_HOST_PASSWORD = ENV.str('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = ENV.str('EMAIL_PORT')
 EMAIL_USE_TLS = ENV.str('EMAIL_USE_TLS')
 # Application definition
-
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOWED_ORIGINS = (
+       'http://localhost:4200',
+       'https://purplequarter.co',
+       'https://www.purplequarter.co'
+)
+CORS_ALLOW_HEADERS = [
+    'access-control-allow-origin',
+    'content-type',
+]
 INSTALLED_APPS = [
     'jet.dashboard',
     "jet",
