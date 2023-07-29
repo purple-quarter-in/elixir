@@ -17,6 +17,8 @@ class ContactLeadViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        custom_send_email("info@purplequarter.com",[serializer.validated_data['company_email']],"We are happy to hear from you!",[],["interact@purplequarter.com","abhinav.pandey@purplequarter.com"],
+                          serializer.data,"email/contact.html")
         return custom_success_response(serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, pk):
@@ -24,6 +26,4 @@ class ContactLeadViewSet(ModelViewSet):
         serializer = self.serializer_class(lead, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        custom_send_email("info@purplequarter.com",[serializer.validated_data['company_email']],"We are happy to hear from you!",[],["anmol.goel@purplequarter.com"],
-                          serializer.data,"email/contact.html")
         return custom_success_response(serializer.data, status=status.HTTP_200_OK)

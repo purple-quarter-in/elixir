@@ -2,38 +2,26 @@
 <!DOCTYPE html>
 <html style="box-sizing: border-box">
   <head style="box-sizing: border-box">
-    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body style="background: #241c35; font-family: Gotham, sans-serif">
+
+  <body style="font-family: Plus Jakarta Sans, sans-serif">
     <div
       style="
         display: block;
-        padding: 40px 67px;
-        align-items: block-start;
+        padding: 2.5rem 1.875rem;
         gap: 10px;
-        height: 100vh;
+        background: #241c35;
       "
     >
-      <div
-        style="
-          display: block;
-          block-direction: column;
-          align-items: block-start;
-          gap: 36px;
-          width: 100%;
-          height: 100%;
-        "
-      >
-        <div
-          style="
-            display: block;
-            block-direction: column;
-            justify-content: center;
-            align-items: block-start;
-            gap: 24px;
-          "
-        >
-          <div style="display: block; align-items: center; gap: 12px">
+      <div style="display: block">
+        <div style="display: block">
+          <div style="display: block">
             <img
               src="https://api.purplequarter.co/static/assets/images/purplequarter.png"
               style="box-sizing: border-box"
@@ -41,9 +29,20 @@
           </div>
           <p
             style="
-              margin: 0;
               color: #fff;
-              font-family: Gotham;
+
+              font-size: 1rem;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 130%;
+            "
+          >
+            Hello {{name}},
+          </p>
+          <p
+            style="
+              color: #fff;
+              margin-top: 16px;
               font-size: 1rem;
               font-style: normal;
               font-weight: 400;
@@ -54,47 +53,49 @@
           </p>
           <p
             style="
-              margin: 0;
               color: #fff;
-              font-family: Gotham;
+              margin-top: 16px;
               font-size: 1rem;
               font-style: normal;
               font-weight: 400;
               line-height: 130%;
             "
           >
-            To better understand your queries and assist you, a member of our
-            team will contact you within 24 business hours.
+            To assist you better, a member of our team will contact you within
+            24 business hours.
           </p>
           <p
             style="
-              margin: 0;
               color: #fff;
-              font-family: Gotham;
+              margin-top: 16px;
               font-size: 1rem;
               font-style: normal;
               font-weight: 400;
               line-height: 130%;
             "
           >
-            Please expect a delayed response on weekends.Cheers!Team Purple
-            Quarter !
+            Please expect a delayed response on weekends.
+          </p>
+          <p
+            style="
+              color: #fff;
+              font-size: 1rem;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 130%;
+              margin-top: 16px;
+            "
+          >
+            Cheers!<br />
+            Team Purple Quarter
           </p>
         </div>
-        <div
-          style="
-            display: block;
-            block-direction: column;
-            align-items: block-start;
-            gap: 15px;
-          "
-        >
+        <div style="display: block; margin-top: 36px">
           <p
             style="
-              margin: 0;
               color: #fff;
-              font-family: Gotham;
-              font-size: 0.75rem;
+
+              font-size: 0.9rem;
               font-style: normal;
               font-weight: 500;
               line-height: 130%;
@@ -104,10 +105,10 @@
           </p>
           <div
             style="
+              max-width: 333px;
+              margin-top: 15px;
               display: block;
               padding: 24px 26px;
-              align-items: block-start;
-              gap: 10px;
               border-radius: 8px;
               border: 1px solid #353260;
               background: linear-gradient(
@@ -129,108 +130,62 @@
               box-shadow: 0px 24px 44px -20px rgba(0, 0, 0, 0.15);
             "
           >
-            <div
-              style="
-                display: block;
-                block-direction: column;
-                align-items: block-start;
-                gap: 24px;
-              "
-            >
-              <div
-                style="
-                  display: block;
-                  block-direction: column;
-                  align-items: block-start;
-                  gap: 16px;
-                "
-              >
+            <div style="display: block">
+              <div style="display: block">
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
-                    font-size: 0.75rem;
+
+                    font-size: 0.9rem;
                     font-style: normal;
                     font-weight: 400;
                     line-height: normal;
                     text-decoration-line: underline;
                   "
                 >
-                  Your details
+                  Your Details:
                 </p>
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 130%;
+                    margin-bottom: 0;
+                  "
+                >
+                  Name: {{name}}
+                </p>
+                <p
+                  style="
+                    color: #fff;
                     font-size: 0.875rem;
                     font-style: normal;
                     font-weight: 500;
                     line-height: 130%;
                   "
                 >
-                  Name: {{name}}
+                  Email:
+                  <span style="color: #b99480">{{company_email}}</span>
                 </p>
-                <div style="display: block; align-items: center; gap: 6px">
-                  <p
-                    style="
-                      margin: 0;
-                      color: #fff;
-                      font-family: Gotham;
-                      font-size: 0.875rem;
-                      font-style: normal;
-                      font-weight: 500;
-                      line-height: 130%;
-                    "
-                  >
-                    Email:
-                  </p>
-                  <p
-                    style="
-                      margin: 0;
-                      font-family: Gotham;
-                      font-size: 0.875rem;
-                      font-style: normal;
-                      font-weight: 500;
-                      line-height: normal;
-                      background: linear-gradient(
-                        140deg,
-                        #f5cec4 0%,
-                        #dab4a6 4%,
-                        #c8a291 8%,
-                        #bc9784 11%,
-                        #b99480 15%,
-                        #e0aa93 45%,
-                        #9e6d53 84%,
-                        #99674e 100%
-                      );
-                      background-clip: text;
-                      -webkit-background-clip: text;
-                      -webkit-text-fill-color: transparent;
-                    "
-                  >
-                    {{company_email}}
-                  </p>
-                </div>
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
+                    margin-top: 16px;
                     font-size: 0.875rem;
                     font-style: normal;
                     font-weight: 500;
                     line-height: 130%;
+                    margin-top: 0;
                   "
                 >
                   Phone: {{std_code}}-{{phone}}
                 </p>
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
+                    margin-top: 16px;
                     font-size: 0.875rem;
                     font-style: normal;
                     font-weight: 500;
@@ -240,6 +195,11 @@
                   Designation: {{designation}}
                 </p>
               </div>
+              <div style="margin-top: 24px; margin-bottom: 24px">
+                <img
+                  src="https://api.purplequarter.co/static/assets/images/line.png"
+                />
+              </div>
               <div
                 style="
                   height: 0px;
@@ -248,33 +208,24 @@
                   stroke: #2a274b;
                 "
               ></div>
-              <div
-                style="
-                  display: block;
-                  block-direction: column;
-                  align-items: block-start;
-                  gap: 16px;
-                "
-              >
+              <div style="display: block">
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
-                    font-size: 0.75rem;
+                    margin-top: 16px;
+                    font-size: 0.9rem;
                     font-style: normal;
                     font-weight: 400;
                     line-height: normal;
                     text-decoration-line: underline;
                   "
                 >
-                  Role Detials
+                  Role Details:
                 </p>
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
+                    margin-top: 16px;
                     font-size: 0.875rem;
                     font-style: normal;
                     font-weight: 500;
@@ -285,35 +236,32 @@
                 </p>
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
+                    margin-top: 16px;
                     font-size: 0.875rem;
                     font-style: normal;
                     font-weight: 500;
                     line-height: 130%;
                   "
                 >
-                  Budget: {{budget}}
+                  Budget Range: {{budget}}
                 </p>
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
+                    margin-top: 16px;
                     font-size: 0.875rem;
                     font-style: normal;
                     font-weight: 500;
                     line-height: 130%;
                   "
                 >
-                  Role you&rsquo;re Hiring for: {{role}}
+                  Hiring for: {{role}}
                 </p>
                 <p
                   style="
-                    margin: 0;
                     color: #fff;
-                    font-family: Gotham;
+                    margin-top: 16px;
                     font-size: 0.875rem;
                     font-style: normal;
                     font-weight: 500;
@@ -326,61 +274,63 @@
             </div>
           </div>
         </div>
-        <div style="display: block; align-items: block-start; gap: 24px">
-          <img
-            src="https://api.purplequarter.co/static/assets/images/awards.png"
-            style="box-sizing: border-box"
-          />
+        <div style="display: block; margin-top: 36px">
           <div
             style="
-              display: block;
-              block-direction: column;
-              align-items: block-start;
-              gap: 24px;
+              box-sizing: border-box;
+              display: inline-block;
+              vertical-align: middle;
             "
           >
-            <div
+            <img
+              style="max-width: 100%; min-height: 100%"
+              src="https://api.purplequarter.co/static/assets/images/awards.png"
+            />
+          </div>
+          <div>
+            <p
               style="
-                display: block;
-                block-direction: column;
-                align-items: block-start;
-                gap: 16px;
+                color: #fff;
+
+                font-size: 1rem;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 130%;
+                display: inline-block;
+                vertical-align: middle;
               "
             >
-              <p
-                style="
-                  margin: 0;
-                  color: #fff;
-                  font-family: Gotham;
-                  font-size: 1rem;
-                  font-style: normal;
-                  font-weight: 400;
-                  line-height: 130%;
-                "
-              >
-                Find us on Social Platforms
-              </p>
-              <img
-                src="https://api.purplequarter.co/static/assets/images/platforms.png"
+              Find us on Social Platforms
+            </p>
+          </div>
+          <div>
+            <img
+              src="https://api.purplequarter.co/static/assets/images/platforms.png"
+              style="
+                box-sizing: border-box;
+                display: inline-block;
+                vertical-align: middle;
+              "
+            />
+          </div>
+          <div>
+            <p
+              style="
+                color: #fff;
+
+                font-size: 1rem;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 150%;
+                opacity: 0.699999988079071;
+                display: inline-block;
+                vertical-align: middle;
+              "
+            >
+              Bangalore | Santa Clara | London<br
                 style="box-sizing: border-box"
-              />
-              <p
-                style="
-                  margin: 0;
-                  color: #fff;
-                  font-family: Gotham;
-                  font-size: 1rem;
-                  font-style: normal;
-                  font-weight: 400;
-                  line-height: 150%;
-                  opacity: 0.699999988079071;
-                "
-              >
-                Bangalore | Santa Clara | London<br
-                  style="box-sizing: border-box"
-                />Singapore | Dubai
-              </p>
-            </div>
+              />Singapore | Dubai
+            </p>
           </div>
         </div>
       </div>
