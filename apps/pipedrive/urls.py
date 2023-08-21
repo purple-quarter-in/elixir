@@ -1,6 +1,6 @@
 from django.urls import path
-from campaign import views
-from campaign.views import ContactLeadViewSet
+from pipedrive import views
+from pipedrive.views import ContactLeadViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()

@@ -1,5 +1,5 @@
 """
-URL configuration for purplequarter project.
+URL configuration for elixir project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -23,15 +23,15 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [
     path("admin/", admin.site.urls),
 ]
-from campaign.urls import router as campaign_router
+from apps.rbac.urls import router as rbac_router
 
 router = DefaultRouter()
-router.registry.extend(campaign_router.registry)
+# router.registry.extend(campaign_router.registry)
+router.registry.extend(rbac_router.registry)
 urlpatterns = [
-    path('jet/', include('jet.urls', 'jet')),
-    path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
+    path("jet/", include("jet.urls", "jet")),
+    path("jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")),
     path("admin/", admin.site.urls),
     path("v1/api/", include(router.urls)),
-    path("",include("campaign.urls"), name="home")
 ]
-urlpatterns+= static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

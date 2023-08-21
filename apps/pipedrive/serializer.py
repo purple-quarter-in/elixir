@@ -1,4 +1,4 @@
-from campaign.models import ContactLead
+from pipedrive.models import ContactLead
 from rest_framework import serializers
 
 

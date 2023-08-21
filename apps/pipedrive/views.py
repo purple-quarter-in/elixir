@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
-from campaign.models import ContactLead
-from campaign.serializer import ContactLeadSerializer
-from purplequarter.utils import custom_send_email, custom_success_response
+from pipedrive.models import ContactLead
+from pipedrive.serializer import ContactLeadSerializer
+from elixir.utils import custom_send_email, custom_success_response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 
@@ -17,7 +17,7 @@ class ContactLeadViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        custom_send_email("info@purplequarter.com",[serializer.validated_data['company_email']],"We are happy to hear from you!",[],["interact@purplequarter.com","abhinav.pandey@purplequarter.com"],
+        custom_send_email("info@purplequarter.com",[serializer.validated_data['company_email']],"We are happy to hear from you!",[],["abhinav.pandey@purplequarter.com","anmol.goel@purplequarter.com"],
                           serializer.data,"email/contact.html")
         return custom_success_response(serializer.data, status=status.HTTP_201_CREATED)
 

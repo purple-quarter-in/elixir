@@ -1,5 +1,5 @@
 """
-WSGI config for purplequarter project.
+WSGI config for elixir project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'purplequarter.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'elixir.settings')
 
 application = get_wsgi_application()
