@@ -1,10 +1,11 @@
 from django.urls import path
-from pipedrive import views
-from pipedrive.views import ContactLeadViewSet
 from rest_framework.routers import DefaultRouter
 
+from apps.pipedrive import views
+
+from .views import LeadViewSet, RoleDetailViewSet
+
 router = DefaultRouter()
-router.register("lead", ContactLeadViewSet)
-urlpatterns = [
-    path("template", views.say_hello, name="home")
-]
+router.register("lead", LeadViewSet)
+router.register("role_detail", RoleDetailViewSet)
+urlpatterns = [path("template", views.say_hello, name="home")]

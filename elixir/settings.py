@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "apps.django_rest_passwordreset",
     "apps.user",
     "apps.rbac",
     "apps.pipedrive",
@@ -173,3 +174,4 @@ JET_DEFAULT_THEME = "light-violet"
 LOGGING_CONFIG = None
 logging.config.dictConfig(LOGGING)
 LOGGEER = logging.getLogger("elixir")
+SITE_URL = "www.elixie.purplequarter.co/"

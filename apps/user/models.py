@@ -1,9 +1,7 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils import timezone
-from django.db import models
-from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser, BaseUserManager, Group
+from django.db import models
+from django.utils import timezone
 
 
 # User = get_user_model()
@@ -42,11 +40,10 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, db_index=True)
     region = models.CharField(max_length=50, blank=True, null=True)
     function = models.CharField(max_length=50)
-    profile = models.CharField(max_length=50)
     time_zone = models.CharField(max_length=50, blank=True, null=True)
     gauth = models.JSONField(default=dict, blank=True, null=True)
     is_email_verified = models.BooleanField(default=0)
-    group = models.ForeignKey(
+    profile = models.ForeignKey(
         Group, on_delete=models.DO_NOTHING, related_name="user_group", null=True
     )
     gender = models.CharField(max_length=30, default=None, null=True)
@@ -55,6 +52,7 @@ class User(AbstractUser):
         on_delete=models.DO_NOTHING,
         default=None,
         null=True,
+        blank=True,
         related_name="reporting_user",
     )
     created_by = models.ForeignKey(

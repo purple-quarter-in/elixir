@@ -1,10 +1,32 @@
-from re import T
-
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, GroupManager
 from django.db import models
 from django.utils import timezone
 
+group_manager = GroupManager()
 # Create your models here.
+Group.add_to_class(
+    "created_by",
+    models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="group_created_by_user",
+    ),
+)
+Group.add_to_class(
+    "updated_by",
+    models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="group_updated_by_user",
+    ),
+)
+Group.add_to_class("created_at", models.DateTimeField(auto_now_add=True, blank=True, null=True))
+Group.add_to_class("updated_at", models.DateTimeField(auto_now=True, blank=True, null=True))
+
 AccessCategoryTypes = (
     ("menu", "Menu"),
     ("administration", "Administration"),
@@ -19,9 +41,7 @@ class AccessCategory(models.Model):
     code = models.CharField(max_length=100)
     url_frontend = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(choices=AccessCategoryTypes, max_length=100)
-    parent = models.ForeignKey(
-        "self", on_delete=models.DO_NOTHING, null=True, blank=True
-    )
+    parent = models.ForeignKey("self", on_delete=models.DO_NOTHING, null=True, blank=True)
     default_access = models.JSONField(
         default=dict(access=False, view=False, change=True, add=False)
     )
@@ -70,3 +90,30 @@ class GroupCategoryAccessDetail(models.Model):
             self.created_at = timezone.now()
         self.updated_at = timezone.now()
         return super(GroupCategoryAccessDetail, self).save(*args, **kwargs)
+
+
+# class CustomGroup(Group):
+#     created_by = models.ForeignKey(
+#         "user.User",
+#         on_delete=models.DO_NOTHING,
+#         default=None,
+#         null=True,
+#         related_name="group_created_by_user",
+#     )
+#     updated_by = models.ForeignKey(
+#         "user.User",
+#         on_delete=models.DO_NOTHING,
+#         default=None,
+#         null=True,
+#         related_name="group_updated_by_user",
+#     )
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     objects = group_manager
+
+#     def save(self, *args, **kwargs):
+#         """On save, update timestamps"""
+#         if not self.id:
+#             self.created_at = timezone.now()
+#         self.updated_at = timezone.now()
+#         return super(CustomGroup, self).save(*args, **kwargs)

@@ -81,4 +81,4 @@ db.sqlite3
 media
 static
 # *.settings.py
-*/migrations/*
+migrations/*

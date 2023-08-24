@@ -14,24 +14,36 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.conf.urls.static import static
-from django.urls import path, include
-from . import settings
+from django.contrib import admin
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
+from apps.django_rest_passwordreset.urls import urlpatterns as reset_urlpatterns
+from apps.user.urls import urlpatterns as user_urlpatterns
+
+from . import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
 ]
+from apps.client.urls import router as client_router
+from apps.pipedrive.urls import router as pipedrive_router
 from apps.rbac.urls import router as rbac_router
+from apps.user.urls import router as user_router
 
 router = DefaultRouter()
 # router.registry.extend(campaign_router.registry)
 router.registry.extend(rbac_router.registry)
+router.registry.extend(pipedrive_router.registry)
+router.registry.extend(client_router.registry)
+router.registry.extend(user_router.registry)
 urlpatterns = [
     path("jet/", include("jet.urls", "jet")),
     path("jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")),
     path("admin/", admin.site.urls),
+    path("v1/api/", include(user_urlpatterns)),
+    path("v1/api/password_reset/", include(reset_urlpatterns)),
     path("v1/api/", include(router.urls)),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

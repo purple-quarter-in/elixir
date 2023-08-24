@@ -7,7 +7,7 @@ class Organisation(models.Model):
     """Model definition for Organisation."""
 
     name = models.CharField(max_length=100)
-    registered_name = models.CharField(max_length=100)
+    registered_name = models.CharField(max_length=100, blank=True, null=True)
     govt_id = models.CharField(max_length=100, blank=True, null=True)
     billing_address = models.TextField(blank=True, null=True)
     shipping_address = models.TextField(blank=True, null=True)
@@ -63,8 +63,9 @@ class Organisation(models.Model):
 class Contact(models.Model):
     """Model definition for Contact."""
 
+    organisation = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=100)
-    company_email = models.EmailField(max_length=100)
+    email = models.EmailField(max_length=100)
     std_code = models.CharField(max_length=5)
     phone = models.CharField(max_length=15)
     designation = models.CharField(max_length=100)

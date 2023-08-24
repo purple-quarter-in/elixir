@@ -1,8 +1,7 @@
-from django.utils import timezone
 from django.db import models
+from django.utils import timezone
 
 from apps.client.models import Organisation
-
 
 # Create your models here.
 
@@ -44,11 +43,9 @@ class Lead(models.Model):
     """Model definition for RoleDetail."""
 
     # TODO: Define fields here
-    organization = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
+    organisation = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
     role = models.ForeignKey(RoleDetail, on_delete=models.DO_NOTHING)
-    currency = models.CharField(
-        max_length=3, blank=True, null=True
-    )  # discuss with abhinav
+    currency = models.CharField(max_length=3, blank=True, null=True)  # discuss with abhinav
     service_fee = models.FloatField(blank=True, null=True)
     service_fee_range = models.CharField(max_length=100, blank=True, null=True)
     retainer_advance = models.BooleanField(blank=True, null=True)
