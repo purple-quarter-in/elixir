@@ -1,17 +1,19 @@
 from django.shortcuts import render
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 from apps.client.models import Contact, Organisation
-from apps.pipedrive.models import Lead, RoleDetail
+from apps.pipedrive.models import Lead, Prospect, RoleDetail
 from apps.pipedrive.serializer import (
     CreateLeadSerializer,
     LeadSerializer,
+    ProspectSerializer,
     RoleDetailSerializer,
     UpdateLeadSerializer,
 )
-from elixir.utils import custom_success_response
+from elixir.utils import custom_success_response, set_crated_by_updated_by
 from elixir.viewsets import ModelViewSet
 
 
@@ -90,6 +92,22 @@ class LeadViewSet(ModelViewSet):
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
         )
 
+    @action(detail=True, methods=["patch"])
+    def promote(self, request, pk):
+        obj = self.get_object()
+        if obj.is_converted_to_prospect:
+            raise ValidationError({"message": "Lead already converted to prospect"})
+        obj.is_converted_to_prospect = True
+        obj.updated_by = request.user
+        prospect = Prospect.objects.update_or_create(
+            lead=obj, defaults={"owner": request.user, **set_crated_by_updated_by(request.user)}
+        )
+        if prospect:
+            obj.save()
+            return custom_success_response(self.serializer_class(obj).data)
+        else:
+            raise ValidationError({"message": ["Technical error"]})
+
     def partial_update(self, request, pk):
         lead = self.get_object()
         serializer = UpdateLeadSerializer(lead, data=request.data, partial=True)
@@ -103,3 +121,9 @@ class RoleDetailViewSet(ModelViewSet):
     serializer_class = RoleDetailSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "patch"]
+
+
+class ProspectViewSet(ModelViewSet):
+    queryset = Prospect.objects.all()
+    serializer_class = ProspectSerializer
+    permission_classes = [IsAuthenticated]

@@ -44,6 +44,7 @@ class Lead(models.Model):
 
     # TODO: Define fields here
     organisation = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
+    title = models.CharField(max_length=50, blank=True, null=True)
     role = models.ForeignKey(RoleDetail, on_delete=models.DO_NOTHING)
     currency = models.CharField(max_length=3, blank=True, null=True)  # discuss with abhinav
     service_fee = models.FloatField(blank=True, null=True)
@@ -100,12 +101,12 @@ class Prospect(models.Model):
     """Model definition for Prospect."""
 
     # TODO: Define fields here
-    organization = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
-    role = models.CharField(max_length=100, blank=True, null=True)
-    budget = models.CharField(max_length=100, blank=True, null=True)
-    location = models.CharField(max_length=100, blank=True, null=True)
-    source = models.CharField(max_length=100)
-    status = models.CharField(default="Unverified", max_length=50)
+    # organization = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
+    # role = models.CharField(max_length=100, blank=True, null=True)
+    # budget = models.CharField(max_length=100, blank=True, null=True)
+    # location = models.CharField(max_length=100, blank=True, null=True)
+    # source = models.CharField(max_length=100)
+    status = models.CharField(default="Qualified", max_length=50)
     lead = models.ForeignKey(Lead, on_delete=models.DO_NOTHING)
     is_converted_to_deal = models.BooleanField(default=0)
     archived = models.BooleanField(default=0)
