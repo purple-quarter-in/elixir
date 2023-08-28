@@ -77,7 +77,7 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     # REQUIRED_FIELDS = ['username']
-    REQUIRED_FIELDS = ["first_name", "last_name", "mobile", "function", "profile"]
+    REQUIRED_FIELDS = ["first_name", "last_name", "mobile", "function"]
 
     def get_full_name(self):
         """
