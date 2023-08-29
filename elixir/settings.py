@@ -33,7 +33,7 @@ SECRET_KEY = ENV.str("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
+#
 # Email setup
 EMAIL_HOST = ENV.str("EMAIL_HOST")
 EMAIL_HOST_USER = ENV.str("EMAIL_HOST_USER")
@@ -41,7 +41,7 @@ EMAIL_HOST_PASSWORD = ENV.str("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = ENV.str("EMAIL_PORT")
 EMAIL_USE_TLS = ENV.str("EMAIL_USE_TLS")
 # Application definition
-# CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ALLOWED_ORIGINS = ["*"]
 CORS_ALLOW_HEADERS = [
     "access-control-allow-origin",
