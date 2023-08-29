@@ -41,12 +41,8 @@ EMAIL_HOST_PASSWORD = ENV.str("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = ENV.str("EMAIL_PORT")
 EMAIL_USE_TLS = ENV.str("EMAIL_USE_TLS")
 # Application definition
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ALLOWED_ORIGINS = (
-    "http://localhost:4200",
-    "https://purplequarter.co",
-    "https://www.purplequarter.co",
-)
+# CORS_ORIGIN_ALLOW_ALL = False
+# CORS_ALLOWED_ORIGINS = ["*"]
 CORS_ALLOW_HEADERS = [
     "access-control-allow-origin",
     "content-type",
@@ -61,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_spectacular",
     "rest_framework.authtoken",
     "corsheaders",
     "apps.django_rest_passwordreset",
@@ -130,7 +127,8 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "EXCEPTION_HANDLER": "elixir.exception.my_exception_handler"
+    "EXCEPTION_HANDLER": "elixir.exception.my_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema"
     # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 AUTH_PASSWORD_VALIDATORS = [

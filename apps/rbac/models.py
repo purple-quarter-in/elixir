@@ -63,6 +63,9 @@ class AccessCategory(models.Model):
         self.updated_at = timezone.now()
         return super(AccessCategory, self).save(*args, **kwargs)
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class GroupCategoryAccessDetail(models.Model):
     """Model definition for GroupCategoryAccessDetail."""

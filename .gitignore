@@ -82,3 +82,4 @@ media
 static
 # *.settings.py
 0*.py
+openapi-schema.yml

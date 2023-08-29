@@ -17,7 +17,9 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
+from rest_framework.schemas import get_schema_view
 
 from apps.django_rest_passwordreset.urls import urlpatterns as reset_urlpatterns
 from apps.user.urls import urlpatterns as user_urlpatterns
@@ -45,5 +47,21 @@ urlpatterns = [
     path("v1/api/", include(user_urlpatterns)),
     path("v1/api/password_reset/", include(reset_urlpatterns)),
     path("v1/api/", include(router.urls)),
+    path(
+        "openapi",
+        get_schema_view(
+            title="Your Project",
+            description="API for all things …",
+            version="1.0.0",
+            urlconf="elixir.urls",
+        ),
+        name="openapi-schema",
+    ),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "docs/",
+        SpectacularSwaggerView.as_view(template_name="swagger-ui.html", url_name="schema"),
+        name="swagger-ui",
+    ),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

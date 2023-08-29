@@ -9,3 +9,6 @@ boto3==1.24.94
 django-environ==0.4.5
 mysqlclient==2.0.3
 django-jet-reboot
+uritemplate
+pyyaml
+drf-spectacular

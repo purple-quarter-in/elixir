@@ -40,7 +40,7 @@ class RoleDetail(models.Model):
 
 
 class Lead(models.Model):
-    """Model definition for RoleDetail."""
+    """Model definition for Lead."""
 
     # TODO: Define fields here
     organisation = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
@@ -80,10 +80,10 @@ class Lead(models.Model):
     )
 
     class Meta:
-        """Meta definition for ContactLead."""
+        """Meta definition for Lead."""
 
-        verbose_name = "ContactLead"
-        verbose_name_plural = "ContactLeads"
+        verbose_name = "Lead"
+        verbose_name_plural = "Leads"
         permissions = [("access_lead", "Can access Lead")]
 
     def __str__(self):
