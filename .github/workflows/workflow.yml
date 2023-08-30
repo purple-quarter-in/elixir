@@ -17,11 +17,10 @@ jobs:
         install -m 600 -D /dev/null ~/.ssh/id_rsa
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-    - name: connect
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
-    - name: pull code
-      run: "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
-    - name: activate environment and install requirements
-      run: source env/bin/activate && pip install -r requirements.txt
-    - name: deploy code
-      run: sudo uwsgi ../uwsgi/pq.ini
+    - name: connect and pull code
+      run: |
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+        "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
+        source env/bin/activate && pip install -r requirements.txt
+        sudo uwsgi ../uwsgi/pq.ini
+        exit
