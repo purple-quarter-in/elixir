@@ -23,6 +23,6 @@ jobs:
         cd /var/www/elixir && git checkout main && git pull &&
         source env/bin/activate && pip install -r requirements.txt &&
         sudo uwsgi ../uwsgi/pq.ini &&
-        exit
+        exit "
     - name: cleanup
       run: rm -rf ~/.ssh
