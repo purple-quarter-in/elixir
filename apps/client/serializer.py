@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.client.models import Contact, Organisation
-from apps.pipedrive.models import RoleDetail
+from apps.pipedrive.models import Lead, RoleDetail
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -14,6 +14,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
     updated_by = serializers.SerializerMethodField()
+    lead_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Organisation
@@ -27,3 +28,6 @@ class OrganisationSerializer(serializers.ModelSerializer):
 
     def get_contacts(self, instance):
         return ContactSerializer(Contact.objects.filter(organisation=instance), many=True).data
+
+    def get_lead_count(self, instance):
+        return Lead.objects.filter(organisation=instance).count()

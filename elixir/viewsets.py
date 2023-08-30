@@ -18,6 +18,13 @@ class ModelViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         if request.user.has_perms(self.user_permissions["get"]):
             queryset = self.filter_queryset(self.get_queryset())
+            if request.GET:
+                _filter = {key: request.GET[key] for key in request.GET if key != "page"}
+
+                # for key in request.GET:
+                #     _filter[key]=request.GET[key]
+                queryset = queryset.filter(**(_filter))
+
             serializer = self.get_serializer(queryset, many=True, context={"request": request})
             return custom_success_response(serializer.data)
         else:
