@@ -84,6 +84,7 @@ class LeadViewSet(ModelViewSet):
             organisation_id=org_id,
             role=role,
             source=dto["source"],
+            title= dto['title'],
             created_by=request.user,
             updated_by=request.user,
             owner=request.user,
