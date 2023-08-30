@@ -142,7 +142,7 @@ class Prospect(models.Model):
         permissions = [("access_prospect", "Can access prospect")]
 
     def __str__(self):
-        return self.organization
+        return self.lead.title
 
     def save(self, *args, **kwargs):
         """On save, update timestamps"""

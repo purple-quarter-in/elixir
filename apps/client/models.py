@@ -46,6 +46,7 @@ class Organisation(models.Model):
 
     def __str__(self):
         """Unicode representation of Organisation."""
+        return self.name
         pass
 
     def save(self, *args, **kwargs):
@@ -82,6 +83,7 @@ class Contact(models.Model):
 
     def __str__(self):
         """Unicode representation of Contact."""
+        return self.name
         pass
 
     def save(self, *args, **kwargs):
