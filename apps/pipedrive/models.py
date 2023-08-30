@@ -87,7 +87,7 @@ class Lead(models.Model):
         permissions = [("access_lead", "Can access Lead")]
 
     def __str__(self):
-        return self.organisation
+        return self.organisation.name
 
     def save(self, *args, **kwargs):
         """On save, update timestamps"""
