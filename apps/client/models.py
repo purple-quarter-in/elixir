@@ -15,7 +15,7 @@ class Organisation(models.Model):
     domain = models.CharField(max_length=50, blank=True, null=True)
     size = models.CharField(max_length=50, blank=True, null=True)
     last_funding_stage = models.CharField(max_length=50, blank=True, null=True)
-    last_funding_amount = models.IntegerField(blank=True, null=True)
+    last_funding_amount = models.CharField(max_length=50, blank=True, null=True)
     funding_currency = models.CharField(max_length=3, blank=True, null=True)
     archived = models.BooleanField(default=0)
     segment = models.CharField(max_length=50, blank=True, null=True)

@@ -12,8 +12,8 @@ class RoleDetail(models.Model):
     # TODO: Define fields here
     role_type = models.CharField(max_length=100)
     budget_range = models.CharField(max_length=100)
-    fixed_budget = models.FloatField(blank=True, null=True)
-    fixed_budget_ul = models.FloatField(blank=True, null=True)
+    fixed_budget = models.CharField(max_length=50, blank=True, null=True)
+    fixed_budget_ul = models.CharField(max_length=50, blank=True, null=True)
     esop_rsu = models.CharField(max_length=100, blank=True, null=True)
     region = models.CharField(max_length=100)
     location = models.CharField(max_length=100, blank=True, null=True)
@@ -47,7 +47,7 @@ class Lead(models.Model):
     title = models.CharField(max_length=50, blank=True, null=True)
     role = models.ForeignKey(RoleDetail, on_delete=models.DO_NOTHING)
     currency = models.CharField(max_length=3, blank=True, null=True)  # discuss with abhinav
-    service_fee = models.FloatField(blank=True, null=True)
+    service_fee = models.CharField(max_length=50, blank=True, null=True)
     service_fee_range = models.CharField(max_length=100, blank=True, null=True)
     retainer_advance = models.BooleanField(blank=True, null=True)
     exclusivity = models.BooleanField(blank=True, null=True)
