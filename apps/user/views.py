@@ -88,22 +88,22 @@ class UserViewSet(ModelViewSet):
         token, created = Token.objects.get_or_create(user=user)
         headers = self.get_success_headers(serializer.data)
         user.profile.user_set.add(user)
-        # message = render_to_string(
-        #     "email/acc_active_email.html",
-        #     {
-        #         "user": user,
-        #         "uid": urlsafe_base64_encode(force_bytes(user.id)),
-        #         "token": account_activation_token.make_token(user),
-        #     },
-        # )
-        # email = send_mail(
-        #     "Activate Your Account",
-        #     message,
-        #     "info@kalagato.co",
-        #     [user.email],
-        #     html_message=message,
-        #     fail_silently=True,
-        # )
+        message = render_to_string(
+            "email/acc_active_email.html",
+            {
+                "user": user,
+                "uid": urlsafe_base64_encode(force_bytes(user.username)),
+                "token": account_activation_token.make_token(user),
+            },
+        )
+        email = send_mail(
+            "Activate Your Account",
+            message,
+            "info@purplequarter.com",
+            [user.email],
+            html_message=message,
+            fail_silently=True,
+        )
         return custom_success_response(
             serializer.data,
             status=status.HTTP_201_CREATED,
