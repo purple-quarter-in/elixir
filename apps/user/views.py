@@ -47,19 +47,19 @@ class CustomPasswordResetView:
             "reset_password_url": "{}password-reset/{}".format(
                 "www.elixir.purplequarter.co/", reset_password_token.key
             ),
-            "site_name": "Kalagato DMS",
-            "site_domain": "www.kalagato.ai",
+            "site_name": "Elixir",
+            "site_domain": "www.elixir.purplequarter.com",
         }
         # render email text
-        # email_html_message = render_to_string("email/user_reset_password.html", {"data": context})
-        # email_plaintext_message = strip_tags(email_html_message)
-        # result = send_mail(
-        #     "Password Reset for {}".format("Elixir."),
-        #     email_plaintext_message,
-        #     "info@purplequarter.com",
-        #     [reset_password_token.user.email],
-        #     html_message=email_html_message,
-        # )
+        email_html_message = render_to_string("email/user_reset_password.html", {"data": context})
+        email_plaintext_message = strip_tags(email_html_message)
+        result = send_mail(
+            "Password Reset for {}".format("Elixir."),
+            email_plaintext_message,
+            "info@purplequarter.com",
+            [reset_password_token.user.email],
+            html_message=email_html_message,
+        )
         return Response(context)
 
 
@@ -190,27 +190,27 @@ class UserViewSet(ModelViewSet):
                 user = User.objects.get(email=email)
                 if user and user.is_active == False:
                     token = account_activation_token.make_token(user)
-                    # message = render_to_string(
-                    #     "email/acc_active_email.html",
-                    #     {
-                    #         "user": user,
-                    #         "uid": urlsafe_base64_encode(force_bytes(user._id)),
-                    #         "token": token,
-                    #     },
-                    # )
+                    message = render_to_string(
+                        "email/acc_active_email.html",
+                        {
+                            "user": user,
+                            "uid": urlsafe_base64_encode(force_bytes(user.username)),
+                            "token": token,
+                        },
+                    )
                     context = {
                         "user": user,
                         "uid": urlsafe_base64_encode(force_bytes(user.username)),
                         "token": token,
                     }
-                    # email = send_mail(
-                    #     "Activate Your Account",
-                    #     message,
-                    #     "info@kalagato.co",
-                    #     [user.email],
-                    #     html_message=message,
-                    #     fail_silently=True,
-                    # )
+                    email = send_mail(
+                        "Activate Your Account",
+                        message,
+                        "info@purplequarter.com",
+                        [user.email],
+                        html_message=message,
+                        fail_silently=True,
+                    )
                     print(context)
                 else:
                     raise ValidationError({"message": ["User Already verified"]})
