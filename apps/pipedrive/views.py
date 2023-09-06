@@ -84,7 +84,7 @@ class LeadViewSet(ModelViewSet):
             organisation_id=org_id,
             role=role,
             source=dto["source"],
-            title= dto['title'],
+            title=dto["title"],
             created_by=request.user,
             updated_by=request.user,
             owner=request.user,
@@ -106,6 +106,23 @@ class LeadViewSet(ModelViewSet):
         if prospect:
             obj.save()
             return custom_success_response(self.serializer_class(obj).data)
+        else:
+            raise ValidationError({"message": ["Technical error"]})
+
+    @action(detail=False, methods=["patch"])
+    def bulk_archive(self, request):
+        if "leads" not in request.data:
+            raise ValidationError({"leads": "List of lead id is required"})
+        if "archive" not in request.data:
+            raise ValidationError({"archive": "This boolean field is required"})
+
+        prospect = Lead.objects.filter(id__in=request.data.get("leads")).update(
+            archived=request.data.get("archive")
+        )
+        if prospect > 0:
+            return custom_success_response(
+                {"message": [f"{prospect} prospect(s) has been archived"]}
+            )
         else:
             raise ValidationError({"message": ["Technical error"]})
 
