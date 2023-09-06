@@ -18,7 +18,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organisation
-        exclude = ("created_at", "updated_at")
+        fields = "__all__"
 
     def get_created_by(self, instance):
         return instance.created_by.get_full_name()
