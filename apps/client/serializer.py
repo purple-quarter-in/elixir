@@ -8,6 +8,7 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         exclude = ("created_at", "updated_at")
+        depth = 1
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
