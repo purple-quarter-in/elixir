@@ -65,6 +65,20 @@ class Lead(models.Model):
         null=True,
         related_name="lead_owner_user",
     )
+    fullfilled_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="lead_fullfilled_by_user",
+    )
+    closed_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="lead_closed_by_user",
+    )
     created_by = models.ForeignKey(
         "user.User",
         on_delete=models.DO_NOTHING,

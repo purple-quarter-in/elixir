@@ -43,7 +43,7 @@ x = {
 
 # Create your views here.
 class LeadViewSet(ModelViewSet):
-    queryset = Lead.objects.all()
+    queryset = Lead.objects.filter(is_converted_to_prospect=False)
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
 
@@ -97,7 +97,7 @@ class LeadViewSet(ModelViewSet):
     def promote(self, request, pk):
         obj = self.get_object()
         if obj.is_converted_to_prospect:
-            raise ValidationError({"message": "Lead already converted to prospect"})
+            raise ValidationError({"message": ["Lead already converted to prospect"]})
         obj.is_converted_to_prospect = True
         obj.updated_by = request.user
         prospect = Prospect.objects.update_or_create(
