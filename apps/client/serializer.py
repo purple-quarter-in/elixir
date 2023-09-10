@@ -11,6 +11,12 @@ class ContactSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class CreateContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        exclude = ("created_at", "updated_at")
+
+
 class OrganisationSerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()

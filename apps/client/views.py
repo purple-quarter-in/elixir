@@ -1,11 +1,17 @@
 from typing import Any
 
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 from apps.client.models import Contact, Organisation
-from apps.client.serializer import ContactSerializer, OrganisationSerializer
+from apps.client.serializer import (
+    ContactSerializer,
+    CreateContactSerializer,
+    OrganisationSerializer,
+)
+from apps.pipedrive.models import Lead
 from elixir.utils import custom_success_response, set_crated_by_updated_by
 from elixir.viewsets import ModelViewSet
 
@@ -43,6 +49,21 @@ class OrganisationViewSet(ModelViewSet):
             self.serializer_class(org).data, status=status.HTTP_201_CREATED
         )
 
+    @action(detail=True, methods=["patch"])
+    def org_name(self, request, pk):
+        obj = self.get_object()
+        if obj.name == request.data.get("name"):
+            raise ValidationError({"message": ["No change in Name detected"]})
+        leads = Lead.objects.filter(organisation=obj)
+        for lead in leads:
+            name_split = (lead.title).split("-")
+            name_split[0] = request.data.get("name")
+            lead.title = " - ".join(name_split)
+            lead.save()
+        obj.name = request.data.get("name")
+        obj.save()
+        return custom_success_response({"message": "Organisatiomn name updates successfully"})
+
 
 class ContactViewSet(ModelViewSet):
     queryset = Contact.objects.all()
@@ -50,6 +71,37 @@ class ContactViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def __init__(self, **kwargs: Any) -> None:
-        self.user_permissions["get"] = ["client.access_organisation", "client.view_organisation"]
-        self.user_permissions["post"] = ["client.add_organisation"]
-        self.user_permissions["patch"] = ["client.change_organisation"]
+        self.user_permissions["get"] = ["client.access_contact", "client.view_contact"]
+        self.user_permissions["post"] = ["client.add_contact"]
+        self.user_permissions["patch"] = ["client.change_contact"]
+
+    def create(self, request, *args, **kwargs):
+        if request.user.has_perms(self.user_permissions["post"]):
+            if "organisation" in request.data:
+                serializer = CreateContactSerializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return custom_success_response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED,
+                )
+            elif "organisation_name" in request.data:
+                if Organisation.objects.filter(
+                    name=request.data.get("organisation_name")
+                ).exists():
+                    raise ValidationError(
+                        {
+                            "already_exists": [
+                                f'Organisation with name {request.data.get("organisation_name")} already exists'
+                            ]
+                        }
+                    )
+                org = Organisation.objects.create(
+                    name=request.data.get("organisation_name"),
+                    **set_crated_by_updated_by(request.user),
+                )
+                request.data.pop("organisation_name")
+                contact = Contact.objects.create(**request.data, organisation=org)
+                return custom_success_response(self.get_serializer(contact).data)
+        else:
+            raise PermissionDenied()
