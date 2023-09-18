@@ -69,3 +69,36 @@ class CreateUserSerializer(serializers.ModelSerializer):
             email=email, password=password, username=username, **validated_data
         )
         return user
+
+
+class GetTeamSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+    updated_by = serializers.SerializerMethodField()
+    leader = GetUserSerializer()
+    members = GetUserSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Team
+        fields = "__all__"
+        depth = 1
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_full_name()
+
+    def get_updated_by(self, instance):
+        return instance.updated_by.get_full_name()
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+    updated_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Team
+        fields = "__all__"
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_full_name()
+
+    def get_updated_by(self, instance):
+        return instance.updated_by.get_full_name()

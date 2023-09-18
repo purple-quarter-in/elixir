@@ -27,7 +27,9 @@ from .models import *
 from .serializer import (
     CreateUserSerializer,
     CustomAuthTokenSerializer,
+    GetTeamSerializer,
     GetUserSerializer,
+    TeamSerializer,
 )
 from .tokens import account_activation_token
 
@@ -260,3 +262,18 @@ class Login(ObtainAuthToken):
         return custom_success_response(
             _res, message="User successfully loggedin !", status=status.HTTP_200_OK
         )
+
+
+class TeamViewSet(ModelViewSet):
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method in ["POST", "PATCH"]:
+            return TeamSerializer
+        else:
+            return GetTeamSerializer
+
+    def perform_create(self, serializer, **kwargs):
+        self._instance = serializer.save(**set_crated_by_updated_by(self.request.user))

@@ -85,3 +85,44 @@ class User(AbstractUser):
         """
         full_name = "{} {}".format(self.first_name, self.last_name)
         return full_name.strip()
+
+
+class Team(models.Model):
+    """Model definition for Team."""
+
+    name = models.CharField(max_length=100)
+    leader = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    members = models.ManyToManyField(User, blank=True, null=True, related_name="team_member_user")
+    created_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="team_created_by_user",
+    )
+    updated_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="team_updated_by_user",
+    )
+    archived = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Meta definition for Team."""
+
+        verbose_name = "Team"
+        verbose_name_plural = "Teams"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        """On save, update timestamps"""
+        if not self.id:
+            self.created_at = timezone.now()
+        self.updated_at = timezone.now()
+        return super(Team, self).save(*args, **kwargs)
