@@ -53,6 +53,9 @@ class GetUserSerializer(serializers.ModelSerializer):
             "reporting_to",
             "created_by",
             "function",
+            "region",
+            "is_email_verified",
+            "is_active",
         )
 
     def get_created_by(self, instance):
