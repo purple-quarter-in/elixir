@@ -76,7 +76,8 @@ class ModelViewSet(viewsets.ModelViewSet):
         instance.delete()
 
     def destroy(self, request, *args, **kwargs):
-        raise PermissionDenied()
+        if not request.user.has_perms(self.user_permissions["get"]):
+            raise PermissionDenied()
         instance = self.get_object()
         self.perform_destroy(instance)
         return custom_success_response(

@@ -52,6 +52,7 @@ class GetUserSerializer(serializers.ModelSerializer):
             "profile",
             "reporting_to",
             "created_by",
+            "function",
         )
 
     def get_created_by(self, instance):

@@ -131,7 +131,7 @@ class LeadViewSet(ModelViewSet):
             raise ValidationError({"message": ["Technical error"]})
 
     def partial_update(self, request, pk):
-        lead = self.get_object()
+        lead = Lead.objects.get(id=pk)
         serializer = UpdateLeadSerializer(lead, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save(updated_by=request.user)
