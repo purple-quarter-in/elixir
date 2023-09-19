@@ -1,5 +1,8 @@
 from rest_framework import serializers
 
+from apps.user.models import User
+from apps.user.serializer import GetUserSerializer
+
 from .models import *
 
 
@@ -38,11 +41,21 @@ class GroupSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
     updated_by = serializers.SerializerMethodField()
+    users = serializers.SerializerMethodField()
     # access_category = serializers.SerializerMethodField()
 
     class Meta:
         model = Group
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "created_by",
+            "updated_by",
+            "permissions",
+            "created_at",
+            "updated_at",
+            "users",
+        ]
 
     def get_permissions(self, instance):
         return GroupCategoryAccessDetailSerializer(
@@ -54,3 +67,6 @@ class GroupSerializer(serializers.ModelSerializer):
 
     def get_updated_by(self, instance):
         return instance.updated_by.get_full_name()
+
+    def get_users(self, instance):
+        return GetUserSerializer(User.objects.filter(groups__id=instance.id), many=True).data
