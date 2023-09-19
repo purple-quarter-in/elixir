@@ -80,7 +80,7 @@ class ContactViewSet(ModelViewSet):
             if "organisation" in request.data:
                 serializer = CreateContactSerializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
-                serializer.save()
+                serializer.save(**set_crated_by_updated_by(request.user))
                 return custom_success_response(
                     serializer.data,
                     status=status.HTTP_201_CREATED,
@@ -101,7 +101,12 @@ class ContactViewSet(ModelViewSet):
                     **set_crated_by_updated_by(request.user),
                 )
                 request.data.pop("organisation_name")
-                contact = Contact.objects.create(**request.data, organisation=org)
+                contact = Contact.objects.create(
+                    **request.data, **set_crated_by_updated_by(request.user), organisation=org
+                )
                 return custom_success_response(self.get_serializer(contact).data)
         else:
             raise PermissionDenied()
+
+    def perform_update(self, serializer):
+        self._instance = serializer.save(**(set_crated_by_updated_by(self.request.user)))

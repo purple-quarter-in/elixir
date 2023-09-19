@@ -86,6 +86,9 @@ class User(AbstractUser):
         full_name = "{} {}".format(self.first_name, self.last_name)
         return full_name.strip()
 
+    def get_dict_name_id(self):
+        return {"name": self.get_full_name(), "id": self.id}
+
 
 class Team(models.Model):
     """Model definition for Team."""

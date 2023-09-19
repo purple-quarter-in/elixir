@@ -72,6 +72,20 @@ class Contact(models.Model):
     designation = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
     archived = models.BooleanField(default=False)
+    created_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="contact_created_by_user",
+    )
+    updated_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="contact_updated_by_user",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -96,3 +110,6 @@ class Contact(models.Model):
     def get_absolute_url(self):
         """Return absolute url for Contact."""
         return ""
+
+    def get_dict_name_id(self):
+        return {"name": self.name, "id": self.id}

@@ -37,6 +37,10 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 
 
 class GetUserSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+    reporting_to = serializers.SerializerMethodField()
+    profile = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = (
@@ -46,8 +50,18 @@ class GetUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "profile",
+            "reporting_to",
+            "created_by",
         )
-        extra_kwargs = {"password": {"write_only": True}}
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_dict_name_id() if instance.created_by else None
+
+    def get_reporting_to(self, instance):
+        return instance.reporting_to.get_dict_name_id() if instance.reporting_to else None
+
+    def get_profile(self, instance):
+        return {"id": instance.profile_id, "name": instance.profile.name}
 
 
 class CreateUserSerializer(serializers.ModelSerializer):

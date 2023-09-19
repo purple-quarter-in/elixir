@@ -60,7 +60,9 @@ class LeadViewSet(ModelViewSet):
             org_id = dto["organisation"]["id"]
             if "contact_details" in dto["organisation"]:
                 for contact in dto["organisation"]["contact_details"]:
-                    Contact.objects.create(organisation_id=org_id, **contact)
+                    Contact.objects.create(
+                        organisation_id=org_id, **contact, **set_crated_by_updated_by(request.user)
+                    )
         elif "id" not in dto["organisation"] and "name" in dto["organisation"]:
             # case of create
             if Organisation.objects.filter(name=dto["organisation"]).exists():
@@ -77,7 +79,9 @@ class LeadViewSet(ModelViewSet):
             org_id = org.id
             if "contact_details" in dto["organisation"]:
                 for contact in dto["organisation"]["contact_details"]:
-                    Contact.objects.create(organisation_id=org_id, **contact)
+                    Contact.objects.create(
+                        organisation_id=org_id, **contact, **set_crated_by_updated_by(request.user)
+                    )
             pass
         role = role_serializer.save()
         Lead.objects.create(
@@ -145,3 +149,24 @@ class ProspectViewSet(ModelViewSet):
     queryset = Prospect.objects.all()
     serializer_class = ProspectSerializer
     permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=["patch"])
+    def bulk_archive(self, request):
+        if "prospects" not in request.data:
+            raise ValidationError({"prospects": ["List of prospect id(s) is/are required"]})
+        if "archive" not in request.data:
+            raise ValidationError({"archive": ["This boolean field is required"]})
+
+        prospect = Prospect.objects.filter(id__in=request.data.get("prospects")).update(
+            archived=request.data.get("archive")
+        )
+        if prospect > 0:
+            return custom_success_response(
+                {
+                    "message": [
+                        f"{prospect} prospect(s) has been marked archived as {request.data.get('archive')}"
+                    ]
+                }
+            )
+        else:
+            raise ValidationError({"message": ["Technical error"]})

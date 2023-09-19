@@ -5,10 +5,22 @@ from apps.pipedrive.models import Lead, RoleDetail
 
 
 class ContactSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+    updated_by = serializers.SerializerMethodField()
+    organisation = serializers.SerializerMethodField()
+
     class Meta:
         model = Contact
         exclude = ("created_at", "updated_at")
-        depth = 1
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_full_name() if instance.created_by else None
+
+    def get_updated_by(self, instance):
+        return instance.updated_by.get_full_name() if instance.updated_by else None
+
+    def get_organisation(self, instance):
+        return instance.get_dict_name_id()
 
 
 class CreateContactSerializer(serializers.ModelSerializer):

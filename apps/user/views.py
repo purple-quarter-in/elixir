@@ -75,6 +75,11 @@ class UserViewSet(ModelViewSet):
         self.user_permissions["post"] = ["user.add_user"]
         self.user_permissions["patch"] = ["user.change_user"]
 
+    def get_serializer_class(self):
+        return (
+            CreateUserSerializer if self.request.method in ["POST", "PATCH"] else GetUserSerializer
+        )
+
     def retrieve(self, request, pk):
         instance = User.objects.get(_id=pk)
         self.check_object_permissions(request, instance)
@@ -276,4 +281,8 @@ class TeamViewSet(ModelViewSet):
             return GetTeamSerializer
 
     def perform_create(self, serializer, **kwargs):
+        if Team.objects.filter(name=serializer.validated_data["name"]).exists():
+            raise ValidationError(
+                {"message": [f"Team with name {serializer.validated_data['name']} already exists"]}
+            )
         self._instance = serializer.save(**set_crated_by_updated_by(self.request.user))
