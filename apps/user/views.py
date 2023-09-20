@@ -72,7 +72,7 @@ class UserViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def __init__(self, **kwarg) -> None:
-        self.user_permissions["get"] = ["user.access_user", "user.view_user"]
+        self.user_permissions["get"] = ["user.access_user"]
         self.user_permissions["post"] = ["user.add_user"]
         self.user_permissions["patch"] = ["user.change_user"]
 
