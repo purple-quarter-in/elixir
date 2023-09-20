@@ -76,6 +76,7 @@ class ContactViewSet(ModelViewSet):
         self.user_permissions["get"] = ["client.access_contact", "client.view_contact"]
         self.user_permissions["post"] = ["client.add_contact"]
         self.user_permissions["patch"] = ["client.change_contact"]
+        self.response_serializer = ContactSerializer
 
     def get_serializer_class(self):
         return (

@@ -6,6 +6,7 @@ from .utils import custom_success_response
 
 class ModelViewSet(viewsets.ModelViewSet):
     _instance = None
+    response_serializer = None
     user_permissions = {
         "get": [],
         "post": [],
@@ -59,7 +60,10 @@ class ModelViewSet(viewsets.ModelViewSet):
             if getattr(instance, "_prefetched_objects_cache", None):
                 instance._prefetched_objects_cache = {}
             return custom_success_response(
-                self.get_serializer(self._instance).data, message="success, object updated"
+                self.response_serializer(self._instance).data
+                if self.response_serializer
+                else self.get_serializer(self._instance).data,
+                message="success, object updated",
             )
         else:
             raise PermissionDenied()
