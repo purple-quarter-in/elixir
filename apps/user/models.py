@@ -36,6 +36,11 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+
+    class Meta:
+        verbose_name = 'user'
+        verbose_name_plural = "users"
+        permissions = [("access_user", "Can access user")]
     mobile = models.CharField(max_length=18)
     email = models.EmailField(unique=True, db_index=True)
     region = models.CharField(max_length=50, blank=True, null=True)

@@ -97,6 +97,7 @@ class Contact(models.Model):
 
         verbose_name = "Contact"
         verbose_name_plural = "Contacts"
+        permissions = [("access_contact", "Can access contact")]
 
     def __str__(self):
         """Unicode representation of Contact."""
