@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from requests import get
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -244,6 +245,29 @@ class UserViewSet(ModelViewSet):
             return custom_success_response({"message": "Password is successfully changed"})
         else:
             raise ValidationError({"message": ["Uid doesnt belong to any user"]})
+
+    @action(detail=False, methods=["patch"])
+    def bulk_active(self, request):
+        if "users" not in request.data:
+            raise ValidationError({"users": ["List of user id is required"]})
+        if "active" not in request.data:
+            raise ValidationError({"active": ["This boolean field is required"]})
+
+        user = (
+            User.objects.all()
+            .filter(id__in=request.data.get("users"))
+            .update(is_active=request.data.get("active"))
+        )
+        if user > 0:
+            return custom_success_response(
+                {
+                    "message": [
+                        f"{user} user(s) has been marked active = {request.data.get('active')}"
+                    ]
+                }
+            )
+        else:
+            raise ValidationError({"message": ["Technical error"]})
 
 
 class Login(ObtainAuthToken):
