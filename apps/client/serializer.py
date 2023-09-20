@@ -20,7 +20,7 @@ class ContactSerializer(serializers.ModelSerializer):
         return instance.updated_by.get_full_name() if instance.updated_by else None
 
     def get_organisation(self, instance):
-        return instance.get_dict_name_id()
+        return instance.organisation.get_dict_name_id()
 
 
 class CreateContactSerializer(serializers.ModelSerializer):

@@ -36,7 +36,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    mobile = models.CharField(max_length=12)
+    mobile = models.CharField(max_length=18)
     email = models.EmailField(unique=True, db_index=True)
     region = models.CharField(max_length=50, blank=True, null=True)
     function = models.CharField(max_length=50)

@@ -60,6 +60,9 @@ class Organisation(models.Model):
         """Return absolute url for Organisation."""
         return ""
 
+    def get_dict_name_id(self):
+        return {"name": self.name, "id": self.id}
+
 
 class Contact(models.Model):
     """Model definition for Contact."""
