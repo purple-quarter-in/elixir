@@ -77,6 +77,13 @@ class ContactViewSet(ModelViewSet):
         self.user_permissions["post"] = ["client.add_contact"]
         self.user_permissions["patch"] = ["client.change_contact"]
 
+    def get_serializer_class(self):
+        return (
+            CreateContactSerializer
+            if self.request.method in ["POST", "PATCH"]
+            else ContactSerializer
+        )
+
     def create(self, request, *args, **kwargs):
         if request.user.has_perms(self.user_permissions["post"]):
             if "organisation" in request.data:
