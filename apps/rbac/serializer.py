@@ -63,10 +63,10 @@ class GroupSerializer(serializers.ModelSerializer):
         ).data
 
     def get_created_by(self, instance):
-        return instance.created_by.get_full_name()
+        return instance.created_by.get_dict_name_id()
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_full_name()
+        return instance.updated_by.get_dict_name_id()
 
     def get_users(self, instance):
         return GetUserSerializer(User.objects.filter(groups__id=instance.id), many=True).data

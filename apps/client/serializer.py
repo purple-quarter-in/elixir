@@ -14,10 +14,10 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_created_by(self, instance):
-        return instance.created_by.get_full_name() if instance.created_by else None
+        return instance.created_by.get_dict_name_id() if instance.created_by else None
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_full_name() if instance.updated_by else None
+        return instance.updated_by.get_dict_name_id() if instance.updated_by else None
 
     def get_organisation(self, instance):
         return instance.organisation.get_dict_name_id()
@@ -40,10 +40,10 @@ class OrganisationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_created_by(self, instance):
-        return instance.created_by.get_full_name()
+        return instance.created_by.get_dict_name_id()
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_full_name()
+        return instance.updated_by.get_dict_name_id()
 
     def get_contacts(self, instance):
         return ContactSerializer(Contact.objects.filter(organisation=instance), many=True).data

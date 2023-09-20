@@ -34,10 +34,10 @@ class LeadSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_created_by(self, instance):
-        return instance.created_by.get_full_name() if instance.created_by is not None else None
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_full_name() if instance.updated_by is not None else None
+        return instance.updated_by.get_dict_name_id() if instance.updated_by is not None else None
 
     def get_owner(self, instance):
         return instance.owner.get_dict_name_id() if instance.owner is not None else None
@@ -61,10 +61,10 @@ class ProspectSerializer(serializers.ModelSerializer):
         depth = 1
 
     def get_created_by(self, instance):
-        return instance.created_by.get_full_name() if instance.created_by is not None else None
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_full_name() if instance.updated_by is not None else None
+        return instance.updated_by.get_dict_name_id() if instance.updated_by is not None else None
 
     def get_owner(self, instance):
         return instance.owner.get_dict_name_id() if instance.owner is not None else None

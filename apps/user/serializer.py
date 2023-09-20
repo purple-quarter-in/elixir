@@ -102,10 +102,10 @@ class GetTeamSerializer(serializers.ModelSerializer):
         depth = 1
 
     def get_created_by(self, instance):
-        return instance.created_by.get_full_name()
+        return instance.created_by.get_dict_name_id()
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_full_name()
+        return instance.updated_by.get_dict_name_id()
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -117,7 +117,7 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_created_by(self, instance):
-        return instance.created_by.get_full_name()
+        return instance.created_by.get_dict_name_id()
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_full_name()
+        return instance.updated_by.get_dict_name_id()
