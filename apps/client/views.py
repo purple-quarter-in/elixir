@@ -52,6 +52,8 @@ class OrganisationViewSet(ModelViewSet):
     @action(detail=True, methods=["patch"])
     def org_name(self, request, pk):
         obj = self.get_object()
+        if not request.data.get("name") or request.data.get("name") == "":
+            raise ValidationError({"name": ["This field is required and cannot be blank."]})
         if obj.name == request.data.get("name"):
             raise ValidationError({"message": ["No change in Name detected"]})
         leads = Lead.objects.filter(organisation=obj)
