@@ -31,7 +31,7 @@ class LeadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lead
-        fields='__all__'
+        fields = "__all__"
 
     def get_created_by(self, instance):
         return instance.created_by.get_full_name() if instance.created_by is not None else None
@@ -40,7 +40,7 @@ class LeadSerializer(serializers.ModelSerializer):
         return instance.updated_by.get_full_name() if instance.updated_by is not None else None
 
     def get_owner(self, instance):
-        return instance.owner.get_full_name() if instance.owner is not None else None
+        return instance.owner.get_dict_name_id() if instance.owner is not None else None
 
     def get_role(self, instance):
         return RoleDetailSerializer(instance.role).data
@@ -67,7 +67,7 @@ class ProspectSerializer(serializers.ModelSerializer):
         return instance.updated_by.get_full_name() if instance.updated_by is not None else None
 
     def get_owner(self, instance):
-        return instance.owner.get_full_name() if instance.owner is not None else None
+        return instance.owner.get_dict_name_id() if instance.owner is not None else None
 
     def get_lead(self, instance):
         return LeadSerializer(instance.lead).data
