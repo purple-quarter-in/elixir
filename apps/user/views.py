@@ -137,10 +137,7 @@ class UserViewSet(ModelViewSet):
             self.get_serializer(instance).data, message="success, object updated"
         )
 
-    @action(
-        detail=False,
-        methods=["post"],
-    )
+    @action(detail=False, methods=["post"], permission_classes=[])
     def gauth(self, request):
         dto = request.data
         if "email" not in dto:
@@ -167,7 +164,7 @@ class UserViewSet(ModelViewSet):
     def my_account(self, request):
         return custom_success_response(self.get_serializer(request.user).data)
 
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=["post"], permission_classes=[])
     def verify_token(self, request):
         try:
             uid = force_str(urlsafe_base64_decode(request.data.get("uid")))
