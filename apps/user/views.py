@@ -151,7 +151,7 @@ class UserViewSet(ModelViewSet):
         if not User.objects.filter(
             email=dto["email"], is_active=True, is_email_verified=True
         ).exists():
-            raise PermissionDenied()
+            raise ValidationError({"message": ["User Doesn't Exist / is not verified."]})
         user = User.objects.get(email=dto["email"])
         user.gauth = dto
         user.save()
