@@ -21,6 +21,7 @@ class OrganisationViewSet(ModelViewSet):
     queryset = Organisation.objects.all()
     serializer_class = OrganisationSerializer
     permission_classes = [IsAuthenticated]
+    user_permissions={}
 
     def __init__(self, **kwargs: Any) -> None:
         self.user_permissions["get"] = ["client.access_organisation", "client.view_organisation"]
@@ -71,12 +72,13 @@ class ContactViewSet(ModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     permission_classes = [IsAuthenticated]
+    response_serializer = ContactSerializer
+    user_permissions={}
 
     def __init__(self, **kwargs: Any) -> None:
-        self.user_permissions["get"] = ["client.access_contact", "client.view_contact"]
+        self.user_permissions["get"] = ["client.view_contact"]
         self.user_permissions["post"] = ["client.add_contact"]
         self.user_permissions["patch"] = ["client.change_contact"]
-        self.response_serializer = ContactSerializer
 
     def get_serializer_class(self):
         return (

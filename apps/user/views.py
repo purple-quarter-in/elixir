@@ -70,7 +70,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
     permission_classes = [IsAuthenticated]
-
+    user_permissions={}
     def get_permissions(self):
         if self.action in ["verify_token", "gauth", "set_password"]:
             return []

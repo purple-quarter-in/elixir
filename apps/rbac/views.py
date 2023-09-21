@@ -44,12 +44,6 @@ class GroupViewset(ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
-    def list(self, request):
-        if not request.user.has_perm("user.access_user") and not request.user.is_superuser:
-            raise PermissionDenied()
-
-        return custom_success_response(self.serializer_class(Group.objects.all(), many=True).data)
-
     def create(self, request, *args, **kwargs):
         GETserializer = GETGroupCategoryAccessDetailSerializer(data=request.data)
         GETserializer.is_valid(raise_exception=True)
