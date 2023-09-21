@@ -17,8 +17,17 @@ class ModelViewSet(viewsets.ModelViewSet):
         self._instance = serializer.save(**kwargs)
 
     def list(self, request, *args, **kwargs):
-        print(not request.user.is_superuser,len(self.user_permissions["get"]),(request.user).has_perms(tuple(self.user_permissions["get"])),self.user_permissions["get"])
-        if (not request.user.is_superuser) and len(self.user_permissions["get"])>0 and  not (request.user).has_perms(tuple(self.user_permissions["get"])):
+        print(
+            not request.user.is_superuser,
+            len(self.user_permissions["get"]),
+            (request.user).has_perms(tuple(self.user_permissions["get"])),
+            self.user_permissions["get"],
+        )
+        if (
+            (not request.user.is_superuser)
+            and len(self.user_permissions["get"]) > 0
+            and not (request.user).has_perms(tuple(self.user_permissions["get"]))
+        ):
             raise PermissionDenied()
         queryset = self.filter_queryset(self.get_queryset())
         if request.GET:
@@ -30,10 +39,13 @@ class ModelViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True, context={"request": request})
         return custom_success_response(serializer.data)
-            
 
     def create(self, request, *args, **kwargs):
-        if (not request.user.is_superuser) and len(self.user_permissions["post"])>0 and not request.user.has_perms(tuple(self.user_permissions["get"])):
+        if (
+            (not request.user.is_superuser)
+            and len(self.user_permissions["post"]) > 0
+            and not request.user.has_perms(tuple(self.user_permissions["get"]))
+        ):
             raise PermissionDenied()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -44,13 +56,16 @@ class ModelViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
-         
 
     def perform_update(self, serializer):
         self._instance = serializer.save()
 
     def update(self, request, *args, **kwargs):
-        if (not request.user.is_superuser) and len(self.user_permissions["patch"])>0 and not request.user.has_perms(tuple(self.user_permissions["get"])):
+        if (
+            (not request.user.is_superuser)
+            and len(self.user_permissions["patch"]) > 0
+            and not request.user.has_perms(tuple(self.user_permissions["get"]))
+        ):
             raise PermissionDenied()
         partial = kwargs.pop("partial", True)
         instance = self.get_object()
@@ -69,17 +84,25 @@ class ModelViewSet(viewsets.ModelViewSet):
         )
 
     def retrieve(self, request, *args, **kwargs):
-        if (not request.user.is_superuser) and len(self.user_permissions["get"])>0 and request.user.has_perms(tuple(self.user_permissions["get"])):
+        if (
+            (not request.user.is_superuser)
+            and len(self.user_permissions["get"]) > 0
+            and not request.user.has_perms(tuple(self.user_permissions["get"]))
+        ):
             raise PermissionDenied()
         instance = self.get_object()
         serializer = self.get_serializer(instance, context={"request": request})
         return custom_success_response(serializer.data)
-        
+
     def perform_destroy(self, instance):
         instance.delete()
 
     def destroy(self, request, *args, **kwargs):
-        if (not request.user.is_superuser) and len(self.user_permissions["get"])>0 and not request.user.has_perms(tuple(self.user_permissions["get"])):
+        if (
+            (not request.user.is_superuser)
+            and len(self.user_permissions["get"]) > 0
+            and not request.user.has_perms(tuple(self.user_permissions["get"]))
+        ):
             raise PermissionDenied()
         instance = self.get_object()
         self.perform_destroy(instance)

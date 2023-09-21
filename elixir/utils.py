@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from math import remainder
 
 from django.core.mail import EmailMultiAlternatives
@@ -27,7 +28,7 @@ def custom_success_response(
     response = Response(data, status=status, headers=headers)
     if cookies:
         for key, value in cookies.items():
-            response.set_cookie(key, value)
+            response.set_cookie(key, value, max_age=timedelta(days=2), expires=timedelta(days=1))
     return response
 
 
