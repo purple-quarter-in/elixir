@@ -11,6 +11,7 @@ def custom_success_response(
     message="success",
     status=status.HTTP_200_OK,
     headers=None,
+    cookies=None,
     **kwargs,
 ):
     data = {}
@@ -23,7 +24,11 @@ def custom_success_response(
             serialized_data[key] = value
     data["message"] = message
     data["status"] = "1"
-    return Response(data, status=status, headers=headers)
+    response = Response(data, status=status, headers=headers)
+    if cookies:
+        for key, value in cookies.items():
+            response.set_cookie(key, value)
+    return response
 
 
 def custom_send_email(_from, _to, subject, cc, bcc, data, template):

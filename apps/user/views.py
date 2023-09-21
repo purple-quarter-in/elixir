@@ -15,7 +15,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from apps.django_rest_passwordreset.signals import reset_password_token_created
@@ -71,8 +71,14 @@ class UserViewSet(ModelViewSet):
     serializer_class = CreateUserSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_permissions(self):
+        if self.action in ["verify_token", "gauth", "set_password"]:
+            return []
+        else:
+            return super().get_permissions()
+
     def __init__(self, **kwarg) -> None:
-        self.user_permissions["get"] = ["user.access_user"]
+        self.user_permissions["get"] = ["user.view_user"]
         self.user_permissions["post"] = ["user.add_user"]
         self.user_permissions["patch"] = ["user.change_user"]
 
@@ -137,7 +143,7 @@ class UserViewSet(ModelViewSet):
             self.get_serializer(instance).data, message="success, object updated"
         )
 
-    @action(detail=False, methods=["post"], permission_classes=[])
+    @action(detail=False, methods=["post"])
     def gauth(self, request):
         dto = request.data
         if "email" not in dto:
@@ -164,7 +170,7 @@ class UserViewSet(ModelViewSet):
     def my_account(self, request):
         return custom_success_response(self.get_serializer(request.user).data)
 
-    @action(detail=False, methods=["post"], permission_classes=[])
+    @action(detail=False, methods=["post"], permission_classes=AllowAny)
     def verify_token(self, request):
         try:
             uid = force_str(urlsafe_base64_decode(request.data.get("uid")))
@@ -286,7 +292,11 @@ class Login(ObtainAuthToken):
             "function": user.function,
         }
         return custom_success_response(
-            _res, message="User successfully loggedin !", status=status.HTTP_200_OK
+            _res,
+            message="User successfully loggedin !",
+            status=status.HTTP_200_OK,
+            headers={"Location": "/"},
+            cookies=_res,
         )
 
 
