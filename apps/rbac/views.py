@@ -11,6 +11,7 @@ from apps.rbac.serializer import (
     GETGroupCategoryAccessDetailSerializer,
     GroupSerializer,
 )
+from apps.user.models import User
 from elixir.utils import custom_success_response
 from elixir.viewsets import ModelViewSet
 
@@ -114,3 +115,11 @@ class GroupViewset(ModelViewSet):
         return custom_success_response(
             {"Group permission updated successfully"}, status=status.HTTP_201_CREATED
         )
+
+    def destroy(self, request, pk, *args, **kwargs):
+        obj = self.get_object()
+        if User.objects.filter(groups__id=obj.id).exists():
+            raise ValidationError({"profile": ["User(s) are mapped to this profile."]})
+        GroupCategoryAccessDetail.objects.filter(group_id=obj.id).delete()
+        obj.delete()
+        return custom_success_response({"message": "Profile deleted successfully"})
