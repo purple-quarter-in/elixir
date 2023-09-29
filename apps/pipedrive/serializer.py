@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
+from apps.client.models import Contact
 from apps.client.serializer import OrganisationSerializer
-from apps.pipedrive.models import Lead, Prospect, RoleDetail
+from apps.pipedrive.models import Activity, Lead, Note, Prospect, RoleDetail
 
 
 class CreateLeadSerializer(serializers.Serializer):
@@ -71,3 +72,56 @@ class ProspectSerializer(serializers.ModelSerializer):
 
     def get_lead(self, instance):
         return LeadSerializer(instance.lead).data
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    contacts = serializers.SerializerMethodField()
+    created_by = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        fields = "__all__"
+        extra_kwargs = {"created_by": {"read_only": True}}
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        return super().create(validated_data)
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
+
+    def get_contacts(self, instance):
+        return NotesContactSerializer(instance.contact, many=True).data
+
+    def get_status(self, instance):
+        status = instance.status
+        if not instance.closed_at:
+            status = ""
+        return status
+
+
+class NotesContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = ["name", "email", "std_code", "phone", "designation"]
+
+
+class NoteSerializer(serializers.ModelSerializer):
+    contacts = serializers.SerializerMethodField()
+    created_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Note
+        fields = "__all__"
+        extra_kwargs = {"created_by": {"read_only": True}}
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        return super().create(validated_data)
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
+
+    def get_contacts(self, instance):
+        return NotesContactSerializer(instance.contact, many=True).data

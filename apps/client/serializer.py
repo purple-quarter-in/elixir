@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.client.models import Contact, Organisation
-from apps.pipedrive.models import Lead, RoleDetail
+from apps.pipedrive.models import Lead
 
 
 class ContactSerializer(serializers.ModelSerializer):

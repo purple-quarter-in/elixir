@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from apps.client.models import Organisation
+from apps.user.models import User
 
 # Create your models here.
 
@@ -166,3 +167,94 @@ class Prospect(models.Model):
             self.created_at = timezone.now()
         self.updated_at = timezone.now()
         return super(Prospect, self).save(*args, **kwargs)
+
+
+class Note(models.Model):
+    """Model definition for Note."""
+
+    lead = models.ForeignKey(Lead, related_name="notes_lead", on_delete=models.DO_NOTHING)
+    activity_type = models.CharField(max_length=50)
+    contact = models.ManyToManyField("client.Contact", related_name="notes_contact")
+    mode = models.CharField(max_length=50)
+    role_status = models.CharField(max_length=50, blank=True, null=True)
+    role_urgency = models.CharField(max_length=50, blank=True, null=True)
+    is_retainer_model = models.CharField(max_length=50, blank=True, null=True)
+    is_min_flat_Service = models.CharField(max_length=50, blank=True, null=True)
+    is_collateral_shared = models.BooleanField(blank=True, null=True)
+    is_response_shared = models.BooleanField(blank=True, null=True)
+    is_open_engange = models.CharField(max_length=50, blank=True, null=True)
+    is_role_clear = models.BooleanField(blank=True, null=True)
+    is_willing_pay_ra = models.CharField(max_length=50, blank=True, null=True)
+    exp_service_fee = models.CharField(max_length=50, blank=True, null=True)
+    is_proposal_shared = models.BooleanField(blank=True, null=True)
+    related_to = models.CharField(max_length=50, blank=True, null=True)
+    prospect_status = models.CharField(max_length=50, blank=True, null=True)
+    deal_status = models.CharField(max_length=50, blank=True, null=True)
+    negotiation_broker = models.CharField(max_length=50, blank=True, null=True)
+    is_contract_draft_shared = models.BooleanField(blank=True, null=True)
+    next_step = models.CharField(max_length=50, blank=True, null=True)
+    created_by = models.ForeignKey(
+        User, related_name="note_created_by", on_delete=models.DO_NOTHING
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+
+    class Meta:
+        """Meta definition for Note."""
+
+        verbose_name = "Note"
+        verbose_name_plural = "Notes"
+
+    def __str__(self):
+        """Unicode representation of Note."""
+        return self.activity_type + "_" + self.mode + "_" + self.created_by.get_full_name()
+
+
+class Activity(models.Model):
+    """Model definition for Activity."""
+
+    # Logic to link activity to entity
+    lead = models.ForeignKey(Lead, related_name="activity_lead", on_delete=models.DO_NOTHING)
+    type = models.CharField(max_length=50)
+    contact = models.ManyToManyField("client.Contact", related_name="activity_contact")
+    mode = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, default="In Progress", blank=True, null=True)
+    due_date = models.DateTimeField(blank=True, null=True)
+    reminder = models.IntegerField(blank=True, null=True)
+    created_by = models.ForeignKey(
+        User, related_name="activity_created_by", on_delete=models.DO_NOTHING
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    closed_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        """Meta definition for Activity."""
+
+        verbose_name = "Activity"
+        verbose_name_plural = "Activitys"
+
+    def __str__(self):
+        """Unicode representation of Activity."""
+        return self.type + "_" + self.mode + "_" + self.created_by.get_full_name()
+
+
+class changelog(models.Model):
+    """Model definition for changelog."""
+
+    type = models.CharField(max_length=50)
+    field_name = models.CharField(max_length=50, blank=True, null=True)
+    changed_from = models.CharField(max_length=150, blank=True, null=True)
+    changed_to = models.CharField(max_length=150, blank=True, null=True)
+    description = models.CharField(max_length=150, blank=True, null=True)
+    changed_by = models.ForeignKey(User, related_name="changed_by", on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    model_name = models.CharField(max_length=50, blank=True, null=True)
+    obj_id = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        """Meta definition for changelog."""
+
+        verbose_name = "changelog"
+        verbose_name_plural = "changelogs"
+
+    def __str__(self):
+        return self.type + " : " + (self.description or "")
