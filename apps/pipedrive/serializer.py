@@ -143,7 +143,7 @@ class NoteSerializer(serializers.ModelSerializer):
 
 class HistoryNoteSerializer(serializers.ModelSerializer):
     activity_type = serializers.CharField(source="activity.type")
-    mode = serializers.CharField(source="activity.type")
+    mode = serializers.CharField(source="activity.mode")
     contacts = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
 
