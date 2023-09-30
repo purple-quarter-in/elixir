@@ -18,10 +18,10 @@ from elixir.viewsets import ModelViewSet
 
 # Create your views here.
 class OrganisationViewSet(ModelViewSet):
-    queryset = Organisation.objects.all()
+    queryset = Organisation.objects.all().order_by("-created_at")
     serializer_class = OrganisationSerializer
     permission_classes = [IsAuthenticated]
-    user_permissions={}
+    user_permissions = {}
 
     def __init__(self, **kwargs: Any) -> None:
         self.user_permissions["get"] = ["client.access_organisation", "client.view_organisation"]
@@ -69,11 +69,11 @@ class OrganisationViewSet(ModelViewSet):
 
 
 class ContactViewSet(ModelViewSet):
-    queryset = Contact.objects.all()
+    queryset = Contact.objects.all().order_by("-created_at")
     serializer_class = ContactSerializer
     permission_classes = [IsAuthenticated]
     response_serializer = ContactSerializer
-    user_permissions={}
+    user_permissions = {}
 
     def __init__(self, **kwargs: Any) -> None:
         self.user_permissions["get"] = ["client.view_contact"]

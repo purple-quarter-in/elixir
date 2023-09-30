@@ -43,13 +43,13 @@ x = {
 
 # Create your views here.
 class LeadViewSet(ModelViewSet):
-    queryset = Lead.objects.filter(is_converted_to_prospect=False)
+    queryset = Lead.objects.filter(is_converted_to_prospect=False).order_by("-created_at")
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
-    user_permissions={
-        "get":['pipedrive.view_lead'],
-        "post":['pipedrive.create_lead'],
-        "patch":['pipedrive.update_lead']
+    user_permissions = {
+        "get": ["pipedrive.view_lead"],
+        "post": ["pipedrive.create_lead"],
+        "patch": ["pipedrive.update_lead"],
     }
 
     def create(self, request, *args, **kwargs):
@@ -151,13 +151,13 @@ class RoleDetailViewSet(ModelViewSet):
 
 
 class ProspectViewSet(ModelViewSet):
-    queryset = Prospect.objects.all()
+    queryset = Prospect.objects.all().order_by("-created_at")
     serializer_class = ProspectSerializer
     permission_classes = [IsAuthenticated]
-    user_permissions={
-        "get":['pipedrive.view_prospect'],
-        "post":['pipedrive.create_prospect'],
-        "patch":['pipedrive.update_prospect']
+    user_permissions = {
+        "get": ["pipedrive.view_prospect"],
+        "post": ["pipedrive.create_prospect"],
+        "patch": ["pipedrive.update_prospect"],
     }
 
     @action(detail=False, methods=["patch"])
