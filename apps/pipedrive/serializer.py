@@ -139,3 +139,17 @@ class NoteSerializer(serializers.ModelSerializer):
         return (
             ActivitySerializer(instance.activity).data if instance.activity is not None else None
         )
+
+
+class HistoryNoteSerializer(serializers.ModelSerializer):
+    activity_type = serializers.CharField(source="activity.type")
+    mode = serializers.CharField(source="activity.type")
+    contacts = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Note
+        fields = "__all__"
+        extra_kwargs = {"created_by": {"read_only": True}}
+
+    def get_contacts(self, instance):
+        return NotesContactSerializer(instance.activity.contact, many=True).data

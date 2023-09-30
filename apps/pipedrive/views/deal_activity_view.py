@@ -5,6 +5,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from apps.client.models import Contact, Organisation
@@ -12,6 +13,7 @@ from apps.pipedrive.models import Activity, Lead, Note, Prospect, RoleDetail
 from apps.pipedrive.serializer import (
     ActivitySerializer,
     CreateLeadSerializer,
+    HistoryNoteSerializer,
     LeadSerializer,
     NoteSerializer,
     ProspectSerializer,
@@ -73,7 +75,7 @@ class ActivityViewSet(ModelViewSet):
     @action(detail=True, methods=["patch"])
     def update_status(self, request, pk):
         if "status" not in request.data:
-            raise ValidationError({"status": ["Lead id not provided."]})
+            raise ValidationError({"status": ["Status id not provided."]})
         obj = self.get_object()
         obj.status = request.data.get("status")
         obj.closed_at = datetime.now()
@@ -88,5 +90,29 @@ class NoteViewSet(ModelViewSet):
     http_method_names = ["get", "post"]
 
 
-# class ListHistory(APIView):
-#     pass
+class History(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if "lead" not in request.query_params:
+            raise ValidationError({"lead": ["Lead id not provided."]})
+        lead = request.query_params.get("lead")
+        activity = Activity.objects.filter(lead_id=lead).order_by("-created_at")
+        activity_ids = []
+        activity_data = []
+        for act in activity:
+            activity_ids.append(act.id)
+            if act.closed_at:
+                activity_data.append(ActivitySerializer(act).data)
+        notes = HistoryNoteSerializer(
+            Note.objects.filter(activity_id__in=activity_ids).order_by("-created_at"),
+            many=True,
+        ).data
+        # activity_data = ActivitySerializer(
+        #     activity,
+        #     many=True,
+        # ).data
+        changelog = []
+        return custom_success_response(
+            {"notes": notes, "activity": activity_data, "changelog": changelog}
+        )

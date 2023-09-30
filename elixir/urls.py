@@ -22,6 +22,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
 from apps.django_rest_passwordreset.urls import urlpatterns as reset_urlpatterns
+from apps.pipedrive.urls import urlpatterns as pipedrive_urlpatterns
 from apps.user.urls import urlpatterns as user_urlpatterns
 
 from . import settings
@@ -47,6 +48,7 @@ urlpatterns = [
     path("v1/api/", include(user_urlpatterns)),
     path("v1/api/password_reset/", include(reset_urlpatterns)),
     path("v1/api/", include(router.urls)),
+    path("v1/api/", include(pipedrive_urlpatterns)),
     path(
         "openapi",
         get_schema_view(
