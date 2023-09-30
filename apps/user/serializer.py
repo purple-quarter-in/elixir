@@ -54,7 +54,7 @@ class GetUserSerializer(serializers.ModelSerializer):
             "created_by",
             "function",
             "region",
-            "is_email_verified",
+            "time_zone" "is_email_verified",
             "is_active",
             "created_at",
         )

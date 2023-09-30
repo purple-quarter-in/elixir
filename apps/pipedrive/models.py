@@ -169,13 +169,53 @@ class Prospect(models.Model):
         return super(Prospect, self).save(*args, **kwargs)
 
 
+class Activity(models.Model):
+    """Model definition for Activity."""
+
+    # Logic to link activity to entity
+    title = models.CharField(max_length=100, blank=True, default="")
+    lead = models.ForeignKey(Lead, related_name="activity_lead", on_delete=models.DO_NOTHING)
+    type = models.CharField(max_length=50)
+    contact = models.ManyToManyField("client.Contact", related_name="activity_contact")
+    mode = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, default="In Progress", blank=True, null=True)
+    due_date = models.DateTimeField(blank=True, null=True)
+    reminder = models.IntegerField(blank=True, null=True)
+    created_by = models.ForeignKey(
+        User, related_name="activity_created_by", on_delete=models.DO_NOTHING
+    )
+    assigned_to = models.ForeignKey(
+        User,
+        related_name="activity_assigned_to",
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    closed_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        """Meta definition for Activity."""
+
+        verbose_name = "Activity"
+        verbose_name_plural = "Activitys"
+
+    def __str__(self):
+        """Unicode representation of Activity."""
+        return self.type + "_" + self.mode + "_" + self.created_by.get_full_name()
+
+
 class Note(models.Model):
     """Model definition for Note."""
 
-    lead = models.ForeignKey(Lead, related_name="notes_lead", on_delete=models.DO_NOTHING)
-    activity_type = models.CharField(max_length=50)
-    contact = models.ManyToManyField("client.Contact", related_name="notes_contact")
-    mode = models.CharField(max_length=50)
+    activity = models.ForeignKey(
+        Activity,
+        related_name="notes_activity",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+    )
     role_status = models.CharField(max_length=50, blank=True, null=True)
     role_urgency = models.CharField(max_length=50, blank=True, null=True)
     is_retainer_model = models.CharField(max_length=50, blank=True, null=True)
@@ -207,34 +247,6 @@ class Note(models.Model):
     def __str__(self):
         """Unicode representation of Note."""
         return self.activity_type + "_" + self.mode + "_" + self.created_by.get_full_name()
-
-
-class Activity(models.Model):
-    """Model definition for Activity."""
-
-    # Logic to link activity to entity
-    lead = models.ForeignKey(Lead, related_name="activity_lead", on_delete=models.DO_NOTHING)
-    type = models.CharField(max_length=50)
-    contact = models.ManyToManyField("client.Contact", related_name="activity_contact")
-    mode = models.CharField(max_length=50)
-    status = models.CharField(max_length=50, default="In Progress", blank=True, null=True)
-    due_date = models.DateTimeField(blank=True, null=True)
-    reminder = models.IntegerField(blank=True, null=True)
-    created_by = models.ForeignKey(
-        User, related_name="activity_created_by", on_delete=models.DO_NOTHING
-    )
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    closed_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        """Meta definition for Activity."""
-
-        verbose_name = "Activity"
-        verbose_name_plural = "Activitys"
-
-    def __str__(self):
-        """Unicode representation of Activity."""
-        return self.type + "_" + self.mode + "_" + self.created_by.get_full_name()
 
 
 class changelog(models.Model):

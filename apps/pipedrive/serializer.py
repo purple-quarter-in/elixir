@@ -77,6 +77,7 @@ class ProspectSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
+    assigned_to = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
 
     class Meta:
@@ -86,10 +87,20 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
+        validated_data["assigned_to_id"] = self.context["request"].data.get("assigned_to", None)
+        count = Activity.objects.filter(
+            lead=validated_data["lead"], type=validated_data["type"]
+        ).count()
+        validated_data["title"] = validated_data["type"] + " - " + f"{count+1}".zfill(2)
         return super().create(validated_data)
 
     def get_created_by(self, instance):
         return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
+
+    def get_assigned_to(self, instance):
+        return (
+            instance.assigned_to.get_dict_name_id() if instance.assigned_to is not None else None
+        )
 
     def get_contacts(self, instance):
         return NotesContactSerializer(instance.contact, many=True).data
@@ -97,7 +108,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     def get_status(self, instance):
         status = instance.status
         if not instance.closed_at:
-            status = ""
+            status = None
         return status
 
 
@@ -108,7 +119,7 @@ class NotesContactSerializer(serializers.ModelSerializer):
 
 
 class NoteSerializer(serializers.ModelSerializer):
-    contacts = serializers.SerializerMethodField()
+    activity = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
 
     class Meta:
@@ -118,10 +129,13 @@ class NoteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
+        validated_data["activity_id"] = self.context["request"].data.get("activity", None)
         return super().create(validated_data)
 
     def get_created_by(self, instance):
         return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
 
-    def get_contacts(self, instance):
-        return NotesContactSerializer(instance.contact, many=True).data
+    def get_activity(self, instance):
+        return (
+            ActivitySerializer(instance.activity).data if instance.activity is not None else None
+        )

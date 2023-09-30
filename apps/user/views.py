@@ -70,7 +70,8 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
     permission_classes = [IsAuthenticated]
-    user_permissions={}
+    user_permissions = {}
+
     def get_permissions(self):
         if self.action in ["verify_token", "gauth", "set_password"]:
             return []
@@ -290,6 +291,7 @@ class Login(ObtainAuthToken):
             "last_name": user.last_name,
             "profile": {"id": user.profile.id, "name": user.profile.name},
             "function": user.function,
+            "timezone": user.time_zone if user.time_zone else None,
         }
         return custom_success_response(
             _res,
