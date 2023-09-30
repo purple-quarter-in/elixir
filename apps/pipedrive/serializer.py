@@ -145,6 +145,7 @@ class HistoryNoteSerializer(serializers.ModelSerializer):
     activity_type = serializers.CharField(source="activity.type")
     mode = serializers.CharField(source="activity.type")
     contacts = serializers.SerializerMethodField()
+    created_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Note
@@ -153,3 +154,6 @@ class HistoryNoteSerializer(serializers.ModelSerializer):
 
     def get_contacts(self, instance):
         return NotesContactSerializer(instance.activity.contact, many=True).data
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
