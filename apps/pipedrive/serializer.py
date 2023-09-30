@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.client.models import Contact
 from apps.client.serializer import OrganisationSerializer
-from apps.pipedrive.models import Activity, Lead, Note, Prospect, RoleDetail
+from apps.pipedrive.models import Activity, Lead, Note, Prospect, RoleDetail, changelog
 
 
 class CreateLeadSerializer(serializers.Serializer):
@@ -157,3 +157,14 @@ class HistoryNoteSerializer(serializers.ModelSerializer):
 
     def get_created_by(self, instance):
         return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
+
+
+class ChangelogSerializer(serializers.ModelSerializer):
+    changed_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = changelog
+        exclude = ["model_name", "obj_id"]
+
+    def get_changed_by(self, instance):
+        return instance.changed_by.get_dict_name_id() if instance.changed_by is not None else None

@@ -10,8 +10,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.client.models import Contact, Organisation
 from apps.pipedrive.models import Activity, Lead, Note, Prospect, RoleDetail
+from apps.pipedrive.models import changelog as Changelog
 from apps.pipedrive.serializer import (
     ActivitySerializer,
+    ChangelogSerializer,
     CreateLeadSerializer,
     HistoryNoteSerializer,
     LeadSerializer,
@@ -112,7 +114,10 @@ class History(ListAPIView):
         #     activity,
         #     many=True,
         # ).data
-        changelog = []
+        changelog = ChangelogSerializer(
+            Changelog.objects.filter(model_name="Lead", obj_id=lead).order_by("-created_at"),
+            many=True,
+        ).data
         return custom_success_response(
             {"notes": notes, "activity": activity_data, "changelog": changelog}
         )

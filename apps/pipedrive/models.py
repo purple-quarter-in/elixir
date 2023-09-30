@@ -39,6 +39,9 @@ class RoleDetail(models.Model):
         self.updated_at = timezone.now()
         return super(RoleDetail, self).save(*args, **kwargs)
 
+    def get_lead_id(self):
+        return Lead.objects.get(role_id=self.id).id
+
 
 class Lead(models.Model):
     """Model definition for Lead."""

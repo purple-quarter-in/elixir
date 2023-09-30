@@ -13,6 +13,7 @@ from apps.pipedrive.serializer import (
     RoleDetailSerializer,
     UpdateLeadSerializer,
 )
+from elixir.changelog import changelog
 from elixir.utils import custom_success_response, set_crated_by_updated_by
 from elixir.viewsets import ModelViewSet
 
@@ -50,6 +51,40 @@ class LeadViewSet(ModelViewSet):
         "get": ["pipedrive.view_lead"],
         "post": ["pipedrive.create_lead"],
         "patch": ["pipedrive.update_lead"],
+    }
+    changelog = {
+        "model": "Lead",
+        "mapping_obj": "id",
+        "is_mapping_obj_func": False,
+        "create": {
+            "is_created": {"type": "Entity Created", "description": "Lead Created"},
+        },
+        "update": {
+            "status": {"type": "Status Update", "description": "Lead status changed"},
+            "is_converted_to_prospect": {
+                "type": "State Update",
+                "description": "Lead Converted to Prospect",
+            },
+            "service_fee": {
+                "type": "Field Update",
+                "description": "service_fee updated",
+            },
+            "owned_by": {
+                "field_to_get": "get_full_name",
+                "type": "Field Update",
+                "description": "Field Updated",
+            },
+            "closed_by": {
+                "field_to_get": "get_full_name",
+                "type": "Field Update",
+                "description": "Field Updated",
+            },
+            "fullfilled_by": {
+                "field_to_get": "get_full_name",
+                "type": "Field Update",
+                "description": "Field Updated",
+            },
+        },
     }
 
     def create(self, request, *args, **kwargs):
@@ -113,6 +148,13 @@ class LeadViewSet(ModelViewSet):
             lead=obj, defaults={"owner": request.user, **set_crated_by_updated_by(request.user)}
         )
         if prospect:
+            changelog(
+                self.changelog,
+                obj,
+                {"is_converted_to_prospect": True},
+                "update",
+                request.user.id,
+            )
             obj.save()
             return custom_success_response(self.serializer_class(obj).data)
         else:
@@ -139,6 +181,14 @@ class LeadViewSet(ModelViewSet):
         lead = Lead.objects.get(id=pk)
         serializer = UpdateLeadSerializer(lead, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        if self.changelog and ("update" in self.changelog):
+            changelog(
+                self.changelog,
+                lead,
+                serializer._validated_data,
+                "update",
+                request.user.id,
+            )
         serializer.save(updated_by=request.user)
         return custom_success_response(serializer.data, status=status.HTTP_200_OK)
 
@@ -148,6 +198,21 @@ class RoleDetailViewSet(ModelViewSet):
     serializer_class = RoleDetailSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "patch"]
+    changelog = {
+        "model": "Lead",
+        "mapping_obj": "get_lead_id",
+        "is_mapping_obj_func": True,
+        "update": {
+            "location": {
+                "type": "Field Update",
+                "description": "Location Updated",
+            },
+            "fixed_budget": {
+                "type": "Field Update",
+                "description": "Cash CTC Budget Updated",
+            },
+        },
+    }
 
 
 class ProspectViewSet(ModelViewSet):
@@ -158,6 +223,18 @@ class ProspectViewSet(ModelViewSet):
         "get": ["pipedrive.view_prospect"],
         "post": ["pipedrive.create_prospect"],
         "patch": ["pipedrive.update_prospect"],
+    }
+    changelog = {
+        "model": "Lead",
+        "mapping_obj": "lead_id",
+        "is_mapping_obj_func": False,
+        "update": {
+            "status": {"type": "Status Update", "description": "Prospect status changed"},
+            "is_converted_to_deal": {
+                "type": "State Update",
+                "description": "Prospect Converted to Deal",
+            },
+        },
     }
 
     @action(detail=False, methods=["patch"])

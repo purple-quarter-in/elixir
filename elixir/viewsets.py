@@ -1,6 +1,8 @@
 from rest_framework import status, viewsets
 from rest_framework.exceptions import PermissionDenied
 
+from elixir.changelog import changelog
+
 from .utils import custom_success_response
 
 
@@ -12,6 +14,7 @@ class ModelViewSet(viewsets.ModelViewSet):
         "post": [],
         "patch": [],
     }
+    changelog = None
 
     def perform_create(self, serializer, **kwargs):
         self._instance = serializer.save(**kwargs)
@@ -73,6 +76,14 @@ class ModelViewSet(viewsets.ModelViewSet):
             instance, data=request.data, partial=partial, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
+        if self.changelog and ("update" in self.changelog):
+            changelog(
+                self.changelog,
+                instance,
+                serializer._validated_data,
+                "update",
+                request.user.id,
+            )
         self.perform_update(serializer)
         if getattr(instance, "_prefetched_objects_cache", None):
             instance._prefetched_objects_cache = {}
