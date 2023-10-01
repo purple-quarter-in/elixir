@@ -69,7 +69,7 @@ class LeadViewSet(ModelViewSet):
                 "type": "Field Update",
                 "description": "service_fee updated",
             },
-            "owned_by": {
+            "owner": {
                 "field_to_get": "get_full_name",
                 "type": "Field Update",
                 "description": "Field Updated",
@@ -124,7 +124,7 @@ class LeadViewSet(ModelViewSet):
                     )
             pass
         role = role_serializer.save()
-        Lead.objects.create(
+        lead = Lead.objects.create(
             organisation_id=org_id,
             role=role,
             source=dto["source"],
@@ -132,6 +132,13 @@ class LeadViewSet(ModelViewSet):
             created_by=request.user,
             updated_by=request.user,
             owner=request.user,
+        )
+        changelog(
+            self.changelog,
+            lead,
+            {"is_created": request.user},
+            "create",
+            request.user.id,
         )
         return custom_success_response(
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
