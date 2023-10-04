@@ -81,9 +81,9 @@ class ActivityViewSet(ModelViewSet):
     def activity_wo_notes(self, request):
         if "lead" not in request.query_params:
             raise ValidationError({"lead": ["Lead id not provided."]})
-        sql = f"SELECT pa.id,pa.type,pa.mode,pa.status FROM `pipedrive_activity` as pa LEFT OUTER JOIN `pipedrive_note` pn ON pn.activity_id=pa.id WHERE pn.activity_id IS NULL And pa.lead_id={request.query_params.get('lead')} And pa.closed_at IS NULL;"
+        sql = f"SELECT * FROM `pipedrive_activity` as pa LEFT OUTER JOIN `pipedrive_note` pn ON pn.activity_id=pa.id WHERE pn.activity_id IS NULL And pa.lead_id={request.query_params.get('lead')} And pa.closed_at IS NULL;"
         activity = Activity.objects.raw(sql)
-        return custom_success_response(DropDownActivitySerializer(activity, many=True).data)
+        return custom_success_response(ActivitySerializer(activity, many=True).data)
 
 
 class NoteViewSet(ModelViewSet):

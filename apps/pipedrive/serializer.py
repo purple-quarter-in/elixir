@@ -81,12 +81,13 @@ class ProspectSerializer(serializers.ModelSerializer):
         return LeadSerializer(instance.lead).data
 
 
+# not used
 class DropDownActivitySerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
-        fields = ["id", "mode", "type", "title", "contacts"]
+        fields = "__all__"
 
     def get_contacts(self, instance):
         cursor = connection.cursor()
