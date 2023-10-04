@@ -80,6 +80,12 @@ class ProspectSerializer(serializers.ModelSerializer):
         return LeadSerializer(instance.lead).data
 
 
+class DropDownActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ["id", "mode", "type", "title"]
+
+
 class ActivitySerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()

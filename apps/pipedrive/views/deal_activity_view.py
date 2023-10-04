@@ -1,28 +1,21 @@
 from datetime import datetime
 
-from django import views
 from django.shortcuts import render
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from apps.client.models import Contact, Organisation
-from apps.pipedrive.models import Activity, Lead, Note, Prospect, RoleDetail
+from apps.pipedrive.models import Activity, Note
 from apps.pipedrive.models import changelog as Changelog
 from apps.pipedrive.serializer import (
     ActivitySerializer,
     ChangelogSerializer,
-    CreateLeadSerializer,
+    DropDownActivitySerializer,
     HistoryNoteSerializer,
-    LeadSerializer,
     NoteSerializer,
-    ProspectSerializer,
-    RoleDetailSerializer,
-    UpdateLeadSerializer,
 )
-from elixir.utils import custom_success_response, set_crated_by_updated_by
+from elixir.utils import custom_success_response
 from elixir.viewsets import ModelViewSet
 
 
@@ -83,6 +76,14 @@ class ActivityViewSet(ModelViewSet):
         obj.closed_at = datetime.now()
         obj.save()
         return custom_success_response({"message": "Status updated successfully"})
+
+    @action(detail=False, methods=["get"])
+    def activity_wo_notes(self, request):
+        if "lead" not in request.query_params:
+            raise ValidationError({"lead": ["Lead id not provided."]})
+        sql = f"SELECT pa.id,pa.type,pa.mode,pa.status FROM `pipedrive_activity` as pa LEFT OUTER JOIN `pipedrive_note` pn ON pn.activity_id=pa.id WHERE pn.activity_id IS NULL And pa.lead_id={request.query_params.get('lead')};"
+        activity = Activity.objects.raw(sql)
+        return custom_success_response(DropDownActivitySerializer(activity, many=True).data)
 
 
 class NoteViewSet(ModelViewSet):
