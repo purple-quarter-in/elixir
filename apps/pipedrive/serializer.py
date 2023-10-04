@@ -138,7 +138,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 class NotesContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = ["name", "email", "std_code", "phone", "designation"]
+        fields = ["id", "name", "email", "std_code", "phone", "designation"]
 
 
 class NoteSerializer(serializers.ModelSerializer):
