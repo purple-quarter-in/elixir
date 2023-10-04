@@ -58,7 +58,7 @@ class ProspectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Prospect
-        exclude = "updated_at"
+        exclude = ["updated_at"]
         depth = 1
 
     def get_created_by(self, instance):
