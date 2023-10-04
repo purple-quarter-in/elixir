@@ -1,3 +1,4 @@
+from django.db import connection
 from rest_framework import serializers
 
 from apps.client.models import Contact
@@ -81,9 +82,19 @@ class ProspectSerializer(serializers.ModelSerializer):
 
 
 class DropDownActivitySerializer(serializers.ModelSerializer):
+    contacts = serializers.SerializerMethodField()
+
     class Meta:
         model = Activity
-        fields = ["id", "mode", "type", "title"]
+        fields = ["id", "mode", "type", "title", "contacts"]
+
+    def get_contacts(self, instance):
+        cursor = connection.cursor()
+        cursor.execute(
+            f"select contact_id from pipedrive_activity_contact where activity_id = {instance.id}"
+        )
+        list_of_ids = [row[0] for row in cursor.fetchall()]
+        return NotesContactSerializer(Contact.objects.filter(id__in=list_of_ids), many=True).data
 
 
 class ActivitySerializer(serializers.ModelSerializer):
