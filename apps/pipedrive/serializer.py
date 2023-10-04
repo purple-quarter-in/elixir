@@ -17,6 +17,12 @@ class UpdateLeadSerializer(serializers.ModelSerializer):
         exclude = ("created_at", "updated_at")
 
 
+class UpdateProspectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prospect
+        exclude = ("created_at", "updated_at")
+
+
 class RoleDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoleDetail

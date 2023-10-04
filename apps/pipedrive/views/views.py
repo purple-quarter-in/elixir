@@ -12,6 +12,7 @@ from apps.pipedrive.serializer import (
     ProspectSerializer,
     RoleDetailSerializer,
     UpdateLeadSerializer,
+    UpdateProspectSerializer,
 )
 from elixir.changelog import changelog
 from elixir.utils import custom_success_response, set_crated_by_updated_by
@@ -246,7 +247,7 @@ class ProspectViewSet(ModelViewSet):
 
     def partial_update(self, request, pk):
         prospect = self.get_object()
-        serializer = ProspectSerializer(prospect, data=request.data, partial=True)
+        serializer = UpdateProspectSerializer(prospect, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         if self.changelog and ("update" in self.changelog):
             changelog(
@@ -256,8 +257,10 @@ class ProspectViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
-        serializer.save(updated_by=request.user)
-        return custom_success_response(serializer.data, status=status.HTTP_200_OK)
+        prospect = serializer.save(updated_by=request.user)
+        return custom_success_response(
+            ProspectSerializer(prospect).data, status=status.HTTP_200_OK
+        )
 
     @action(detail=False, methods=["patch"])
     def bulk_archive(self, request):
