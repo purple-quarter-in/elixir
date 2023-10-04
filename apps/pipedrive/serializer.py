@@ -58,7 +58,7 @@ class ProspectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Prospect
-        exclude = ("created_at", "updated_at")
+        exclude = "updated_at"
         depth = 1
 
     def get_created_by(self, instance):
@@ -144,6 +144,7 @@ class NoteSerializer(serializers.ModelSerializer):
 class HistoryNoteSerializer(serializers.ModelSerializer):
     activity_type = serializers.CharField(source="activity.type")
     mode = serializers.CharField(source="activity.mode")
+    title = serializers.CharField(source="activity.title")
     contacts = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
 
