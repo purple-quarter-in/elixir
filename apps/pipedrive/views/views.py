@@ -244,6 +244,21 @@ class ProspectViewSet(ModelViewSet):
         },
     }
 
+    def partial_update(self, request, pk):
+        prospect = self.get_object()
+        serializer = ProspectSerializer(prospect, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        if self.changelog and ("update" in self.changelog):
+            changelog(
+                self.changelog,
+                prospect,
+                serializer._validated_data,
+                "update",
+                request.user.id,
+            )
+        serializer.save(updated_by=request.user)
+        return custom_success_response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=["patch"])
     def bulk_archive(self, request):
         if "prospects" not in request.data:
