@@ -100,7 +100,7 @@ class History(ListAPIView):
         if "lead" not in request.query_params:
             raise ValidationError({"lead": ["Lead id not provided."]})
         lead = request.query_params.get("lead")
-        activity = Activity.objects.filter(lead_id=lead).order_by("-created_at")
+        activity = Activity.objects.filter(lead_id=lead).order_by("due_date")
         activity_ids = []
         activity_data = []
         for act in activity:
