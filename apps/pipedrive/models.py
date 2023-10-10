@@ -184,6 +184,7 @@ class Activity(models.Model):
     status = models.CharField(max_length=50, default="In Progress", blank=True, null=True)
     due_date = models.DateTimeField(blank=True, null=True)
     reminder = models.IntegerField(blank=True, null=True)
+    rescheduled = models.IntegerField(default=0)
     created_by = models.ForeignKey(
         User, related_name="activity_created_by", on_delete=models.DO_NOTHING
     )

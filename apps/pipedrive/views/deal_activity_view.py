@@ -47,12 +47,18 @@ x = {
 class ActivityViewSet(ModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     user_permissions = {
         "get": ["pipedrive.view_lead"],
         "post": ["pipedrive.create_lead"],
         "patch": ["pipedrive.update_lead"],
     }
+
+    def perform_update(self, serializer):
+        if "due_date" in serializer.initial_data:
+            self._instance = serializer.save(rescheduled=serializer.instance.rescheduled + 1)
+        else:
+            self._instance = serializer.save()
 
     @action(detail=False, methods=["get"])
     def to_do(self, request):
