@@ -127,7 +127,10 @@ class UserViewSet(ModelViewSet):
         )
 
     def update(self, request, *args, **kwargs):
-        if not request.user.has_perms(self.user_permissions["patch"]):
+        if not (
+            request.user.has_perms(self.user_permissions["patch"])
+            or request.user.id == int(kwargs["pk"])
+        ):
             raise PermissionDenied()
         partial = kwargs.pop("partial", True)
         instance = self.get_object()
@@ -135,8 +138,9 @@ class UserViewSet(ModelViewSet):
             instance, data=request.data, partial=partial, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
-        instance.groups.clear()
-        serializer.validated_data["profile"].user_set.add(instance)
+        if "profile" in serializer.validated_data:
+            instance.groups.clear()
+            serializer.validated_data["profile"].user_set.add(instance)
         serializer.save(updated_by=request.user)
         if getattr(instance, "_prefetched_objects_cache", None):
             instance._prefetched_objects_cache = {}
@@ -272,6 +276,23 @@ class UserViewSet(ModelViewSet):
             )
         else:
             raise ValidationError({"message": ["Technical error"]})
+
+    @action(detail=True, methods=["patch"])
+    def update_password(self, request, pk):
+        if not request.user.id == int(pk):
+            raise PermissionDenied()
+        required_fields = ["old_password", "new_password"]
+        for x in required_fields:
+            if not request.data.get(x, None) and not request.data.get(x) == "":
+                raise ValidationError({x: "This field is required"})
+        user = request.user
+        if not user.check_password(request.data.get("old_password")):
+            raise ValidationError({"message": ["Old Password is Wrong"]})
+        user.set_password(request.data.get("new_password"))
+        user.save()
+        return custom_success_response(
+            {"message": "password changes successfully"}, status=status.HTTP_200_OK
+        )
 
 
 class Login(ObtainAuthToken):
