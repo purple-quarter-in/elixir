@@ -61,7 +61,7 @@ class LeadViewSet(ModelViewSet):
             "is_created": {"type": "Entity Created", "description": "Lead Created"},
         },
         "update": {
-            "status": {"type": "Status Update", "description": "Lead Status Updated"},
+            "status": {"type": "Status Update", "description": "Lead State Updated"},
             "is_converted_to_prospect": {
                 "type": "State Update",
                 "description": "Lead Converted to Prospect",
@@ -237,7 +237,7 @@ class ProspectViewSet(ModelViewSet):
         "mapping_obj": "lead_id",
         "is_mapping_obj_func": False,
         "update": {
-            "status": {"type": "Status Update", "description": "Prospect Status Updated"},
+            "status": {"type": "Status Update", "description": "Prospect State Updated"},
             "is_converted_to_deal": {
                 "type": "State Update",
                 "description": "Prospect Converted to Deal",
