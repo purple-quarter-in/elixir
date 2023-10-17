@@ -31,6 +31,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 ]
 from apps.client.urls import router as client_router
+from apps.notification.urls import router as notification_router
 from apps.pipedrive.urls import router as pipedrive_router
 from apps.rbac.urls import router as rbac_router
 from apps.user.urls import router as user_router
@@ -41,6 +42,7 @@ router.registry.extend(rbac_router.registry)
 router.registry.extend(pipedrive_router.registry)
 router.registry.extend(client_router.registry)
 router.registry.extend(user_router.registry)
+router.registry.extend(notification_router.registry)
 urlpatterns = [
     path("jet/", include("jet.urls", "jet")),
     path("jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")),

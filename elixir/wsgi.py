@@ -11,6 +11,9 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'elixir.settings')
+from elixir import schedular
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "elixir.settings")
 
 application = get_wsgi_application()
+Apschedular = schedular.Schedular()

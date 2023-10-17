@@ -12,3 +12,4 @@ django-jet-reboot
 uritemplate
 pyyaml
 drf-spectacular
+django-apscheduler

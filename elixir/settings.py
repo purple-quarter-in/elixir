@@ -66,11 +66,13 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework.authtoken",
     "corsheaders",
+    "django_apscheduler",
     "apps.django_rest_passwordreset",
     "apps.user",
     "apps.rbac",
     "apps.pipedrive",
     "apps.client",
+    "apps.notification",
 ]
 
 MIDDLEWARE = [
@@ -152,7 +154,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# This scheduler config will:
+# - Store jobs in the project database
+# - Execute jobs in threads inside the application process
+SCHEDULER_CONFIG = {
+    "apscheduler.jobstores.default": {"class": "django_apscheduler.jobstores:DjangoJobStore"},
+    "apscheduler.executors.processpool": {"type": "threadpool"},
+}
+SCHEDULER_AUTOSTART = True
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 

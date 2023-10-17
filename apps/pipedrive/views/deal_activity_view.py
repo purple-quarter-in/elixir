@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time, timedelta
 
 from django.shortcuts import render
 from rest_framework.decorators import action
@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
+from apps.notification.views import schedule_create_notification
 from apps.pipedrive.models import Activity, Note
 from apps.pipedrive.models import changelog as Changelog
 from apps.pipedrive.serializer import (
@@ -17,6 +18,7 @@ from apps.pipedrive.serializer import (
 )
 from elixir.utils import custom_success_response
 from elixir.viewsets import ModelViewSet
+from elixir.wsgi import Apschedular
 
 
 def say_hello(request):
@@ -53,6 +55,40 @@ class ActivityViewSet(ModelViewSet):
         "post": ["pipedrive.create_lead"],
         "patch": ["pipedrive.update_lead"],
     }
+
+    def perform_create(self, serializer, **kwargs):
+        super().perform_create(serializer, **kwargs)
+        Apschedular.scheduler.add_job(
+            schedule_create_notification,
+            trigger="date",
+            run_date=self._instance.due_date - timedelta(minutes=self._instance.reminder),
+            id=f"schedule_create_notification-activity_reminder-{self._instance.id}",  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            kwargs={
+                "instance": self._instance,
+                "type": "Activity Reminder",
+                "description": " X Activity is due in x mins",
+                "user": self._instance.assigned_to,
+                "model_name": "Activity",
+            },
+            replace_existing=True,
+        )
+        Apschedular.scheduler.add_job(
+            schedule_create_notification,
+            trigger="date",
+            run_date=datetime.now(),
+            id=f"schedule_create_notification-activity_create-{self._instance.id}",  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            kwargs={
+                "instance": self._instance,
+                "type": "Activity Assigned",
+                "description": " X Activity has been created and assugned to you",
+                "user": self._instance.assigned_to,
+                "model_name": "Activity",
+            },
+            replace_existing=True,
+        )
+        return
 
     def perform_update(self, serializer):
         if "due_date" in serializer.initial_data:
