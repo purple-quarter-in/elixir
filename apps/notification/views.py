@@ -9,7 +9,7 @@ from elixir.viewsets import ModelViewSet
 
 # Create your views here.
 class NotificationViewSet(ModelViewSet):
-    queryset = Notification.objects.all().filter(archived=False)
+    queryset = Notification.objects.all().filter(archived=False).order_by("-created_at")
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
 
