@@ -43,16 +43,19 @@ EMAIL_USE_TLS = ENV.str("EMAIL_USE_TLS")
 # Application definition
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOWED_ORIGINS = [
+    "https://api.elixir.purplequarter.co",
     "http://localhost:3000",
     "https://pq-crm-rajgopaljakhmola1-gmailcom.vercel.app",
     "https://elixir.purplequarter.co",
-    "https://api.elixir.purplequarter.co",
 ]
 CORS_ALLOW_HEADERS = [
     "access-control-allow-origin",
     "content-type",
     "authorization",
     "accept",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://api.elixir.purplequarter.co"
 ]
 INSTALLED_APPS = [
     "jet.dashboard",
