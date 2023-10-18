@@ -12,4 +12,5 @@ django-jet-reboot
 uritemplate
 pyyaml
 drf-spectacular
-django-apscheduler
+APScheduler==3.10.4
+SQLAlchemy==2.0.22

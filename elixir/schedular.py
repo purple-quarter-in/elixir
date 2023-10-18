@@ -1,23 +1,40 @@
 import logging
 
+from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
+from apscheduler.executors.pool import ThreadPoolExecutor
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.triggers.cron import CronTrigger
 from django.conf import settings
-from django.core.management.base import BaseCommand
-from django_apscheduler import util
-from django_apscheduler.jobstores import DjangoJobStore
-from django_apscheduler.models import DjangoJobExecution
 
-logger = logging.getLogger(__name__)
+from elixir.settings import DATABASES
+
+logging.basicConfig()
+logging.getLogger("apscheduler").setLevel(logging.DEBUG)
+
+db_settings = DATABASES["default"]
+db_url = f"mysql://{db_settings['USER']}:{db_settings['PASSWORD']}@{db_settings['HOST']}:{db_settings['PORT']}/{db_settings['NAME']}"
 
 
 class Schedular:
     scheduler = None
 
+    def my_listener(self, event):
+        if event.exception:
+            print(f"The job {event.job_id} crashed with execption:- {event.exception}:(")
+        else:
+            print(f"The job {event.job_id} worked :)")
+
     def __init__(self):
-        self.scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
-        self.scheduler.add_jobstore(DjangoJobStore(), "default")
+        executors = {"default": ThreadPoolExecutor(20)}
+        job_defaults = {
+            "coalesce": False,
+            "misfire_grace_time": 60 * 60,
+        }
+        self.scheduler = BackgroundScheduler(
+            timezone=settings.TIME_ZONE, job_defaults=job_defaults, executors=executors
+        )
+        self.scheduler.add_listener(self.my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+        self.scheduler.add_jobstore(SQLAlchemyJobStore(db_url), "default")
         self.scheduler.start()
 
 

@@ -46,7 +46,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://pq-crm-rajgopaljakhmola1-gmailcom.vercel.app",
     "https://elixir.purplequarter.co",
-    "https://api.elixir.purplequarter.co"
+    "https://api.elixir.purplequarter.co",
 ]
 CORS_ALLOW_HEADERS = [
     "access-control-allow-origin",
@@ -67,7 +67,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework.authtoken",
     "corsheaders",
-    "django_apscheduler",
     "apps.django_rest_passwordreset",
     "apps.user",
     "apps.rbac",
