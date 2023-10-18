@@ -84,3 +84,4 @@ static
 data/*
 0*.py
 openapi-schema.yml
+config
