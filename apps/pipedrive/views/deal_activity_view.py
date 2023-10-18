@@ -60,8 +60,8 @@ class ActivityViewSet(ModelViewSet):
     def perform_create(self, serializer, **kwargs):
         super().perform_create(serializer, **kwargs)
         Notification.objects.create(
-            type="Activity Reminder",
-            description="X Activity is due in x mins",
+            type="Activity Assigned",
+            description=" X Activity has been created and assugned to you",
             user=self._instance.assigned_to,
             model_name="Activity",
             object_id=self._instance.id,
