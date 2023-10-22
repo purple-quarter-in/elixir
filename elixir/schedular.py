@@ -34,7 +34,12 @@ class Schedular:
             timezone=settings.TIME_ZONE, job_defaults=job_defaults, executors=executors
         )
         self.scheduler.add_listener(self.my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
-        self.scheduler.add_jobstore(SQLAlchemyJobStore(db_url), "default")
+        self.scheduler.add_jobstore(
+            SQLAlchemyJobStore(
+                db_url, engine_options={"pool_pre_ping": True, "pool_recycle": 3600}
+            ),
+            "default",
+        )
         self.scheduler.start()
 
 
