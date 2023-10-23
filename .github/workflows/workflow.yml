@@ -20,7 +20,7 @@ jobs:
       - name: connect and pull code
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-          sudo su -
+          # sudo su -
           cd /var/www/elixir && git checkout main && git pull &&
           source env/bin/activate && pip install -r requirements.txt &&
           python3 manage.py makemigrations && python3 manage.py migrate &&
