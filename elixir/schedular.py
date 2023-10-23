@@ -4,6 +4,7 @@ from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from django.conf import settings
 
 from elixir.settings import DATABASES
@@ -46,12 +47,19 @@ class Schedular:
             ),
             "default",
         )
+        self.scheduler.add_job(
+            my_job,
+            trigger=CronTrigger(hour="*/6"),  # Every 10 seconds
+            id="my_job",  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            replace_existing=True,
+        )
         self.scheduler.start()
 
 
 def my_job():
     # Your job processing logic here...
-    print("anmol")
+    print("MySQl connection refresh")
     pass
 
 
