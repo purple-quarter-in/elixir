@@ -24,7 +24,7 @@ jobs:
           cd /var/www/elixir && git checkout main && git pull &&
           source env/bin/activate && pip install -r requirements.txt &&
           python3 manage.py makemigrations && python3 manage.py migrate &&
-          sudo supervisorctl restart gunicorn && 
+          supervisorctl restart gunicorn && 
           exit "
       - name: cleanup
         run: rm -rf ~/.ssh
