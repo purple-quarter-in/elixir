@@ -23,8 +23,8 @@ class Schedular:
 
     def my_listener(self, event):
         print("in listnrer")
-        for job in self.scheduler.get_jobs():
-            print("JOB: " + str(job))
+        self.scheduler.print_jobs("default")
+        print(self.scheduler._executors)
         if event.exception:
             print(f"The job {event.job_id} crashed with execption:- {event.exception}:(")
         else:
@@ -53,7 +53,7 @@ class Schedular:
         )
         self.scheduler.add_job(
             my_job,
-            trigger=CronTrigger(hour="*/4"),  # Every 10 seconds
+            trigger=CronTrigger(second="*/4"),  # Every 10 seconds
             id="my_job",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             replace_existing=True,
