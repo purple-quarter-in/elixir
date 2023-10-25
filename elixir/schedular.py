@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -11,7 +12,7 @@ from django.conf import settings
 from elixir.settings import DATABASES
 
 logging.basicConfig()
-logging.getLogger("apscheduler").setLevel(logging.DEBUG)
+logging.getLogger("apscheduler").setLevel(logging.INFO)
 
 db_settings = DATABASES["default"]
 db_url = f"mysql://{db_settings['USER']}:{db_settings['PASSWORD']}@{db_settings['HOST']}:{db_settings['PORT']}/{db_settings['NAME']}"
@@ -21,6 +22,9 @@ class Schedular:
     scheduler = None
 
     def my_listener(self, event):
+        print("in listnrer")
+        for job in self.scheduler.get_jobs():
+            print("JOB: " + str(job))
         if event.exception:
             print(f"The job {event.job_id} crashed with execption:- {event.exception}:(")
         else:
@@ -43,7 +47,6 @@ class Schedular:
                     "pool_pre_ping": True,
                     "pool_recycle": 3600,
                     "echo": True,
-                    "echo_pool": True,
                 },
             ),
             "default",
@@ -60,8 +63,6 @@ class Schedular:
 
 def my_job():
     # Your job processing logic here...
-    for x in Job._get_run_times():
-        print("Job: runtime : " + str(x))
     print("MySQl connection refresh")
     pass
 

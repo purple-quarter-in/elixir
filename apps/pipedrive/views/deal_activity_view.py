@@ -87,6 +87,31 @@ class ActivityViewSet(ModelViewSet):
     def perform_update(self, serializer):
         if "due_date" in serializer.initial_data:
             self._instance = serializer.save(rescheduled=serializer.instance.rescheduled + 1)
+            if Apschedular.scheduler.get_job(
+                f"schedule_create_notification-activity_reminder-{self._instance.id}"
+            ):
+                Apschedular.scheduler.reschedule_job(
+                    f"schedule_create_notification-activity_reminder-{self._instance.id}",
+                    jobstore="default",
+                    trigger="date",
+                    run_date=self._instance.due_date - timedelta(minutes=self._instance.reminder),
+                )
+            else:
+                Apschedular.scheduler.add_job(
+                    schedule_create_notification,
+                    trigger="date",
+                    run_date=self._instance.due_date - timedelta(minutes=self._instance.reminder),
+                    id=f"schedule_create_notification-activity_reminder-{self._instance.id}",  # The `id` assigned to each job MUST be unique
+                    max_instances=1,
+                    kwargs={
+                        "instance": self._instance,
+                        "type": "Activity Reminder",
+                        "description": " X Activity is due in x mins",
+                        "user": self._instance.assigned_to,
+                        "model_name": "Activity",
+                    },
+                    replace_existing=True,
+                )
         else:
             self._instance = serializer.save()
 
