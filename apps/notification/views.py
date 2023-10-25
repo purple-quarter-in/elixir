@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
 from apps.notification.models import Notification
@@ -16,6 +17,11 @@ class NotificationViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.filter(user=request.user)
         return custom_success_response(self.serializer_class(queryset, many=True).data)
+
+    @action(detail=False, methods=["delete"])
+    def bulk_delete(self, request):
+        Notification.objects.filter(user=request.user).delete()
+        return custom_success_response({"message": "All Notifications has been deleted"})
 
 
 def schedule_create_notification(instance, type, description, user, model_name):
