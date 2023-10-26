@@ -136,6 +136,12 @@ class ActivityViewSet(ModelViewSet):
         obj.status = request.data.get("status")
         obj.closed_at = datetime.now()
         obj.save()
+        if Apschedular.scheduler.get_job(
+            f"schedule_create_notification-activity_reminder-{obj.id}"
+        ):
+            Apschedular.scheduler.remove_job(
+                f"schedule_create_notification-activity_reminder-{obj.id}"
+            )
         return custom_success_response({"message": "Status updated successfully"})
 
     @action(detail=False, methods=["get"])
