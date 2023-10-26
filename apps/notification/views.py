@@ -1,3 +1,4 @@
+from django import db
 from django.shortcuts import render
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -12,23 +13,19 @@ from elixir.viewsets import ModelViewSet
 class NotificationViewSet(ModelViewSet):
     queryset = Notification.objects.all().filter(archived=False).order_by("-created_at")
     serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.filter(user=request.user)
         return custom_success_response(self.serializer_class(queryset, many=True).data)
 
+    @action(detail=False, methods=["post"])
+    def schedule_create_notification(self, request):
+        serializer = NotificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return custom_success_response({"message": "Notification created"})
+
     @action(detail=False, methods=["delete"])
     def bulk_delete(self, request):
         Notification.objects.filter(user=request.user).delete()
         return custom_success_response({"message": "All Notifications has been deleted"})
-
-
-def schedule_create_notification(instance, type, description, user, model_name):
-    Notification.objects.create(
-        type=type,
-        description=description,
-        user=user,
-        model_name=model_name,
-        object_id=instance.id if instance else None,
-    )

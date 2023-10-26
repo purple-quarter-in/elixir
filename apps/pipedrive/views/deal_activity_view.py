@@ -7,7 +7,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from apps.notification.models import Notification
-from apps.notification.views import schedule_create_notification
 from apps.pipedrive.models import Activity, Note
 from apps.pipedrive.models import changelog as Changelog
 from apps.pipedrive.serializer import (
@@ -17,6 +16,7 @@ from apps.pipedrive.serializer import (
     HistoryNoteSerializer,
     NoteSerializer,
 )
+from elixir.schedular import schedule_create_notification
 from elixir.utils import custom_success_response
 from elixir.viewsets import ModelViewSet
 from elixir.wsgi import Apschedular

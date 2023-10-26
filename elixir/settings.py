@@ -54,9 +54,7 @@ CORS_ALLOW_HEADERS = [
     "authorization",
     "accept",
 ]
-CSRF_TRUSTED_ORIGINS = [
-    "https://api.elixir.purplequarter.co"
-]
+CSRF_TRUSTED_ORIGINS = ["https://api.elixir.purplequarter.co"]
 INSTALLED_APPS = [
     "jet.dashboard",
     "jet",
@@ -191,3 +189,4 @@ LOGGING_CONFIG = None
 logging.config.dictConfig(LOGGING)
 LOGGEER = logging.getLogger("elixir")
 SITE_URL = "www.elixie.purplequarter.co/"
+API_URL = ENV.str("API_URL")
