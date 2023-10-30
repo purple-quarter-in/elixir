@@ -122,3 +122,16 @@ class ContactViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         self._instance = serializer.save(**(set_crated_by_updated_by(self.request.user)))
+
+    @action(detail=False, methods=["get"])
+    def is_duplicate(self, request):
+        is_duplicate = False
+        phone = request.query_params.get("phone", None)
+        email = request.query_params.get("email", None)
+        if phone:
+            is_phone = Contact.objects.filter(phone=phone).exists()
+            is_duplicate = is_duplicate or is_phone
+        if email:
+            is_email = Contact.objects.filter(email=email).exists()
+            is_duplicate = is_duplicate or is_email
+        return custom_success_response({"is_duplicate": is_duplicate})

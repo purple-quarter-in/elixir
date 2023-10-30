@@ -92,7 +92,7 @@ class User(AbstractUser):
         return full_name.strip()
 
     def get_dict_name_id(self):
-        return {"name": self.get_full_name(), "id": self.id}
+        return {"name": self.get_full_name(), "id": self.id, "is_active": self.is_active}
 
 
 class Team(models.Model):

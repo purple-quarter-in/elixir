@@ -132,7 +132,6 @@ class LeadViewSet(ModelViewSet):
             title=dto["title"],
             created_by=request.user,
             updated_by=request.user,
-            owner=request.user,
         )
         changelog(
             self.changelog,
@@ -153,7 +152,7 @@ class LeadViewSet(ModelViewSet):
         obj.is_converted_to_prospect = True
         obj.updated_by = request.user
         prospect = Prospect.objects.update_or_create(
-            lead=obj, defaults={"owner": request.user, **set_crated_by_updated_by(request.user)}
+            lead=obj, defaults={"owner": obj.owner, **set_crated_by_updated_by(request.user)}
         )
         if prospect:
             changelog(
