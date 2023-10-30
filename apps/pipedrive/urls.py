@@ -8,7 +8,12 @@ from apps.pipedrive.views.deal_activity_view import (
     NoteViewSet,
 )
 
-from .views.views import LeadViewSet, ProspectViewSet, RoleDetailViewSet
+from .views.views import (
+    CreateLandingPageLead,
+    LeadViewSet,
+    ProspectViewSet,
+    RoleDetailViewSet,
+)
 
 router = DefaultRouter()
 router.register("lead", LeadViewSet)
@@ -19,4 +24,5 @@ router.register("activity", ActivityViewSet)
 urlpatterns = [
     path("template", views.say_hello, name="home"),
     path("history/activity/", view=History.as_view()),
+    path("landingpage/createlead/", CreateLandingPageLead.as_view()),
 ]

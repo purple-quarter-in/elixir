@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from apps.client.models import Contact, Organisation
@@ -281,3 +282,59 @@ class ProspectViewSet(ModelViewSet):
             )
         else:
             raise ValidationError({"message": ["Technical error"]})
+
+
+class CreateLandingPageLead(CreateAPIView):
+    changelog = {
+        "model": "Lead",
+        "mapping_obj": "id",
+        "is_mapping_obj_func": False,
+        "create": {
+            "is_created": {"type": "Entity Created", "description": "Lead Created"},
+        },
+    }
+
+    def post(self, request, *args, **kwargs):
+        serializer = CreateLeadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        dto = serializer.validated_data
+        role_serializer = RoleDetailSerializer(data=dto["role_details"])
+        role_serializer.is_valid(raise_exception=True)
+        org_id = None
+        count = 0
+        if Organisation.objects.filter(name=dto["organisation"]["name"]).exists():
+            org = Organisation.objects.filter(name=dto["organisation"]["name"]).last()
+
+        else:
+            org = Organisation.objects.create(name=dto["organisation"]["name"])
+        org_id = org.id
+        role = role_serializer.save()
+        if "contact_details" in dto["organisation"]:
+            for contact in dto["organisation"]["contact_details"]:
+                Contact.objects.create(
+                    organisation_id=org_id, **contact, **set_crated_by_updated_by(None)
+                )
+            pass
+        count = Lead.objects.filter(
+            organisation_id=org_id,
+            role__region=dto["role_details"]["region"],
+            role__role_type=dto["role_details"]["role_type"],
+        ).count()
+        lead = Lead.objects.create(
+            organisation_id=org_id,
+            role=role,
+            source=dto["source"],
+            title=f'{dto["organisation"]["name"]} - {dto["role_details"]["region"]} - {dto["role_details"]["role_type"]} - {count+1}',
+            created_by=None,
+            updated_by=None,
+        )
+        changelog(
+            self.changelog,
+            lead,
+            {"is_created": None},
+            "create",
+            None,
+        )
+        return custom_success_response(
+            {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
+        )

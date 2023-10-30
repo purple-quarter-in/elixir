@@ -40,10 +40,10 @@ class OrganisationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_created_by(self, instance):
-        return instance.created_by.get_dict_name_id()
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
 
     def get_updated_by(self, instance):
-        return instance.updated_by.get_dict_name_id()
+        return instance.updated_by.get_dict_name_id() if instance.updated_by is not None else None
 
     def get_contacts(self, instance):
         return ContactSerializer(Contact.objects.filter(organisation=instance), many=True).data

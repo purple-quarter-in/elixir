@@ -261,7 +261,9 @@ class changelog(models.Model):
     changed_from = models.CharField(max_length=150, blank=True, null=True)
     changed_to = models.CharField(max_length=150, blank=True, null=True)
     description = models.CharField(max_length=150, blank=True, null=True)
-    changed_by = models.ForeignKey(User, related_name="changed_by", on_delete=models.DO_NOTHING)
+    changed_by = models.ForeignKey(
+        User, related_name="changed_by", on_delete=models.DO_NOTHING, null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     model_name = models.CharField(max_length=50, blank=True, null=True)
     obj_id = models.CharField(max_length=50, blank=True, null=True)
