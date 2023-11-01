@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import action
@@ -163,6 +165,8 @@ class LeadViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
+            if not obj.closure_time:
+                obj.closure_time = datetime.now()
             obj.save()
             return custom_success_response(self.serializer_class(obj).data)
         else:
@@ -189,6 +193,7 @@ class LeadViewSet(ModelViewSet):
         lead = Lead.objects.get(id=pk)
         serializer = UpdateLeadSerializer(lead, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+
         if self.changelog and ("update" in self.changelog):
             changelog(
                 self.changelog,
@@ -197,7 +202,10 @@ class LeadViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
-        serializer.save(updated_by=request.user)
+        if not lead.verification_time and "status" in serializer.validated_data:
+            serializer.save(updated_by=request.user, verification_time=datetime.now())
+        else:
+            serializer.save(updated_by=request.user)
         return custom_success_response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -90,13 +90,9 @@ class Lead(models.Model):
         null=True,
         related_name="lead_created_by_user",
     )
-    updated_by = models.ForeignKey(
-        "user.User",
-        on_delete=models.DO_NOTHING,
-        default=None,
-        null=True,
-        related_name="lead_updated_by_user",
-    )
+    updated_by = models.ForeignKey("user.User",on_delete=models.DO_NOTHING,default=None,null=True,related_name="lead_updated_by_user"),
+    verification_time =models.DateTimeField(default=None, blank=True, null=True),
+    closure_time = models.DateTimeField(default=None, blank=True, null=True)
 
     class Meta:
         """Meta definition for Lead."""
@@ -113,6 +109,14 @@ class Lead(models.Model):
         if not self.id:
             self.created_at = timezone.now()
         self.updated_at = timezone.now()
+        count = Lead.objects.filter(
+            organisation=self.organisation,
+            role__region=self.role.region,
+            role__role_type=self.role.role_type,
+        ).count()
+        self.title = title = (
+            f"{self.organisation.name} - {self.role_details.region} - {self.role_details.role_type} - {count+1}",
+        )
         return super(Lead, self).save(*args, **kwargs)
 
 

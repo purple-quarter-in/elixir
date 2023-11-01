@@ -47,6 +47,7 @@ class CustomPasswordResetView:
             "current_user": reset_password_token.user,
             "username": reset_password_token.user.username,
             "email": reset_password_token.user.email,
+            "full_name": reset_password_token.user.get_full_name(),
             "reset_password_url": "{}password-reset/{}".format(
                 "www.elixir.purplequarter.co/", reset_password_token.key
             ),
