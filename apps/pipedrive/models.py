@@ -90,8 +90,14 @@ class Lead(models.Model):
         null=True,
         related_name="lead_created_by_user",
     )
-    updated_by = models.ForeignKey("user.User",on_delete=models.DO_NOTHING,default=None,null=True,related_name="lead_updated_by_user"),
-    verification_time =models.DateTimeField(default=None, blank=True, null=True),
+    updated_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="lead_updated_by_user",
+    )
+    verification_time = models.DateTimeField(default=None, blank=True, null=True)
     closure_time = models.DateTimeField(default=None, blank=True, null=True)
 
     class Meta:
