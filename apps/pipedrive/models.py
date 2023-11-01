@@ -120,7 +120,7 @@ class Lead(models.Model):
             role__region=self.role.region,
             role__role_type=self.role.role_type,
         ).count()
-        self.title = title = (
+        self.title = (
             f"{self.organisation.name} - {self.role.region} - {self.role.role_type} - {count+1}",
         )
         return super(Lead, self).save(*args, **kwargs)
