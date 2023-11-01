@@ -114,15 +114,15 @@ class Lead(models.Model):
         """On save, update timestamps"""
         if not self.id:
             self.created_at = timezone.now()
+            count = Lead.objects.filter(
+                organisation=self.organisation,
+                role__region=self.role.region,
+                role__role_type=self.role.role_type,
+            ).count()
+            self.title = (
+                f"{self.organisation.name} - {self.role.region} - {self.role.role_type} - {count+1}",
+            )
         self.updated_at = timezone.now()
-        count = Lead.objects.filter(
-            organisation=self.organisation,
-            role__region=self.role.region,
-            role__role_type=self.role.role_type,
-        ).count()
-        self.title = (
-            f"{self.organisation.name} - {self.role.region} - {self.role.role_type} - {count+1}",
-        )
         return super(Lead, self).save(*args, **kwargs)
 
 
