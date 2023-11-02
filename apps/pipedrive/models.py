@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from apps.client.models import Organisation
+from apps.pipedrive.helper import upload_path_rdcapsule, upload_path_service_contract
 from apps.user.models import User
 
 # Create your models here.
@@ -119,9 +120,7 @@ class Lead(models.Model):
                 role__region=self.role.region,
                 role__role_type=self.role.role_type,
             ).count()
-            self.title = (
-                f"{self.organisation.name} - {self.role.region} - {self.role.role_type} - {count+1}",
-            )
+            self.title = f"{self.organisation.name} - {self.role.region} - {self.role.role_type} - {count+1}"
         self.updated_at = timezone.now()
         return super(Lead, self).save(*args, **kwargs)
 
@@ -286,3 +285,47 @@ class changelog(models.Model):
 
     def __str__(self):
         return self.type + " : " + (self.description or "")
+
+
+class ServiceContract(models.Model):
+    """Model definition for ServiceContract."""
+
+    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=upload_path_service_contract)
+    uploaded_at = models.DateTimeField(auto_now_add=True, editable=False)
+    sent_on = models.DateTimeField(default=None, blank=True, null=True)
+    uploaded_by = models.ForeignKey(
+        User, related_name="contract_uploaded_by", on_delete=models.DO_NOTHING
+    )
+
+    class Meta:
+        """Meta definition for ServiceContract."""
+
+        verbose_name = "ServiceContract"
+        verbose_name_plural = "ServiceContracts"
+
+    def __str__(self):
+        """Unicode representation of ServiceContract."""
+        return self.file.url
+
+
+class RDCapsule(models.Model):
+    """Model definition for RDCapsule."""
+
+    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=upload_path_rdcapsule)
+    uploaded_at = models.DateTimeField(auto_now_add=True, editable=False)
+    sent_on = models.DateTimeField(default=None, blank=True, null=True)
+    uploaded_by = models.ForeignKey(
+        User, related_name="rdcapsule_uploaded_by", on_delete=models.DO_NOTHING
+    )
+
+    class Meta:
+        """Meta definition for RDCapsule."""
+
+        verbose_name = "RDCapsule"
+        verbose_name_plural = "RDCapsules"
+
+    def __str__(self):
+        """Unicode representation of RDCapsule."""
+        return self.file.url

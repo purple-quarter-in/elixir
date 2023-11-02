@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
-from .settings import LOGGEER
+from .settings.base import LOGGEER
 
 
 def my_exception_handler(exc, context):

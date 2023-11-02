@@ -12,7 +12,9 @@ from .views.views import (
     CreateLandingPageLead,
     LeadViewSet,
     ProspectViewSet,
+    RDCapsuleViewSet,
     RoleDetailViewSet,
+    ServiceContractViewSet,
 )
 
 router = DefaultRouter()
@@ -21,6 +23,8 @@ router.register("role_detail", RoleDetailViewSet)
 router.register("prospect", ProspectViewSet)
 router.register("note", NoteViewSet)
 router.register("activity", ActivityViewSet)
+router.register("contract", ServiceContractViewSet)
+router.register("rdcapsule", RDCapsuleViewSet)
 urlpatterns = [
     path("template", views.say_hello, name="home"),
     path("history/activity/", view=History.as_view()),

@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from urllib import request
 
 from django.shortcuts import render
 from rest_framework import status
@@ -6,14 +7,17 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
+from yaml import serialize
 
 from apps.client.models import Contact, Organisation
-from apps.pipedrive.models import Lead, Prospect, RoleDetail
+from apps.pipedrive.models import Lead, Prospect, RDCapsule, RoleDetail, ServiceContract
 from apps.pipedrive.serializer import (
     CreateLeadSerializer,
     LeadSerializer,
     ProspectSerializer,
+    RDCapsuleSerializer,
     RoleDetailSerializer,
+    ServiceContractSerializer,
     UpdateLeadSerializer,
     UpdateProspectSerializer,
 )
@@ -202,7 +206,11 @@ class LeadViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
-        if not lead.verification_time and "status" in serializer.validated_data:
+        if (
+            not lead.verification_time
+            and "status" in serializer.validated_data
+            and serializer.validated_data["status"] != "Unverified"
+        ):
             serializer.save(updated_by=request.user, verification_time=datetime.now())
         else:
             serializer.save(updated_by=request.user)
@@ -291,6 +299,10 @@ class ProspectViewSet(ModelViewSet):
         else:
             raise ValidationError({"message": ["Technical error"]})
 
+    # @action(detail=False, methods=["post"], permission_classes=[IsAuthenticated])
+    # def contract(self, request):
+    #     # obj = self.get_object(pk=request.data.get("prospect"))
+
 
 class CreateLandingPageLead(CreateAPIView):
     changelog = {
@@ -346,3 +358,41 @@ class CreateLandingPageLead(CreateAPIView):
         return custom_success_response(
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
         )
+
+
+class ServiceContractViewSet(ModelViewSet):
+    queryset = ServiceContract.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = ServiceContractSerializer
+    http_method_names = ["post", "get"]
+
+    def list(self, request, *args, **kwargs):
+        prospect = request.query_params.get("prospect", None)
+        if prospect:
+            return custom_success_response(
+                self.get_serializer(self.queryset.filter(prospect=prospect), many=True).data
+            )
+        else:
+            raise ValidationError({"prospect": ["This field is required"]})
+
+    def perform_create(self, serializer, **kwargs):
+        self._instance = serializer.save(uploaded_by=self.request.user)
+
+
+class RDCapsuleViewSet(ModelViewSet):
+    queryset = RDCapsule.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = RDCapsuleSerializer
+    http_method_names = ["post", "get"]
+
+    def list(self, request, *args, **kwargs):
+        prospect = request.query_params.get("prospect", None)
+        if prospect:
+            return custom_success_response(
+                self.get_serializer(self.queryset.filter(prospect=prospect), many=True).data
+            )
+        else:
+            raise ValidationError({"prospect": ["This field is required"]})
+
+    def perform_create(self, serializer, **kwargs):
+        self._instance = serializer.save(uploaded_by=self.request.user)

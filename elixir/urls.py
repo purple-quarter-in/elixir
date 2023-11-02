@@ -25,7 +25,7 @@ from apps.django_rest_passwordreset.urls import urlpatterns as reset_urlpatterns
 from apps.pipedrive.urls import urlpatterns as pipedrive_urlpatterns
 from apps.user.urls import urlpatterns as user_urlpatterns
 
-from . import settings
+from .settings import base
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -68,4 +68,4 @@ urlpatterns = [
         name="swagger-ui",
     ),
 ]
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(base.STATIC_URL, document_root=base.STATIC_ROOT)

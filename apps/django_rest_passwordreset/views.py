@@ -12,7 +12,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, status
 from rest_framework.generics import GenericAPIView
 
-from elixir.settings import SITE_URL
 from elixir.utils import custom_success_response
 
 from .models import (
@@ -28,6 +27,7 @@ from .signals import (
     reset_password_token_created,
 )
 
+SITE_URL = settings.SITE_URL
 User = get_user_model()
 
 __all__ = [

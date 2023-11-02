@@ -11,6 +11,8 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'elixir.settings')
+from elixir.settings.base import ENV
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"elixir.settings.{ENV.str('ENV_TYPE')}")
 
 application = get_asgi_application()

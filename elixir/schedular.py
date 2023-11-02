@@ -13,7 +13,7 @@ from django.conf import settings
 from sqlalchemy import Connection
 
 from apps.notification.models import Notification
-from elixir.settings import DATABASES
+from elixir.settings.base import DATABASES
 
 logging.basicConfig()
 logging.getLogger("apscheduler").setLevel(logging.INFO)

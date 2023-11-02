@@ -3,7 +3,16 @@ from rest_framework import serializers
 
 from apps.client.models import Contact
 from apps.client.serializer import OrganisationSerializer
-from apps.pipedrive.models import Activity, Lead, Note, Prospect, RoleDetail, changelog
+from apps.pipedrive.models import (
+    Activity,
+    Lead,
+    Note,
+    Prospect,
+    RDCapsule,
+    RoleDetail,
+    ServiceContract,
+    changelog,
+)
 
 
 class CreateLeadSerializer(serializers.Serializer):
@@ -193,3 +202,27 @@ class ChangelogSerializer(serializers.ModelSerializer):
 
     def get_changed_by(self, instance):
         return instance.changed_by.get_dict_name_id() if instance.changed_by is not None else None
+
+
+class ServiceContractSerializer(serializers.ModelSerializer):
+    uploaded_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ServiceContract
+        fields = "__all__"
+        extra_kwargs = {"uploaded_by": {"read_only": True}}
+
+    def get_uploaded_by(self, instance):
+        return instance.uploaded_by.get_dict_name_id()
+
+
+class RDCapsuleSerializer(serializers.ModelSerializer):
+    uploaded_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RDCapsule
+        fields = "__all__"
+        extra_kwargs = {"uploaded_by": {"read_only": True}}
+
+    def get_uploaded_by(self, instance):
+        return instance.uploaded_by.get_dict_name_id()

@@ -1,6 +1,7 @@
 # Create your views here.
 import email
 
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.dispatch import receiver
@@ -48,11 +49,11 @@ class CustomPasswordResetView:
             "username": reset_password_token.user.username,
             "email": reset_password_token.user.email,
             "full_name": reset_password_token.user.get_full_name(),
-            "reset_password_url": "{}password-reset/{}".format(
-                "www.elixir.purplequarter.co/", reset_password_token.key
+            "reset_password_url": "{}/password-reset/{}".format(
+                settings.SITE_URL, reset_password_token.key
             ),
             "site_name": "Elixir",
-            "site_domain": "www.elixir.purplequarter.com",
+            "site_domain": "elixir.purplequarter.com",
         }
         # render email text
         email_html_message = render_to_string("email/user_reset_password.html", {"data": context})

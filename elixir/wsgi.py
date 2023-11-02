@@ -11,7 +11,10 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "elixir.settings")
+from elixir.settings.base import ENV
+
+print(f"elixir.settings.{ENV.str('ENV_TYPE')}")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"elixir.settings.{ENV.str('ENV_TYPE')}")
 application = get_wsgi_application()
 from elixir import schedular
 
