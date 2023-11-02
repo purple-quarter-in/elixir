@@ -49,7 +49,7 @@ class CustomPasswordResetView:
             "username": reset_password_token.user.username,
             "email": reset_password_token.user.email,
             "full_name": reset_password_token.user.get_full_name(),
-            "reset_password_url": "{}/password-reset/{}".format(
+            "reset_password_url": "{}/password-reset?token={}".format(
                 settings.SITE_URL, reset_password_token.key
             ),
             "site_name": "Elixir",
@@ -59,7 +59,7 @@ class CustomPasswordResetView:
         email_html_message = render_to_string("email/user_reset_password.html", {"data": context})
         email_plaintext_message = strip_tags(email_html_message)
         result = send_mail(
-            "Password Reset for {}".format("Elixir."),
+            "Reset your {} Password".format("Elixir."),
             email_plaintext_message,
             "info@purplequarter.com",
             [reset_password_token.user.email],
@@ -114,7 +114,7 @@ class UserViewSet(ModelViewSet):
             },
         )
         email = send_mail(
-            "Activate Your Account",
+            f"Welcome to Elixir, {user.first_name}!",
             message,
             "info@purplequarter.com",
             [user.email],
