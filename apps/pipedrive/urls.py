@@ -10,6 +10,7 @@ from apps.pipedrive.views.deal_activity_view import (
 
 from .views.views import (
     CreateLandingPageLead,
+    DealViewSet,
     LeadViewSet,
     ProspectViewSet,
     RDCapsuleViewSet,
@@ -21,6 +22,7 @@ router = DefaultRouter()
 router.register("lead", LeadViewSet)
 router.register("role_detail", RoleDetailViewSet)
 router.register("prospect", ProspectViewSet)
+router.register("deal", DealViewSet)
 router.register("note", NoteViewSet)
 router.register("activity", ActivityViewSet)
 router.register("contract", ServiceContractViewSet)

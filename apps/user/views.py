@@ -59,7 +59,7 @@ class CustomPasswordResetView:
         email_html_message = render_to_string("email/user_reset_password.html", {"data": context})
         email_plaintext_message = strip_tags(email_html_message)
         result = send_mail(
-            "Reset your {} Password".format("Elixir."),
+            "Reset your {} Password".format("Elixir"),
             email_plaintext_message,
             "info@purplequarter.com",
             [reset_password_token.user.email],
@@ -143,11 +143,16 @@ class UserViewSet(ModelViewSet):
         if "profile" in serializer.validated_data:
             instance.groups.clear()
             serializer.validated_data["profile"].user_set.add(instance)
+        if "is_active" in serializer.validated_data:
+            if serializer.validated_data["is_active"] and instance.is_email_verified == False:
+                serializer.validated_data["is_active"] = False
+            else:
+                serializer.validated_data["archived"] = not serializer.validated_data["is_active"]
         serializer.save(updated_by=request.user)
         if getattr(instance, "_prefetched_objects_cache", None):
             instance._prefetched_objects_cache = {}
         return custom_success_response(
-            self.get_serializer(instance).data, message="success, object updated"
+            GetUserSerializer(instance).data, message="success, object updated"
         )
 
     @action(detail=False, methods=["post"])
@@ -187,6 +192,7 @@ class UserViewSet(ModelViewSet):
             user = None
         if (
             user is not None
+            and not user.archived
             and account_activation_token.check_token(user, request.data.get("token"))
             # and UserVerificationToken.objects.filter(
             #     token=request.data.get("token"), is_used=False
@@ -230,6 +236,7 @@ class UserViewSet(ModelViewSet):
                         fail_silently=True,
                     )
                     print(context)
+                    user.save()
                 else:
                     raise ValidationError({"message": ["User Already verified"]})
             except User.DoesNotExist:
@@ -248,6 +255,7 @@ class UserViewSet(ModelViewSet):
         if user is not None and user.is_email_verified:
             user.password = make_password(request.data.get("password"))
             user.is_active = True
+            user.archived = False
             user.save()
             # token = UserVerificationToken.objects.get(token=request.data.get("token"))
             # token.is_used = True

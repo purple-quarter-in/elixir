@@ -47,7 +47,7 @@ class ModelViewSet(viewsets.ModelViewSet):
         if (
             (not request.user.is_superuser)
             and len(self.user_permissions["post"]) > 0
-            and not request.user.has_perms(tuple(self.user_permissions["get"]))
+            and not request.user.has_perms(tuple(self.user_permissions["post"]))
         ):
             raise PermissionDenied()
         serializer = self.get_serializer(data=request.data)
@@ -67,7 +67,7 @@ class ModelViewSet(viewsets.ModelViewSet):
         if (
             (not request.user.is_superuser)
             and len(self.user_permissions["patch"]) > 0
-            and not request.user.has_perms(tuple(self.user_permissions["get"]))
+            and not request.user.has_perms(tuple(self.user_permissions["patch"]))
         ):
             raise PermissionDenied()
         partial = kwargs.pop("partial", True)

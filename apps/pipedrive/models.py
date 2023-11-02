@@ -181,6 +181,62 @@ class Prospect(models.Model):
         return super(Prospect, self).save(*args, **kwargs)
 
 
+class Deal(models.Model):
+    """Model definition for Deal."""
+
+    # TODO: Define fields here
+    # organization = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
+    # role = models.CharField(max_length=100, blank=True, null=True)
+    # budget = models.CharField(max_length=100, blank=True, null=True)
+    # location = models.CharField(max_length=100, blank=True, null=True)
+    # source = models.CharField(max_length=100)
+    status = models.CharField(default="Qualified", max_length=50)
+    reason = models.CharField(max_length=150, blank=True, null=True)
+    prospect = models.ForeignKey(Prospect, on_delete=models.DO_NOTHING)
+    lead = models.ForeignKey(Lead, on_delete=models.DO_NOTHING)
+    archived = models.BooleanField(default=0)
+    created_at = models.DateTimeField(editable=False)
+    updated_at = models.DateTimeField()
+    owner = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="deal_owner_user",
+    )
+    created_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="deal_lead_created_by_user",
+    )
+    updated_by = models.ForeignKey(
+        "user.User",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+        related_name="deal_updated_by_user",
+    )
+
+    class Meta:
+        """Meta definition for Deal."""
+
+        verbose_name = "Deal"
+        verbose_name_plural = "Deals"
+        permissions = [("access_deal", "Can access deal")]
+
+    def __str__(self):
+        return self.lead.title
+
+    def save(self, *args, **kwargs):
+        """On save, update timestamps"""
+        if not self.id:
+            self.created_at = timezone.now()
+        self.updated_at = timezone.now()
+        return super(Deal, self).save(*args, **kwargs)
+
+
 class Activity(models.Model):
     """Model definition for Activity."""
 

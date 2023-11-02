@@ -4,6 +4,7 @@ from math import remainder
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 
@@ -43,3 +44,13 @@ def set_crated_by_updated_by(user):
         "created_by": user,
         "updated_by": user,
     }
+
+
+def check_permisson(self, request):
+    method = (request.method).lower()
+    if (
+        (not request.user.is_superuser)
+        and len(self.user_permissions[method]) > 0
+        and not request.user.has_perms(tuple(self.user_permissions[method]))
+    ):
+        raise PermissionDenied()

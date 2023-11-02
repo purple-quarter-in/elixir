@@ -5,6 +5,7 @@ from apps.client.models import Contact
 from apps.client.serializer import OrganisationSerializer
 from apps.pipedrive.models import (
     Activity,
+    Deal,
     Lead,
     Note,
     Prospect,
@@ -31,6 +32,12 @@ class UpdateProspectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prospect
         exclude = ("created_at", "updated_at")
+
+
+class UpdateDealSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deal
+        exclude = ("created_at", "updated_at", "lead", "prospect")
 
 
 class RoleDetailSerializer(serializers.ModelSerializer):
@@ -88,6 +95,29 @@ class ProspectSerializer(serializers.ModelSerializer):
 
     def get_lead(self, instance):
         return LeadSerializer(instance.lead).data
+
+
+class DealSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+    updated_by = serializers.SerializerMethodField()
+    owner = serializers.SerializerMethodField()
+    prospect = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Deal
+        exclude = ["updated_at", "lead"]
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
+
+    def get_updated_by(self, instance):
+        return instance.updated_by.get_dict_name_id() if instance.updated_by is not None else None
+
+    def get_owner(self, instance):
+        return instance.owner.get_dict_name_id() if instance.owner is not None else None
+
+    def get_prospect(self, instance):
+        return ProspectSerializer(instance.prospect).data
 
 
 # not used

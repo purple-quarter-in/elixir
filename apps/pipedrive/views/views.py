@@ -4,15 +4,23 @@ from urllib import request
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from yaml import serialize
 
 from apps.client.models import Contact, Organisation
-from apps.pipedrive.models import Lead, Prospect, RDCapsule, RoleDetail, ServiceContract
+from apps.pipedrive.models import (
+    Deal,
+    Lead,
+    Prospect,
+    RDCapsule,
+    RoleDetail,
+    ServiceContract,
+)
 from apps.pipedrive.serializer import (
     CreateLeadSerializer,
+    DealSerializer,
     LeadSerializer,
     ProspectSerializer,
     RDCapsuleSerializer,
@@ -22,7 +30,11 @@ from apps.pipedrive.serializer import (
     UpdateProspectSerializer,
 )
 from elixir.changelog import changelog
-from elixir.utils import custom_success_response, set_crated_by_updated_by
+from elixir.utils import (
+    check_permisson,
+    custom_success_response,
+    set_crated_by_updated_by,
+)
 from elixir.viewsets import ModelViewSet
 
 
@@ -96,7 +108,7 @@ class LeadViewSet(ModelViewSet):
     }
 
     def create(self, request, *args, **kwargs):
-        # if request.user.has_perms(['pipedrive.access_lead','pipedrive.create_lead','client.access_organisation','client.add_organisation'])
+        check_permisson(self, request)
         serializer = CreateLeadSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         dto = request.data
@@ -153,6 +165,7 @@ class LeadViewSet(ModelViewSet):
 
     @action(detail=True, methods=["patch"])
     def promote(self, request, pk):
+        check_permisson(self, request)
         obj = self.get_object()
         if obj.is_converted_to_prospect:
             raise ValidationError({"message": ["Lead already converted to prospect"]})
@@ -178,6 +191,7 @@ class LeadViewSet(ModelViewSet):
 
     @action(detail=False, methods=["patch"])
     def bulk_archive(self, request):
+        check_permisson(self, request)
         if "leads" not in request.data:
             raise ValidationError({"leads": "List of lead id is required"})
         if "archive" not in request.data:
@@ -194,6 +208,7 @@ class LeadViewSet(ModelViewSet):
             raise ValidationError({"message": ["Technical error"]})
 
     def partial_update(self, request, pk):
+        check_permisson(self, request)
         lead = Lead.objects.get(id=pk)
         serializer = UpdateLeadSerializer(lead, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -262,6 +277,7 @@ class ProspectViewSet(ModelViewSet):
     }
 
     def partial_update(self, request, pk):
+        check_permisson(self, request)
         prospect = self.get_object()
         serializer = UpdateProspectSerializer(prospect, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -278,8 +294,35 @@ class ProspectViewSet(ModelViewSet):
             ProspectSerializer(prospect).data, status=status.HTTP_200_OK
         )
 
+    @action(detail=True, methods=["patch"])
+    def promote(self, request, pk):
+        check_permisson(self, request)
+        obj = self.get_object()
+        if obj.is_converted_to_deal:
+            raise ValidationError({"message": ["Prospect already converted to deal"]})
+        obj.is_converted_to_deal = True
+        obj.updated_by = request.user
+        deal = Deal.objects.update_or_create(
+            lead=obj.lead,
+            prospect=obj,
+            defaults={"owner": obj.owner, **set_crated_by_updated_by(request.user)},
+        )
+        if deal:
+            changelog(
+                self.changelog,
+                obj,
+                {"is_converted_to_deal": True},
+                "update",
+                request.user.id,
+            )
+            obj.save()
+            return custom_success_response(self.serializer_class(obj).data)
+        else:
+            raise ValidationError({"message": ["Technical error"]})
+
     @action(detail=False, methods=["patch"])
     def bulk_archive(self, request):
+        check_permisson(self, request)
         if "prospects" not in request.data:
             raise ValidationError({"prospects": ["List of prospect id(s) is/are required"]})
         if "archive" not in request.data:
@@ -299,9 +342,44 @@ class ProspectViewSet(ModelViewSet):
         else:
             raise ValidationError({"message": ["Technical error"]})
 
-    # @action(detail=False, methods=["post"], permission_classes=[IsAuthenticated])
-    # def contract(self, request):
-    #     # obj = self.get_object(pk=request.data.get("prospect"))
+
+class DealViewSet(ModelViewSet):
+    queryset = Deal.objects.all().order_by("-created_at")
+    serializer_class = DealSerializer
+    permission_classes = [IsAuthenticated]
+    user_permissions = {
+        "get": ["pipedrive.view_deal"],
+        "post": ["pipedrive.create_deal"],
+        "patch": ["pipedrive.update_deal"],
+    }
+    changelog = {
+        "model": "Lead",
+        "mapping_obj": "lead_id",
+        "is_mapping_obj_func": False,
+        "update": {"status": {"type": "Status Update", "description": "Deal State Updated"}},
+    }
+
+    @action(detail=False, methods=["patch"])
+    def bulk_archive(self, request):
+        check_permisson(self, request)
+        if "deal" not in request.data:
+            raise ValidationError({"deal": ["List of prospect id(s) is/are required"]})
+        if "archive" not in request.data:
+            raise ValidationError({"archive": ["This boolean field is required"]})
+
+        deal = Deal.objects.filter(id__in=request.data.get("deal")).update(
+            archived=request.data.get("archive")
+        )
+        if deal > 0:
+            return custom_success_response(
+                {
+                    "message": [
+                        f"{deal} deal(s) has been marked archived as {request.data.get('archive')}"
+                    ]
+                }
+            )
+        else:
+            raise ValidationError({"message": ["Technical error"]})
 
 
 class CreateLandingPageLead(CreateAPIView):
