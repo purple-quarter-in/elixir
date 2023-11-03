@@ -53,8 +53,8 @@ class ActivityViewSet(ModelViewSet):
     # permission_classes = [IsAuthenticated]
     user_permissions = {
         "get": ["pipedrive.view_lead"],
-        "post": ["pipedrive.create_lead"],
-        "patch": ["pipedrive.update_lead"],
+        "post": ["pipedrive.add_lead"],
+        "patch": ["pipedrive.change_lead"],
     }
 
     def perform_create(self, serializer, **kwargs):

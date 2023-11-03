@@ -85,7 +85,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         email = validated_data.pop("email")
         password = validated_data.pop("password")
         username = email
-        user = User.objects.create_user(
+        user = User.objects.add_user(
             email=email, password=password, username=username, **validated_data
         )
         return user

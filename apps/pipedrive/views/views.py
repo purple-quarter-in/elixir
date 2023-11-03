@@ -69,8 +69,8 @@ class LeadViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     user_permissions = {
         "get": ["pipedrive.view_lead"],
-        "post": ["pipedrive.create_lead"],
-        "patch": ["pipedrive.update_lead"],
+        "post": ["pipedrive.add_lead"],
+        "patch": ["pipedrive.change_lead"],
     }
     changelog = {
         "model": "Lead",
@@ -171,7 +171,7 @@ class LeadViewSet(ModelViewSet):
             raise ValidationError({"message": ["Lead already converted to prospect"]})
         obj.is_converted_to_prospect = True
         obj.updated_by = request.user
-        prospect = Prospect.objects.update_or_create(
+        prospect = Prospect.objects.change_or_create(
             lead=obj, defaults={"owner": obj.owner, **set_crated_by_updated_by(request.user)}
         )
         if prospect:
@@ -260,8 +260,8 @@ class ProspectViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     user_permissions = {
         "get": ["pipedrive.view_prospect"],
-        "post": ["pipedrive.create_prospect"],
-        "patch": ["pipedrive.update_prospect"],
+        "post": ["pipedrive.add_prospect"],
+        "patch": ["pipedrive.change_prospect"],
     }
     changelog = {
         "model": "Lead",
@@ -302,7 +302,7 @@ class ProspectViewSet(ModelViewSet):
             raise ValidationError({"message": ["Prospect already converted to deal"]})
         obj.is_converted_to_deal = True
         obj.updated_by = request.user
-        deal = Deal.objects.update_or_create(
+        deal = Deal.objects.change_or_create(
             lead=obj.lead,
             prospect=obj,
             defaults={
@@ -353,8 +353,8 @@ class DealViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     user_permissions = {
         "get": ["pipedrive.view_deal"],
-        "post": ["pipedrive.create_deal"],
-        "patch": ["pipedrive.update_deal"],
+        "post": ["pipedrive.add_deal"],
+        "patch": ["pipedrive.change_deal"],
     }
     changelog = {
         "model": "Lead",
