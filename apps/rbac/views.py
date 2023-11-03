@@ -12,7 +12,7 @@ from apps.rbac.serializer import (
     GroupSerializer,
 )
 from apps.user.models import User
-from elixir.utils import custom_success_response
+from elixir.utils import check_permisson, custom_success_response
 from elixir.viewsets import ModelViewSet
 
 
@@ -44,8 +44,15 @@ class GroupViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    user_permissions = {}
+
+    def __init__(self, **kwarg) -> None:
+        self.user_permissions["get"] = ["user.view_user"]
+        self.user_permissions["post"] = ["user.add_user"]
+        self.user_permissions["patch"] = ["user.change_user"]
 
     def create(self, request, *args, **kwargs):
+        check_permisson(self, request)
         GETserializer = GETGroupCategoryAccessDetailSerializer(data=request.data)
         GETserializer.is_valid(raise_exception=True)
         if Group.objects.filter(
@@ -82,6 +89,7 @@ class GroupViewset(ModelViewSet):
         )
 
     def update(self, request, pk, *args, **kwargs):
+        check_permisson(self, request)
         GETserializer = GETGroupCategoryAccessDetailSerializer(data=request.data)
         GETserializer.is_valid(raise_exception=True)
         group_details = request.data.get("group_details")
@@ -117,6 +125,7 @@ class GroupViewset(ModelViewSet):
         )
 
     def destroy(self, request, pk, *args, **kwargs):
+        check_permisson(self, request)
         obj = self.get_object()
         if User.objects.filter(groups__id=obj.id).exists():
             raise ValidationError({"profile": ["User(s) are mapped to this profile."]})
