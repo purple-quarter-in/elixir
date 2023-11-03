@@ -190,6 +190,7 @@ class Deal(models.Model):
     # budget = models.CharField(max_length=100, blank=True, null=True)
     # location = models.CharField(max_length=100, blank=True, null=True)
     # source = models.CharField(max_length=100)
+    deal_value = models.CharField(max_length=50, blank=True, null=True)
     status = models.CharField(default="In Progress", max_length=50)
     reason = models.CharField(max_length=150, blank=True, null=True)
     prospect = models.ForeignKey(Prospect, on_delete=models.DO_NOTHING)

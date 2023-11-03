@@ -305,7 +305,11 @@ class ProspectViewSet(ModelViewSet):
         deal = Deal.objects.update_or_create(
             lead=obj.lead,
             prospect=obj,
-            defaults={"owner": obj.owner, **set_crated_by_updated_by(request.user)},
+            defaults={
+                "owner": obj.owner,
+                "deal_value": request.data.get("deal_value", "0"),
+                **set_crated_by_updated_by(request.user),
+            },
         )
         if deal:
             changelog(
