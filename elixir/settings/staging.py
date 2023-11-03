@@ -7,11 +7,11 @@ ALLOWED_HOSTS = [
     "elixir-staging.purplequarter.co",
     "elixir.purplequarter.co",
     "pq-crm-rajgopaljakhmola1-gmailcom.vercel.app",
-    "localhost",
+    "localhost"
 ]
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOWED_ORIGINS = [
-    "https://api.elixir.purplequarter.co",
+    "https://api.elixir.stage.purplequarter.co",
     "https://staging-api.elixir.purplequarter.co",
     "http://localhost:3000",
     "https://pq-crm-rajgopaljakhmola1-gmailcom.vercel.app",
@@ -25,7 +25,7 @@ CORS_ALLOW_HEADERS = [
     "accept",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://api.elixir.purplequarter.co",
+    "https://api.elixir.stage.purplequarter.co",
     "https://staging-api.elixir.purplequarter.co",
 ]
-SITE_URL = "https://elixir.purplequarter.co"
+SITE_URL = "https://elixir-staging.purplequarter.co"
