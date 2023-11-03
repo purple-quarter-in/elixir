@@ -104,7 +104,7 @@ class GroupViewset(ModelViewSet):
         for permission in GETserializer.validated_data["permissions"]:
             access_category = AccessCategory.objects.get(id=permission["access_category"])
             permission.pop("access_category")
-            gcad = GroupCategoryAccessDetail.objects.change_or_create(
+            gcad = GroupCategoryAccessDetail.objects.update_or_create(
                 group=group,
                 access_category=access_category,
                 defaults={**permission},

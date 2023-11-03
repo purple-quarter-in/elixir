@@ -171,7 +171,7 @@ class LeadViewSet(ModelViewSet):
             raise ValidationError({"message": ["Lead already converted to prospect"]})
         obj.is_converted_to_prospect = True
         obj.updated_by = request.user
-        prospect = Prospect.objects.change_or_create(
+        prospect = Prospect.objects.update_or_create(
             lead=obj, defaults={"owner": obj.owner, **set_crated_by_updated_by(request.user)}
         )
         if prospect:
@@ -302,7 +302,7 @@ class ProspectViewSet(ModelViewSet):
             raise ValidationError({"message": ["Prospect already converted to deal"]})
         obj.is_converted_to_deal = True
         obj.updated_by = request.user
-        deal = Deal.objects.change_or_create(
+        deal = Deal.objects.update_or_create(
             lead=obj.lead,
             prospect=obj,
             defaults={
