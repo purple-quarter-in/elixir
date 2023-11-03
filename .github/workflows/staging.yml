@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - staging
+      - main
   workflow_dispatch:
 
 jobs:
@@ -16,11 +16,11 @@ jobs:
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST_STAGING }} > ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
       - name: connect and pull code
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-          cd /var/www/elixir && git checkout staging && git pull &&
+          cd /var/www/elixir && git checkout main && git pull &&
           source env/bin/activate && pip install -r requirements.txt &&
           python3 manage.py makemigrations && python3 manage.py migrate &&
           sudo supervisorctl restart gunicorn && 

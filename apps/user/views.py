@@ -320,9 +320,12 @@ class Login(ObtainAuthToken):
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "profile": {"id": user.profile.id, "name": user.profile.name},
+            "profile": {"id": user.profile.id, "name": user.profile.name}
+            if user.profile
+            else None,
             "function": user.function,
             "timezone": user.time_zone if user.time_zone else None,
+            "is_superuser": user.is_superuser,
         }
         return custom_success_response(
             _res,
