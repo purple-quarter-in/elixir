@@ -111,8 +111,8 @@ class ModelViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         if (
             (not request.user.is_superuser)
-            and len(self.user_permissions["get"]) > 0
-            and not request.user.has_perms(tuple(self.user_permissions["get"]))
+            and len(self.user_permissions["delete"]) > 0
+            and not request.user.has_perms(tuple(self.user_permissions["delete"]))
         ):
             raise PermissionDenied()
         instance = self.get_object()
