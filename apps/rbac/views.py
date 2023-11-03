@@ -50,6 +50,7 @@ class GroupViewset(ModelViewSet):
         self.user_permissions["get"] = ["user.view_user"]
         self.user_permissions["post"] = ["user.add_user"]
         self.user_permissions["patch"] = ["user.change_user"]
+        self.user_permissions["delete"] = ["user.delete_user"]
 
     def create(self, request, *args, **kwargs):
         check_permisson(self, request)
