@@ -12,7 +12,11 @@ from apps.client.serializer import (
     OrganisationSerializer,
 )
 from apps.pipedrive.models import Lead
-from elixir.utils import custom_success_response, set_crated_by_updated_by
+from elixir.utils import (
+    check_permisson,
+    custom_success_response,
+    set_crated_by_updated_by,
+)
 from elixir.viewsets import ModelViewSet
 
 
@@ -32,6 +36,7 @@ class OrganisationViewSet(ModelViewSet):
         ]
 
     def create(self, request, *args, **kwargs):
+        check_permisson(self, request)
         serializer = OrganisationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if Organisation.objects.filter(name=serializer.validated_data["name"]).exists():
@@ -52,6 +57,7 @@ class OrganisationViewSet(ModelViewSet):
 
     @action(detail=True, methods=["patch"])
     def org_name(self, request, pk):
+        check_permisson(self, request)
         obj = self.get_object()
         if not request.data.get("name") or request.data.get("name") == "":
             raise ValidationError({"name": ["This field is required and cannot be blank."]})
@@ -88,6 +94,7 @@ class ContactViewSet(ModelViewSet):
         )
 
     def create(self, request, *args, **kwargs):
+        check_permisson(self, request)
         if request.user.has_perms(self.user_permissions["post"]):
             if "organisation" in request.data:
                 serializer = CreateContactSerializer(data=request.data)
@@ -125,6 +132,7 @@ class ContactViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def is_duplicate(self, request):
+        check_permisson(self, request)
         is_duplicate = False
         phone = request.query_params.get("phone", None)
         email = request.query_params.get("email", None)
