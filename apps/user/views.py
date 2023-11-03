@@ -274,7 +274,7 @@ class UserViewSet(ModelViewSet):
         user = (
             User.objects.all()
             .filter(id__in=request.data.get("users"))
-            .update(is_active=request.data.get("active"))
+            .update(is_active=request.data.get("active"), archived=not request.data.get("active"))
         )
         if user > 0:
             return custom_success_response(
