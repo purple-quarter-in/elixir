@@ -138,7 +138,7 @@ class ContactViewSet(ModelViewSet):
         email = request.query_params.get("email", None)
         errors = {}
         if phone:
-            std, number = phone.split(" ")
+            std, number = phone.split("-")
             is_phone = Contact.objects.filter(phone=number, std_code=std).exists()
             is_duplicate = is_duplicate or is_phone
             errors["phone"] = is_duplicate
