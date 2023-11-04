@@ -255,7 +255,7 @@ class RoleDetailViewSet(ModelViewSet):
 
 
 class ProspectViewSet(ModelViewSet):
-    queryset = Prospect.objects.all().order_by("-created_at")
+    queryset = Prospect.objects.filter(is_converted_to_deal=False).order_by("-created_at")
     serializer_class = ProspectSerializer
     permission_classes = [IsAuthenticated]
     user_permissions = {
