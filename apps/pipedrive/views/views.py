@@ -87,22 +87,22 @@ class LeadViewSet(ModelViewSet):
             },
             "service_fee": {
                 "type": "Field Update",
-                "description": "service_fee updated",
+                "description": "Service Fee Updated",
             },
             "owner": {
                 "field_to_get": "get_full_name",
                 "type": "Field Update",
-                "description": "Field Updated",
+                "description": "Owned by Field Updated",
             },
             "closed_by": {
                 "field_to_get": "get_full_name",
                 "type": "Field Update",
-                "description": "Field Updated",
+                "description": "Closed by Field Updated",
             },
             "fullfilled_by": {
                 "field_to_get": "get_full_name",
                 "type": "Field Update",
-                "description": "Field Updated",
+                "description": "Fullfilled Field Updated",
             },
         },
     }
@@ -272,6 +272,11 @@ class ProspectViewSet(ModelViewSet):
             "is_converted_to_deal": {
                 "type": "State Update",
                 "description": "Prospect Converted to Deal",
+            },
+            "owner": {
+                "field_to_get": "get_full_name",
+                "type": "Field Update",
+                "description": "Owned by Field Updated",
             },
         },
     }
