@@ -473,13 +473,13 @@ class RDCapsuleViewSet(ModelViewSet):
     http_method_names = ["post", "get"]
 
     def list(self, request, *args, **kwargs):
-        prospect = request.query_params.get("prospect", None)
-        if prospect:
+        deal = request.query_params.get("deal", None)
+        if deal:
             return custom_success_response(
-                self.get_serializer(self.queryset.filter(prospect=prospect), many=True).data
+                self.get_serializer(self.queryset.filter(deal=deal), many=True).data
             )
         else:
-            raise ValidationError({"prospect": ["This field is required"]})
+            raise ValidationError({"deal": ["This field is required"]})
 
     def perform_create(self, serializer, **kwargs):
         self._instance = serializer.save(uploaded_by=self.request.user)

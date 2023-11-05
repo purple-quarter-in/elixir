@@ -384,7 +384,7 @@ class ServiceContract(models.Model):
 class RDCapsule(models.Model):
     """Model definition for RDCapsule."""
 
-    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, default=None)
     file = models.FileField(upload_to=upload_path_rdcapsule)
     uploaded_at = models.DateTimeField(auto_now_add=True, editable=False)
     sent_on = models.DateTimeField(default=None, blank=True, null=True)
