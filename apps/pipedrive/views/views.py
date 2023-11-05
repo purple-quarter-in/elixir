@@ -26,6 +26,7 @@ from apps.pipedrive.serializer import (
     RDCapsuleSerializer,
     RoleDetailSerializer,
     ServiceContractSerializer,
+    UpdateDealSerializer,
     UpdateLeadSerializer,
     UpdateProspectSerializer,
 )
@@ -356,6 +357,7 @@ class DealViewSet(ModelViewSet):
     queryset = Deal.objects.all().order_by("-created_at")
     serializer_class = DealSerializer
     permission_classes = [IsAuthenticated]
+    response_serializer = DealSerializer
     user_permissions = {
         "get": ["pipedrive.view_deal"],
         "post": ["pipedrive.add_deal"],
@@ -367,6 +369,9 @@ class DealViewSet(ModelViewSet):
         "is_mapping_obj_func": False,
         "update": {"status": {"type": "Status Update", "description": "Deal State Updated"}},
     }
+
+    def get_serializer_class(self):
+        return UpdateDealSerializer if self.request.method in ["PATCH"] else DealSerializer
 
     @action(detail=False, methods=["patch"])
     def bulk_archive(self, request):
