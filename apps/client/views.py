@@ -133,17 +133,18 @@ class ContactViewSet(ModelViewSet):
     @action(detail=False, methods=["get"])
     def is_duplicate(self, request):
         check_permisson(self, request)
-        is_duplicate = False
         phone = request.query_params.get("phone", None)
         email = request.query_params.get("email", None)
         errors = {}
         if phone:
+            is_duplicate = False
             std, number = phone.split("-")
             std = "+" + std[1:]
             is_phone = Contact.objects.filter(phone=number, std_code=std).exists()
             is_duplicate = is_duplicate or is_phone
             errors["phone"] = is_duplicate
         if email:
+            is_duplicate = False
             is_email = Contact.objects.filter(email=email).exists()
             is_duplicate = is_duplicate or is_email
             errors["email"] = is_duplicate
