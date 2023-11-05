@@ -372,7 +372,7 @@ class DealViewSet(ModelViewSet):
     def bulk_archive(self, request):
         check_permisson(self, request)
         if "deal" not in request.data:
-            raise ValidationError({"deal": ["List of prospect id(s) is/are required"]})
+            raise ValidationError({"deal": ["List of deal id(s) is/are required"]})
         if "archive" not in request.data:
             raise ValidationError({"archive": ["This boolean field is required"]})
 
