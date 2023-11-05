@@ -139,6 +139,7 @@ class ContactViewSet(ModelViewSet):
         errors = {}
         if phone:
             std, number = phone.split("-")
+            std = "+" + std[1:]
             is_phone = Contact.objects.filter(phone=number, std_code=std).exists()
             is_duplicate = is_duplicate or is_phone
             errors["phone"] = is_duplicate
