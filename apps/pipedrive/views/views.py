@@ -367,7 +367,14 @@ class DealViewSet(ModelViewSet):
         "model": "Lead",
         "mapping_obj": "lead_id",
         "is_mapping_obj_func": False,
-        "update": {"status": {"type": "Status Update", "description": "Deal State Updated"}},
+        "update": {
+            "status": {"type": "Status Update", "description": "Deal State Updated"},
+            "owner": {
+                "field_to_get": "get_full_name",
+                "type": "Field Update",
+                "description": "Owned by Field Updated",
+            },
+        },
     }
 
     def get_serializer_class(self):
