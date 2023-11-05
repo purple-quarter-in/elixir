@@ -102,7 +102,7 @@ class LeadViewSet(ModelViewSet):
             "fullfilled_by": {
                 "field_to_get": "get_full_name",
                 "type": "Field Update",
-                "description": "Fullfilled Field Updated",
+                "description": "Fullfilled by Field Updated",
             },
         },
     }

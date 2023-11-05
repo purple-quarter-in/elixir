@@ -3,4 +3,4 @@ def upload_path_service_contract(instance, filename):
 
 
 def upload_path_rdcapsule(instance, filename):
-    return f"rdcapsule/{instance.prospect.lead.title}/{filename}"
+    return f"rdcapsule/{instance.deal.prospect.lead.title}/{filename}"
