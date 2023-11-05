@@ -49,7 +49,7 @@ class RoleDetailSerializer(serializers.ModelSerializer):
 class LeadSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     updated_by = serializers.SerializerMethodField()
-    fulfilled_by = serializers.SerializerMethodField()
+    fullfilled_by = serializers.SerializerMethodField()
     closed_by = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
@@ -67,8 +67,14 @@ class LeadSerializer(serializers.ModelSerializer):
 
     def get_owner(self, instance):
         return instance.owner.get_dict_name_id() if instance.owner is not None else None
+
     def get_fullfilled_by(self, instance):
-        return instance.fullfilled_by.get_dict_name_id() if instance.fullfilled_by is not None else None
+        return (
+            instance.fullfilled_by.get_dict_name_id()
+            if instance.fullfilled_by is not None
+            else None
+        )
+
     def get_closed_by(self, instance):
         return instance.closed_by.get_dict_name_id() if instance.closed_by is not None else None
 
