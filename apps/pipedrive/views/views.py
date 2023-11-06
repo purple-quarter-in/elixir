@@ -1,3 +1,4 @@
+import os
 from datetime import date, datetime
 from urllib import request
 
@@ -31,6 +32,7 @@ from apps.pipedrive.serializer import (
     UpdateProspectSerializer,
 )
 from elixir.changelog import changelog
+from elixir.settings.base import BASE_DIR
 from elixir.utils import (
     check_permisson,
     custom_success_response,
@@ -40,7 +42,17 @@ from elixir.viewsets import ModelViewSet
 
 
 def say_hello(request):
-    return render(request=request, template_name="email/contact.html")
+    fp_write = open(os.path.join(BASE_DIR, "logg.txt"), "w+")
+    org_list = []
+    for fp in open(os.path.join(BASE_DIR, "data/org_import.tsv"), "r"):
+        row = fp.split("\t")
+        org_list.append(
+            Organisation(
+                name=row[0], industry=row[4], domain=row[5], created_by_id=1, updated_by_id=1
+            )
+        )
+    Organisation.objects.bulk_create(org_list)
+    return custom_success_response({})
 
 
 x = {
