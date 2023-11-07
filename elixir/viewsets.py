@@ -1,3 +1,4 @@
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from rest_framework import status, viewsets
 from rest_framework.exceptions import PermissionDenied
 
@@ -15,6 +16,8 @@ class ModelViewSet(viewsets.ModelViewSet):
         "patch": [],
     }
     changelog = None
+    filtering = None
+    pagination = False
 
     def perform_create(self, serializer, **kwargs):
         self._instance = serializer.save(**kwargs)
@@ -33,15 +36,38 @@ class ModelViewSet(viewsets.ModelViewSet):
         ):
             raise PermissionDenied()
         queryset = self.filter_queryset(self.get_queryset())
+        total_pages = 0
+        page_num = 0
+        _filter = {}
         if request.GET:
-            _filter = {key: request.GET[key] for key in request.GET if key != "page"}
+            for key in request.GET:
+                if key not in ["page", "limit"]:
+                    if self.filtering and key in self.filtering:
+                        _filter[key + self.filtering[key]] = request.GET[key]
+                    else:
+                        _filter[key] = request.GET[key]
 
             # for key in request.GET:
             #     _filter[key]=request.GET[key]
             queryset = queryset.filter(**(_filter))
-
+            if self.pagination:
+                limit = request.GET.get("limit", None)
+                page_num = request.GET.get("page", None)
+                if page_num is not None:
+                    paginator = Paginator(queryset, limit if limit else 10)
+                    try:
+                        queryset = paginator.page(page_num)
+                        total_pages = paginator.num_pages
+                    except PageNotAnInteger:
+                        queryset = paginator.page(1)
+                        page_num = 1
+                    except EmptyPage:
+                        queryset = paginator.page(paginator.num_pages)
+                        page_num = 1
         serializer = self.get_serializer(queryset, many=True, context={"request": request})
-        return custom_success_response(serializer.data)
+        return custom_success_response(
+            serializer.data, current_page=page_num, total_pages=total_pages
+        )
 
     def create(self, request, *args, **kwargs):
         if (

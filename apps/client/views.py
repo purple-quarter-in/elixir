@@ -26,6 +26,8 @@ class OrganisationViewSet(ModelViewSet):
     serializer_class = OrganisationSerializer
     permission_classes = [IsAuthenticated]
     user_permissions = {}
+    filtering = {"name": "__contains"}
+    pagination = True
 
     def __init__(self, **kwargs: Any) -> None:
         self.user_permissions["get"] = ["client.access_organisation", "client.view_organisation"]

@@ -18,7 +18,7 @@ def custom_success_response(
 ):
     data = {}
     data["data"] = serialized_data
-    if type(serialized_data).__name__ == "list":
+    if serialized_data.serializer.many == True:
         for key, value in kwargs.items():
             data[key] = value
     else:
@@ -48,7 +48,7 @@ def set_crated_by_updated_by(user):
 
 def check_permisson(self, request):
     method = (request.method).lower()
-    method = 'patch' if method=='put' else method
+    method = "patch" if method == "put" else method
     print(self.user_permissions[method])
     print(request.user.has_perms(tuple(self.user_permissions[method])))
     if (
