@@ -6,6 +6,7 @@ from django.template.loader import get_template
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 
 
 def custom_success_response(
@@ -18,10 +19,16 @@ def custom_success_response(
 ):
     data = {}
     data["data"] = serialized_data
-    if serialized_data.serializer.many == True:
+    if type(serialized_data) == type([]):
         for key, value in kwargs.items():
             data[key] = value
-    else:
+    elif type(serialized_data) == type({}):
+        for key, value in kwargs.items():
+            serialized_data[key] = value
+    elif type(serialized_data) == ReturnList:
+        for key, value in kwargs.items():
+            data[key] = value
+    elif type(serialized_data) == ReturnDict:
         for key, value in kwargs.items():
             serialized_data[key] = value
     data["message"] = message

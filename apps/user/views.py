@@ -327,12 +327,12 @@ class Login(ObtainAuthToken):
             "timezone": user.time_zone if user.time_zone else None,
             "is_superuser": user.is_superuser,
         }
+
         return custom_success_response(
             _res,
             message="User successfully loggedin !",
             status=status.HTTP_200_OK,
             headers={"Location": "/"},
-            cookies=_res,
         )
 
 
