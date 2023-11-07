@@ -22,7 +22,11 @@ from elixir.viewsets import ModelViewSet
 
 # Create your views here.
 class OrganisationViewSet(ModelViewSet):
-    queryset = Organisation.objects.all().order_by("-created_at")
+    queryset = (
+        Organisation.objects.select_related("created_by", "updated_by")
+        .prefetch_related("contact_organisation")
+        .order_by("-created_at")
+    )
     serializer_class = OrganisationSerializer
     permission_classes = [IsAuthenticated]
     user_permissions = {}
@@ -77,7 +81,7 @@ class OrganisationViewSet(ModelViewSet):
 
 
 class ContactViewSet(ModelViewSet):
-    queryset = Contact.objects.all().order_by("-created_at")
+    queryset = Contact.objects.select_related("created_by", "updated_by").order_by("-created_at")
     serializer_class = ContactSerializer
     permission_classes = [IsAuthenticated]
     response_serializer = ContactSerializer

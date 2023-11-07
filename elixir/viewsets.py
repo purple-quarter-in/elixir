@@ -35,7 +35,7 @@ class ModelViewSet(viewsets.ModelViewSet):
             and not (request.user).has_perms(tuple(self.user_permissions["get"]))
         ):
             raise PermissionDenied()
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
         total_pages = 0
         page_num = 0
         _filter = {}

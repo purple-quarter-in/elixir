@@ -46,7 +46,13 @@ class OrganisationSerializer(serializers.ModelSerializer):
         return instance.updated_by.get_dict_name_id() if instance.updated_by is not None else None
 
     def get_contacts(self, instance):
-        return ContactSerializer(Contact.objects.filter(organisation=instance), many=True).data
+        # return ContactSerializer(
+        #     Contact.objects.select_related("created_by", "updated_by").filter(
+        #         organisation=instance
+        #     ),
+        #     many=True,
+        # ).data
+        return ContactSerializer(instance.contact_organisation.all(), many=True).data
 
     def get_lead_count(self, instance):
         return Lead.objects.filter(organisation=instance).count()

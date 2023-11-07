@@ -43,15 +43,12 @@ from elixir.viewsets import ModelViewSet
 
 def say_hello(request):
     fp_write = open(os.path.join(BASE_DIR, "logg.txt"), "w+")
-    org_list = []
-    for fp in open(os.path.join(BASE_DIR, "data/org_import.tsv"), "r"):
+    contact_list = []
+    for fp in open(os.path.join(BASE_DIR, "data/contact_import.tsv"), "r"):
         row = fp.split("\t")
-        org_list.append(
-            Organisation(
-                name=row[0], industry=row[4], domain=row[5], created_by_id=1, updated_by_id=1
-            )
-        )
-    Organisation.objects.bulk_create(org_list)
+        if not Organisation.objects.filter(name=row[0]).exists():
+            print(row[0])
+
     return custom_success_response({})
 
 
@@ -77,7 +74,19 @@ x = {
 
 # Create your views here.
 class LeadViewSet(ModelViewSet):
-    queryset = Lead.objects.filter(is_converted_to_prospect=False).order_by("-created_at")
+    queryset = (
+        Lead.objects.select_related(
+            "created_by",
+            "updated_by",
+            "owner",
+            "fullfilled_by",
+            "closed_by",
+            "organisation",
+            "role",
+        )
+        .filter(is_converted_to_prospect=False)
+        .order_by("-created_at")
+    )
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
     user_permissions = {
@@ -268,7 +277,11 @@ class RoleDetailViewSet(ModelViewSet):
 
 
 class ProspectViewSet(ModelViewSet):
-    queryset = Prospect.objects.filter(is_converted_to_deal=False).order_by("-created_at")
+    queryset = (
+        Prospect.objects.select_related("created_by", "updated_by", "owner", "lead")
+        .filter(is_converted_to_deal=False)
+        .order_by("-created_at")
+    )
     serializer_class = ProspectSerializer
     permission_classes = [IsAuthenticated]
     user_permissions = {

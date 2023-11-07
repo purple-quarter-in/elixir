@@ -67,7 +67,9 @@ class Organisation(models.Model):
 class Contact(models.Model):
     """Model definition for Contact."""
 
-    organisation = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
+    organisation = models.ForeignKey(
+        Organisation, on_delete=models.DO_NOTHING, related_name="contact_organisation"
+    )
     name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     std_code = models.CharField(max_length=5, blank=True, null=True)
