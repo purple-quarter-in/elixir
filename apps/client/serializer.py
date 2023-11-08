@@ -52,7 +52,11 @@ class OrganisationSerializer(serializers.ModelSerializer):
         #     ),
         #     many=True,
         # ).data
-        return ContactSerializer(instance.contact_organisation.all(), many=True).data
+        return ContactSerializer(
+            instance.contact_organisation.all(),
+            many=True,
+        ).data
 
     def get_lead_count(self, instance):
-        return Lead.objects.filter(organisation=instance).count()
+        # return Lead.objects.filter(organisation=instance).count()
+        return instance.lead_organisation.count()

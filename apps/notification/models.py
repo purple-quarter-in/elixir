@@ -9,12 +9,12 @@ class Notification(models.Model):
 
     type = models.CharField(max_length=50)
     is_viewed = models.BooleanField(default=False)
-    archived = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False, db_index=True)
     description = models.CharField(max_length=100, blank=True, null=True)
     user = models.ForeignKey(User, related_name="notification_user", on_delete=models.CASCADE)
     model_name = models.CharField(max_length=50, blank=True, null=True)
     object_id = models.IntegerField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
         """Meta definition for Notification."""

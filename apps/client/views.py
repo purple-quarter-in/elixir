@@ -24,7 +24,7 @@ from elixir.viewsets import ModelViewSet
 class OrganisationViewSet(ModelViewSet):
     queryset = (
         Organisation.objects.select_related("created_by", "updated_by")
-        .prefetch_related("contact_organisation")
+        .prefetch_related("contact_organisation", "lead_organisation")
         .order_by("-created_at")
     )
     serializer_class = OrganisationSerializer

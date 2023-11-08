@@ -6,7 +6,7 @@ from django.utils import timezone
 class Organisation(models.Model):
     """Model definition for Organisation."""
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     registered_name = models.CharField(max_length=100, blank=True, null=True)
     govt_id = models.CharField(max_length=100, blank=True, null=True)
     billing_address = models.TextField(blank=True, null=True)
@@ -17,7 +17,6 @@ class Organisation(models.Model):
     last_funding_stage = models.CharField(max_length=50, blank=True, null=True)
     last_funding_amount = models.CharField(max_length=50, blank=True, null=True)
     funding_currency = models.CharField(max_length=3, blank=True, null=True)
-    archived = models.BooleanField(default=0)
     segment = models.CharField(max_length=50, blank=True, null=True)
     created_by = models.ForeignKey(
         "user.User",
@@ -34,7 +33,10 @@ class Organisation(models.Model):
         related_name="organisation_updated_by_user",
     )
     archived = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -91,7 +93,7 @@ class Contact(models.Model):
         null=True,
         related_name="contact_updated_by_user",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

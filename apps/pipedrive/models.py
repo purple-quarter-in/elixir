@@ -48,8 +48,10 @@ class Lead(models.Model):
     """Model definition for Lead."""
 
     # TODO: Define fields here
-    organisation = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
-    title = models.CharField(max_length=50, blank=True, null=True)
+    organisation = models.ForeignKey(
+        Organisation, on_delete=models.DO_NOTHING, related_name="lead_organisation"
+    )
+    title = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     role = models.ForeignKey(RoleDetail, on_delete=models.DO_NOTHING)
     currency = models.CharField(max_length=3, blank=True, null=True)  # discuss with abhinav
     service_fee = models.CharField(max_length=50, blank=True, null=True)
@@ -57,11 +59,11 @@ class Lead(models.Model):
     retainer_advance = models.BooleanField(blank=True, null=True)
     exclusivity = models.BooleanField(blank=True, null=True)
     source = models.CharField(max_length=100)
-    status = models.CharField(default="Unverified", max_length=50)
+    status = models.CharField(default="Unverified", max_length=50, db_index=True)
     reason = models.CharField(max_length=150, blank=True, null=True)
-    is_converted_to_prospect = models.BooleanField(default=0)
+    is_converted_to_prospect = models.BooleanField(default=0, db_index=True)
     archived = models.BooleanField(default=0)
-    created_at = models.DateTimeField(editable=False)
+    created_at = models.DateTimeField(editable=False, db_index=True)
     updated_at = models.DateTimeField()
     owner = models.ForeignKey(
         "user.User",
@@ -149,12 +151,12 @@ class Prospect(models.Model):
     # budget = models.CharField(max_length=100, blank=True, null=True)
     # location = models.CharField(max_length=100, blank=True, null=True)
     # source = models.CharField(max_length=100)
-    status = models.CharField(default="Qualified", max_length=50)
+    status = models.CharField(default="Qualified", max_length=50, db_index=True)
     reason = models.CharField(max_length=150, blank=True, null=True)
     lead = models.ForeignKey(Lead, on_delete=models.DO_NOTHING)
-    is_converted_to_deal = models.BooleanField(default=0)
+    is_converted_to_deal = models.BooleanField(default=0, db_index=True)
     archived = models.BooleanField(default=0)
-    created_at = models.DateTimeField(editable=False)
+    created_at = models.DateTimeField(editable=False, db_index=True)
     updated_at = models.DateTimeField()
     owner = models.ForeignKey(
         "user.User",
@@ -211,7 +213,7 @@ class Deal(models.Model):
     prospect = models.ForeignKey(Prospect, on_delete=models.DO_NOTHING)
     lead = models.ForeignKey(Lead, on_delete=models.DO_NOTHING)
     archived = models.BooleanField(default=0)
-    created_at = models.DateTimeField(editable=False)
+    created_at = models.DateTimeField(editable=False, db_index=True)
     updated_at = models.DateTimeField()
     owner = models.ForeignKey(
         "user.User",
@@ -277,7 +279,7 @@ class Activity(models.Model):
         blank=True,
         default=None,
     )
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False, db_index=True)
     closed_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
@@ -321,7 +323,7 @@ class Note(models.Model):
     created_by = models.ForeignKey(
         User, related_name="note_created_by", on_delete=models.DO_NOTHING
     )
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False, db_index=True)
 
     class Meta:
         """Meta definition for Note."""
@@ -345,7 +347,7 @@ class changelog(models.Model):
     changed_by = models.ForeignKey(
         User, related_name="changed_by", on_delete=models.DO_NOTHING, null=True
     )
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False, db_index=True)
     model_name = models.CharField(max_length=50, blank=True, null=True)
     obj_id = models.CharField(max_length=50, blank=True, null=True)
 
@@ -364,7 +366,10 @@ class ServiceContract(models.Model):
 
     prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
     file = models.FileField(upload_to=upload_path_service_contract)
-    uploaded_at = models.DateTimeField(auto_now_add=True, editable=False)
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+    )
     sent_on = models.DateTimeField(default=None, blank=True, null=True)
     uploaded_by = models.ForeignKey(
         User, related_name="contract_uploaded_by", on_delete=models.DO_NOTHING
