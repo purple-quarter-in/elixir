@@ -48,7 +48,7 @@ x = {
 
 # Create your views here.
 class ActivityViewSet(ModelViewSet):
-    queryset = Activity.objects.all()
+    queryset = Activity.objects.all().prefetch_related("contact")
     serializer_class = ActivitySerializer
     # permission_classes = [IsAuthenticated]
     user_permissions = {
@@ -148,13 +148,20 @@ class ActivityViewSet(ModelViewSet):
     def activity_wo_notes(self, request):
         if "lead" not in request.query_params:
             raise ValidationError({"lead": ["Lead id not provided."]})
-        sql = f"SELECT * FROM `pipedrive_activity` as pa LEFT OUTER JOIN `pipedrive_note` pn ON pn.activity_id=pa.id WHERE pn.activity_id IS NULL And pa.lead_id={request.query_params.get('lead')};"
-        activity = Activity.objects.raw(sql)
+
+        activity = (
+            Activity.objects.filter(lead_id=request.query_params.get("lead"))
+            .select_related("created_by", "assigned_to")
+            .prefetch_related("notes_activity", "contact")
+            .filter(notes_activity__isnull=True)
+        )
+        # sql = f"SELECT * FROM `pipedrive_activity` as pa LEFT OUTER JOIN `pipedrive_note` pn ON pn.activity_id=pa.id WHERE pn.activity_id IS NULL And pa.lead_id={request.query_params.get('lead')};"
+        # activity = Activity.objects.raw(sql)
         return custom_success_response(ActivitySerializer(activity, many=True).data)
 
 
 class NoteViewSet(ModelViewSet):
-    queryset = Note.objects.all()
+    queryset = Note.objects.all().select_related("activity").prefetch_related("activity__contact")
     serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post"]

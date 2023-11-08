@@ -178,7 +178,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         )
 
     def get_contacts(self, instance):
-        return NotesContactSerializer(instance.contact, many=True).data
+        return NotesContactSerializer(instance.contact.all(), many=True).data
 
     def get_status(self, instance):
         status = instance.status
