@@ -30,7 +30,14 @@ class OrganisationViewSet(ModelViewSet):
     serializer_class = OrganisationSerializer
     permission_classes = [IsAuthenticated]
     user_permissions = {}
-    filtering = {"name": "__contains"}
+    filtering = {
+        "name": {"operation": "contains", "lookup": "__contains"},
+        "industry": {"operation": "in", "lookup": "__in"},
+        "segment": {"operation": "in", "lookup": "__in"},
+        "last_funding_stage": {"operation": "in", "lookup": "__in"},
+        "created_by": {"operation": "in", "lookup": "_id__in"},
+    }
+    sorting = ["created_at"]
     pagination = True
 
     def __init__(self, **kwargs: Any) -> None:

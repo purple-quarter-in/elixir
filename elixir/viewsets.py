@@ -14,6 +14,7 @@ class ModelViewSet(viewsets.ModelViewSet):
     changelog = None
     filtering = None
     pagination = False
+    sorting = None
 
     def perform_create(self, serializer, **kwargs):
         self._instance = serializer.save(**kwargs)
@@ -35,17 +36,28 @@ class ModelViewSet(viewsets.ModelViewSet):
         total_pages = 0
         page_num = 0
         _filter = {}
+        _sorting = []
         if request.GET:
+            filter_params = ["page", "limit"] + (self.sorting if self.sorting else [])
             for key in request.GET:
-                if key not in ["page", "limit"]:
+                if key not in filter_params:
+                    data = request.GET[key]
                     if self.filtering and key in self.filtering:
-                        _filter[key + self.filtering[key]] = request.GET[key]
+                        if self.filtering[key]["operation"] == "in":
+                            data = (request.GET[key]).split(",")
+                        _filter[key + self.filtering[key]["lookup"]] = data
                     else:
-                        _filter[key] = request.GET[key]
+                        _filter[key] = data
+                elif self.sorting and key in self.sorting:
+                    _sorting.append(("-" if request.GET[key] == "1" else "") + key)
 
             # for key in request.GET:
             #     _filter[key]=request.GET[key]
+
             queryset = queryset.filter(**(_filter))
+            if len(_sorting) > 0:
+                for sort_key in _sorting:
+                    queryset = queryset.order_by(sort_key)
             if self.pagination:
                 limit = request.GET.get("limit", None)
                 page_num = request.GET.get("page", None)
