@@ -41,14 +41,63 @@ from elixir.utils import (
 from elixir.viewsets import ModelViewSet
 
 
-def say_hello(request):
-    fp_write = open(os.path.join(BASE_DIR, "logg.txt"), "w+")
+def contact_import(request):
+    # fp_write = open(os.path.join(BASE_DIR, "logg.txt"), "w+")
     contact_list = []
     for fp in open(os.path.join(BASE_DIR, "data/contact_import.tsv"), "r"):
         row = fp.split("\t")
+        # fp_write.write(str(len(row)) + " " + str(row[0]) + "\n")
+        if not Organisation.objects.filter(name=row[0]).exists():
+            org = Organisation.objects.update_or_create(
+                name=row[0], defaults={"created_by_id": 1, "updated_by_id": 1}
+            )
+            # designation  & email cant be empty
+            contact_list.append(
+                Contact(
+                    organisation_id=org.id,
+                    name=row[1],
+                    email=row[2],
+                    std_code=row[3],
+                    phone=row[4],
+                    designation=row[5],
+                    type=row[6],
+                    created_by_id=1,
+                    updated_by_id=1,
+                )
+            )
+        else:
+            contact_list.append(
+                Contact(
+                    organisation_id=Organisation.objects.get(name=row[0]).id,
+                    name=row[1],
+                    email=row[2],
+                    std_code=row[3],
+                    phone=row[4],
+                    designation=row[5],
+                    type=row[6],
+                    created_by_id=1,
+                    updated_by_id=1,
+                )
+            )
+            print(row[0])
+    Contact.objects.bulk_create(contact_import)
+    return custom_success_response({})
+
+
+def org_import(request):
+    # fp_write = open(os.path.join(BASE_DIR, "logg.txt"), "w+")
+    org_list = []
+    for fp in open(os.path.join(BASE_DIR, "data/org_import.tsv"), "r"):
+        row = fp.split("\t")
+        # fp_write.write(str(len(row)) + " " + str(row[0]) + "\n")
         if not Organisation.objects.filter(name=row[0]).exists():
             print(row[0])
-
+            org_list.append(
+                Organisation(
+                    name=row[0], industry=row[4], domain=row[5], created_by_id=1, updated_by_id=1
+                )
+            )
+    Organisation.objects.bulk_create(org_list)
     return custom_success_response({})
 
 
@@ -84,6 +133,7 @@ class LeadViewSet(ModelViewSet):
             "organisation",
             "role",
         )
+        .prefetch_related("organisation__contact_organisation")
         .filter(is_converted_to_prospect=False)
         .order_by("-created_at")
     )

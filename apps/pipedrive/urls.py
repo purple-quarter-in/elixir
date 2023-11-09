@@ -28,7 +28,8 @@ router.register("activity", ActivityViewSet)
 router.register("contract", ServiceContractViewSet)
 router.register("rdcapsule", RDCapsuleViewSet)
 urlpatterns = [
-    path("import-organisation", views.say_hello, name="home"),
+    path("import-organisation", views.org_import),
+    path("import-contact", views.contact_import),
     path("history/activity/", view=History.as_view()),
     path("landingpage/createlead/", CreateLandingPageLead.as_view()),
 ]

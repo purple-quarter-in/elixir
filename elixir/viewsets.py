@@ -10,11 +10,7 @@ from .utils import custom_success_response
 class ModelViewSet(viewsets.ModelViewSet):
     _instance = None
     response_serializer = None
-    user_permissions = {
-        "get": [],
-        "post": [],
-        "patch": [],
-    }
+    user_permissions = {"get": [], "post": [], "patch": [], "delete": []}
     changelog = None
     filtering = None
     pagination = False
