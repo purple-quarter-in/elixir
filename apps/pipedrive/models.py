@@ -51,7 +51,7 @@ class Lead(models.Model):
     organisation = models.ForeignKey(
         Organisation, on_delete=models.DO_NOTHING, related_name="lead_organisation"
     )
-    title = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    title = models.CharField(max_length=150, blank=True, null=True, db_index=True)
     role = models.ForeignKey(RoleDetail, on_delete=models.DO_NOTHING)
     currency = models.CharField(max_length=3, blank=True, null=True)  # discuss with abhinav
     service_fee = models.CharField(max_length=50, blank=True, null=True)
