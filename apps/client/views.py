@@ -13,7 +13,7 @@ from apps.client.serializer import (
 )
 from apps.pipedrive.models import Deal, Lead, Prospect
 from apps.pipedrive.serializer import DealSerializer, LeadSerializer, ProspectSerializer
-from elixir import changelog
+from elixir.changelog import changelog
 from elixir.utils import (
     check_permisson,
     custom_success_response,
