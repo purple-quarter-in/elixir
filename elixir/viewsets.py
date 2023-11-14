@@ -45,7 +45,13 @@ class ModelViewSet(viewsets.ModelViewSet):
                     if self.filtering and key in self.filtering:
                         if self.filtering[key]["operation"] == "in":
                             data = (request.GET[key]).split(",")
-                        _filter[key + self.filtering[key]["lookup"]] = data
+                            _filter[key + self.filtering[key]["lookup"]] = data
+                        elif self.filtering[key]["operation"] == "from_to":
+                            key_array = key.split("_")
+                            data = request.GET[key]
+                            _filter[
+                                "_".join(key_array[:-1]) + self.filtering[key]["lookup"]
+                            ] = data
                     else:
                         _filter[key] = data
                 elif self.sorting and key in self.sorting:
@@ -60,7 +66,7 @@ class ModelViewSet(viewsets.ModelViewSet):
                     queryset = queryset.order_by(sort_key)
             if self.pagination:
                 limit = request.GET.get("limit", None)
-                page_num = request.GET.get("page", None)
+                page_num = request.GET.get("page", 0)
                 if page_num is not None:
                     paginator = Paginator(queryset, limit if limit else 10)
                     try:

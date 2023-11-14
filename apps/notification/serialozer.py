@@ -2,7 +2,7 @@ from django.apps import apps
 from rest_framework import serializers
 
 from apps.notification.models import Notification
-from apps.pipedrive.models import Activity
+from apps.pipedrive.models import Activity, Lead
 from apps.pipedrive.serializer import NotesContactSerializer
 
 
@@ -39,6 +39,21 @@ class NoteActivitySerializer(serializers.ModelSerializer):
         return status
 
 
+class NoteLeadSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField()
+    organisation = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Lead
+        fields = "__all__"
+
+    def get_organisation(self, instance):
+        return instance.organisation.get_dict_name_id()
+
+    def get_owner(self, instance):
+        return instance.owner.get_dict_name_id()
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     data = serializers.SerializerMethodField()
 
@@ -49,9 +64,11 @@ class NotificationSerializer(serializers.ModelSerializer):
     def get_data(self, instance):
         if instance.object_id:
             model_name = instance.model_name
-            if model_name == "Activity":
+            if model_name in ["Activity", "Lead", "Prospect", "Deal"]:
                 model = apps.get_model("pipedrive", model_name)
                 obj = model.objects.get(pk=instance.object_id)
+                if model_name == "Lead":
+                    return NoteLeadSerializer(obj).data
                 return NoteActivitySerializer(obj).data
 
         return None

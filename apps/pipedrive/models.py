@@ -128,6 +128,9 @@ class Lead(models.Model):
                 "CISO": "ciso",
                 "Principal Architect": "PA",
                 "Principal Engineer": "PE",
+                "VP of Data Science": "VPODS",
+                "Director of Data Science": "DODS",
+                "Board Member": "BM",
             }
 
             REGION = {"India": "IND", "USA": "USA", "APAC": "APAC", "MENA": "MENA", "Europe": "EU"}
@@ -260,7 +263,16 @@ class Activity(models.Model):
 
     # Logic to link activity to entity
     title = models.CharField(max_length=100, blank=True, default="")
-    lead = models.ForeignKey(Lead, related_name="activity_lead", on_delete=models.DO_NOTHING)
+    lead = models.ForeignKey(
+        Lead, related_name="activity_lead", on_delete=models.DO_NOTHING, null=True, default=None
+    )
+    organisation = models.ForeignKey(
+        Organisation,
+        related_name="activity_organisation",
+        on_delete=models.DO_NOTHING,
+        null=True,
+        default=None,
+    )
     type = models.CharField(max_length=50)
     contact = models.ManyToManyField("client.Contact", related_name="activity_contact")
     mode = models.CharField(max_length=50)
@@ -320,6 +332,7 @@ class Note(models.Model):
     negotiation_broker = models.CharField(max_length=50, blank=True, null=True)
     is_contract_draft_shared = models.BooleanField(blank=True, null=True)
     next_step = models.CharField(max_length=50, blank=True, null=True)
+    remarks = models.CharField(max_length=500, blank=True, null=True, default="")
     created_by = models.ForeignKey(
         User, related_name="note_created_by", on_delete=models.DO_NOTHING
     )

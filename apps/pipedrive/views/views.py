@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from yaml import serialize
 
 from apps.client.models import Contact, Organisation
+from apps.notification.models import Notification
 from apps.pipedrive.models import (
     Deal,
     Lead,
@@ -208,6 +209,20 @@ class LeadViewSet(ModelViewSet):
             org = Organisation.objects.create(
                 name=dto["organisation"]["name"], created_by=request.user, updated_by=request.user
             )
+            changelog(
+                {
+                    "model": "Organisation",
+                    "mapping_obj": "id",
+                    "is_mapping_obj_func": False,
+                    "create": {
+                        "is_created": {"type": "Entity Created", "description": "Account Created"},
+                    },
+                },
+                org,
+                {"is_created": request.user},
+                "create",
+                request.user.id,
+            )
             org_id = org.id
             if "contact_details" in dto["organisation"]:
                 for contact in dto["organisation"]["contact_details"]:
@@ -292,6 +307,14 @@ class LeadViewSet(ModelViewSet):
                 serializer._validated_data,
                 "update",
                 request.user.id,
+            )
+        if lead.owner_id != serializer._validated_data["owner"]:
+            Notification.objects.create(
+                type="Lead Owner Assigned",
+                description=f"{request.user.get_full_name()} assigned Ownership for Lead {lead.title} to {serializer.validated_data['owner'].get_full_name()}",
+                user=serializer.validated_data["owner"],
+                model_name="Lead",
+                object_id=lead.id,
             )
         if (
             not lead.verification_time

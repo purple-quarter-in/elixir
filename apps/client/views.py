@@ -11,7 +11,8 @@ from apps.client.serializer import (
     CreateContactSerializer,
     OrganisationSerializer,
 )
-from apps.pipedrive.models import Lead
+from apps.pipedrive.models import Deal, Lead, Prospect
+from apps.pipedrive.serializer import DealSerializer, LeadSerializer, ProspectSerializer
 from elixir.utils import (
     check_permisson,
     custom_success_response,
@@ -36,9 +37,42 @@ class OrganisationViewSet(ModelViewSet):
         "segment": {"operation": "in", "lookup": "__in"},
         "last_funding_stage": {"operation": "in", "lookup": "__in"},
         "created_by": {"operation": "in", "lookup": "_id__in"},
+        "created_at_from": {"operation": "from_to", "lookup": "__gte"},
+        "created_at_to": {"operation": "from_to", "lookup": "__lte"},
     }
     sorting = ["created_at"]
     pagination = True
+    changelog = {
+        "model": "Organisation",
+        "mapping_obj": "id",
+        "is_mapping_obj_func": False,
+        "create": {
+            "is_created": {"type": "Entity Created", "description": "Account Created"},
+        },
+        "update": {
+            "industry": {
+                "type": "Field Update",
+                "description": "Industry Updated",
+            },
+            "billing_address": {
+                "type": "Field Update",
+                "description": "Billing Address Updated",
+            },
+            "shipping_address": {
+                "type": "Field Update",
+                "description": "Shipping Address Updated",
+            },
+            "govt_id": {
+                "type": "Field Update",
+                "description": " GSTIN/VAT/GST Updated",
+            },
+            "last_funding_stage": {
+                "type": "Field Update",
+                "description": " Last Funding Stage Updated",
+            },
+        },
+    }
+    # X assigned Ownership for Lead Zomato-IND-HOE-1 to Y
 
     def __init__(self, **kwargs: Any) -> None:
         self.user_permissions["get"] = ["client.access_organisation", "client.view_organisation"]
@@ -85,6 +119,31 @@ class OrganisationViewSet(ModelViewSet):
         obj.name = request.data.get("name")
         obj.save()
         return custom_success_response({"message": "Organisatiomn name updates successfully"})
+
+    @action(detail=True, methods=["get"])
+    def related_entities(self, request, pk):
+        check_permisson(self, request)
+        # org = Organisation.objects.filter(id=pk).prefetch_related("lead_organisation")
+        leads = Lead.objects.filter(organisation_id=pk, is_converted_to_prospect=False)
+        prospects = Prospect.objects.filter(
+            lead__organisation_id=pk, is_converted_to_deal=False
+        ).select_related("lead")
+        deals = Deal.objects.filter(lead__organisation_id=pk).select_related("lead")
+        res = {
+            "leads": LeadSerializer(leads, many=True).data,
+            "prospects": ProspectSerializer(prospects, many=True).data,
+            "deal": DealSerializer(deals, many=True).data,
+        }
+
+        # temp_dict={
+        #     "title":lead.title,
+        #     "source":lead.source,
+        #     "created_by":lead.created_by.get_dict_name_id() if lead.created_by else None,
+        #     "owned_by":lead.owned_by.get_dict_name_id() if lead.owned_by else None,
+        #     "status":lead.status,
+        #     "created_at":lead.created_at,
+        # }
+        return custom_success_response(res)
 
 
 class ContactViewSet(ModelViewSet):

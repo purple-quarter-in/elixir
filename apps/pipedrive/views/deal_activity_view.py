@@ -117,16 +117,13 @@ class ActivityViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def to_do(self, request):
-        if "lead" not in request.query_params:
-            raise ValidationError({"lead": ["Lead id not provided."]})
-        return custom_success_response(
-            self.serializer_class(
-                Activity.objects.filter(
-                    lead=request.query_params.get("lead"), closed_at=None
-                ).order_by("-created_at"),
-                many=True,
-            ).data
-        )
+        if "lead" not in request.query_params and "organisation" not in request.query_params:
+            raise ValidationError({"lead/organisation": ["Lead/Organisation id not provided."]})
+        _filter = {}
+        for key in request.query_params:
+            _filter[key] = request.query_params.get(key)
+        obj = Activity.objects.filter(closed_at=None, **_filter).order_by("-created_at")
+        return custom_success_response(self.serializer_class(obj, many=True).data)
 
     @action(detail=True, methods=["patch"])
     def update_status(self, request, pk):
@@ -146,11 +143,13 @@ class ActivityViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def activity_wo_notes(self, request):
-        if "lead" not in request.query_params:
-            raise ValidationError({"lead": ["Lead id not provided."]})
-
+        if "lead" not in request.query_params and "organisation" not in request.query_params:
+            raise ValidationError({"lead/organisation": ["Lead/Organisation id not provided."]})
+        _filter = {}
+        for key in request.query_params:
+            _filter[key] = request.query_params.get(key)
         activity = (
-            Activity.objects.filter(lead_id=request.query_params.get("lead"))
+            Activity.objects.filter(**_filter)
             .select_related("created_by", "assigned_to")
             .prefetch_related("notes_activity", "contact")
             .filter(notes_activity__isnull=True)
@@ -171,10 +170,15 @@ class History(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        if "lead" not in request.query_params:
-            raise ValidationError({"lead": ["Lead id not provided."]})
-        lead = request.query_params.get("lead")
-        activity = Activity.objects.filter(lead_id=lead).order_by("due_date")
+        if "lead" not in request.query_params and "organisation" not in request.query_params:
+            raise ValidationError({"lead/organisation": ["Lead/Organisation id not provided."]})
+        _filter = {}
+        changelog_filter = {}
+        for key in request.query_params:
+            _filter[key] = request.query_params.get(key)
+            changelog_filter["model_name"] = key.capitalize()
+            changelog_filter["obj_id"] = request.query_params.get(key)
+        activity = Activity.objects.filter(**_filter).order_by("due_date")
         activity_ids = []
         activity_data = []
         for act in activity:
@@ -190,7 +194,7 @@ class History(ListAPIView):
         #     many=True,
         # ).data
         changelog = ChangelogSerializer(
-            Changelog.objects.filter(model_name="Lead", obj_id=lead).order_by("-created_at"),
+            Changelog.objects.filter(**changelog_filter).order_by("-created_at"),
             many=True,
         ).data
         return custom_success_response(
