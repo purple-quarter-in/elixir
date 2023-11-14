@@ -13,6 +13,7 @@ from apps.client.serializer import (
 )
 from apps.pipedrive.models import Deal, Lead, Prospect
 from apps.pipedrive.serializer import DealSerializer, LeadSerializer, ProspectSerializer
+from elixir import changelog
 from elixir.utils import (
     check_permisson,
     custom_success_response,
@@ -95,6 +96,13 @@ class OrganisationViewSet(ModelViewSet):
                 }
             )
         org = serializer.save(**set_crated_by_updated_by(request.user))
+        changelog(
+            self.changelog,
+            org,
+            {"is_created": request.user},
+            "create",
+            request.user.id,
+        )
         if "contact_details" in request.data:
             for contact in request.data.get("contact_details"):
                 Contact.objects.create(organisation=org, **contact)
