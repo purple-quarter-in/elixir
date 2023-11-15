@@ -163,9 +163,14 @@ class ActivitySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
         validated_data["assigned_to_id"] = self.context["request"].data.get("assigned_to", None)
-        count = Activity.objects.filter(
-            lead=validated_data["lead"], type=validated_data["type"]
-        ).count()
+        if "lead" in self.context["request"].data:
+            count = Activity.objects.filter(
+                lead=validated_data["lead"], type=validated_data["type"]
+            ).count()
+        elif "organisation" in self.context["request"].data:
+            count = Activity.objects.filter(
+                organisation=validated_data["organisation"], type=validated_data["type"]
+            ).count()
         validated_data["title"] = validated_data["type"] + " - " + f"{count+1}".zfill(2)
         return super().create(validated_data)
 
