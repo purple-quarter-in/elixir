@@ -52,6 +52,8 @@ class ModelViewSet(viewsets.ModelViewSet):
                             _filter[
                                 "_".join(key_array[:-1]) + self.filtering[key]["lookup"]
                             ] = data
+                        else:
+                            _filter[key + self.filtering[key]["lookup"]] = data
                     else:
                         _filter[key] = data
                 elif self.sorting and key in self.sorting:
