@@ -95,7 +95,12 @@ def org_import(request):
             print(row[0])
             org_list.append(
                 Organisation(
-                    name=row[0], industry=row[4], domain=row[5], created_by_id=1, updated_by_id=1
+                    name=row[0],
+                    industry=row[4],
+                    domain=row[5],
+                    created_by_id=row[9],
+                    updated_by_id=row[9],
+                    created_at=row[8],
                 )
             )
     Organisation.objects.bulk_create(org_list)
@@ -320,7 +325,7 @@ class LeadViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
-        if lead.owner_id != serializer._validated_data["owner"]:
+        if lead.owner_id != serializer._validated_data["owner"].id:
             Notification.objects.create(
                 type="Lead Owner Assigned",
                 description=f"{request.user.get_full_name()} assigned Ownership for Lead {lead.title} to {serializer.validated_data['owner'].get_full_name()}",
@@ -417,7 +422,7 @@ class ProspectViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
-        if prospect.owner_id != serializer._validated_data["owner"]:
+        if prospect.owner_id != serializer._validated_data["owner"].id:
             Notification.objects.create(
                 type="Lead Owner Assigned",
                 description=f"{request.user.get_full_name()} assigned Ownership for Prospect {prospect.lead.title} to {serializer.validated_data['owner'].get_full_name()}",
