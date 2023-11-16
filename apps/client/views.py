@@ -33,7 +33,7 @@ class OrganisationViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     user_permissions = {}
     filtering = {
-        "name": {"operation": "contains", "lookup": "__contains"},
+        "name": {"operation": "contains", "lookup": "__icontains"},
         "industry": {"operation": "in", "lookup": "__in"},
         "segment": {"operation": "in", "lookup": "__in"},
         "last_funding_stage": {"operation": "in", "lookup": "__in"},
