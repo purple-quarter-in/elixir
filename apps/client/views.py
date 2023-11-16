@@ -69,7 +69,7 @@ class OrganisationViewSet(ModelViewSet):
             },
             "last_funding_stage": {
                 "type": "Field Update",
-                "description": " Last Funding Stage Updated",
+                "description": " Last Funding Round Updated",
             },
         },
     }
