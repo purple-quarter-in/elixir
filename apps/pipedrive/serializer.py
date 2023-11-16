@@ -223,6 +223,7 @@ class NoteSerializer(serializers.ModelSerializer):
 
 class HistoryNoteSerializer(serializers.ModelSerializer):
     activity_type = serializers.CharField(source="activity.type")
+    due_date = serializers.CharField(source="activity.due_date")
     mode = serializers.CharField(source="activity.mode")
     title = serializers.CharField(source="activity.title")
     contacts = serializers.SerializerMethodField()

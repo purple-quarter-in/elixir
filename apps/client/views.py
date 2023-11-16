@@ -160,6 +160,17 @@ class ContactViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     response_serializer = ContactSerializer
     user_permissions = {}
+    filtering = {
+        "name": {"operation": "contains", "lookup": "__icontains"},
+        "organisation__name": {"operation": "in", "lookup": "__in"},
+        "designation": {"operation": "in", "lookup": "__in"},
+        "type": {"operation": "in", "lookup": "__in"},
+        "created_by": {"operation": "in", "lookup": "_id__in"},
+        "created_at_from": {"operation": "from_to", "lookup": "__gte"},
+        "created_at_to": {"operation": "from_to", "lookup": "__lte"},
+    }
+    sorting = ["created_at"]
+    pagination = True
 
     def __init__(self, **kwargs: Any) -> None:
         self.user_permissions["get"] = ["client.view_contact"]

@@ -2,7 +2,7 @@ from django.apps import apps
 from rest_framework import serializers
 
 from apps.notification.models import Notification
-from apps.pipedrive.models import Activity, Lead
+from apps.pipedrive.models import Activity, Deal, Lead, Prospect
 from apps.pipedrive.serializer import NotesContactSerializer
 
 
@@ -30,7 +30,11 @@ class NoteActivitySerializer(serializers.ModelSerializer):
         return NotesContactSerializer(instance.contact, many=True).data
 
     def get_organisation(self, instance):
-        return instance.lead.organisation.get_dict_name_id()
+        return (
+            instance.lead.organisation.get_dict_name_id()
+            if instance.lead
+            else instance.organisation.get_dict_name_id()
+        )
 
     def get_status(self, instance):
         status = instance.status
@@ -54,6 +58,36 @@ class NoteLeadSerializer(serializers.ModelSerializer):
         return instance.owner.get_dict_name_id()
 
 
+class NoteProspectSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField()
+    lead = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Prospect
+        fields = "__all__"
+
+    def get_lead(self, instance):
+        return NoteLeadSerializer(instance.lead).data
+
+    def get_owner(self, instance):
+        return instance.owner.get_dict_name_id()
+
+
+class NoteDealSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField()
+    prospect = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Deal
+        fields = "__all__"
+
+    def get_prospect(self, instance):
+        return NoteProspectSerializer(instance.prospect).data
+
+    def get_owner(self, instance):
+        return instance.owner.get_dict_name_id()
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     data = serializers.SerializerMethodField()
 
@@ -69,6 +103,10 @@ class NotificationSerializer(serializers.ModelSerializer):
                 obj = model.objects.get(pk=instance.object_id)
                 if model_name == "Lead":
                     return NoteLeadSerializer(obj).data
+                elif model_name == "Prospect":
+                    return NoteProspectSerializer(obj).data
+                elif model_name == "Deal":
+                    return NoteDealSerializer(obj).data
                 return NoteActivitySerializer(obj).data
 
         return None

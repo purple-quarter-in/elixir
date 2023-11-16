@@ -141,7 +141,7 @@ class LeadViewSet(ModelViewSet):
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
     filtering = {
-        "title": {"operation": "contains", "lookup": "__contains"},
+        "title": {"operation": "contains", "lookup": "__icontains"},
         "role__region": {"operation": "in", "lookup": "__in"},
         "source": {"operation": "in", "lookup": "__in"},
         "status": {"operation": "in", "lookup": "__in"},
@@ -370,7 +370,7 @@ class ProspectViewSet(ModelViewSet):
     serializer_class = ProspectSerializer
     permission_classes = [IsAuthenticated]
     filtering = {
-        "lead__title": {"operation": "contains", "lookup": "__contains"},
+        "lead__title": {"operation": "contains", "lookup": "__icontains"},
         "lead__role__region": {"operation": "in", "lookup": "__in"},
         "lead__source": {"operation": "in", "lookup": "__in"},
         "status": {"operation": "in", "lookup": "__in"},
@@ -416,6 +416,14 @@ class ProspectViewSet(ModelViewSet):
                 serializer._validated_data,
                 "update",
                 request.user.id,
+            )
+        if prospect.owner_id != serializer._validated_data["owner"]:
+            Notification.objects.create(
+                type="Lead Owner Assigned",
+                description=f"{request.user.get_full_name()} assigned Ownership for Prospect {prospect.lead.title} to {serializer.validated_data['owner'].get_full_name()}",
+                user=serializer.validated_data["owner"],
+                model_name="Prospect",
+                object_id=prospect.id,
             )
         prospect = serializer.save(updated_by=request.user)
         return custom_success_response(
@@ -481,7 +489,7 @@ class DealViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     response_serializer = DealSerializer
     filtering = {
-        "lead__title": {"operation": "contains", "lookup": "__contains"},
+        "lead__title": {"operation": "contains", "lookup": "__icontains"},
         "lead__fullfilled_by": {"operation": "in", "lookup": "__in"},
         "lead__source": {"operation": "in", "lookup": "__in"},
         "status": {"operation": "in", "lookup": "__in"},
