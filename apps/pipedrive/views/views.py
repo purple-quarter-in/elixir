@@ -140,6 +140,18 @@ class LeadViewSet(ModelViewSet):
     )
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
+    filtering = {
+        "title": {"operation": "contains", "lookup": "__contains"},
+        "role__region": {"operation": "in", "lookup": "__in"},
+        "source": {"operation": "in", "lookup": "__in"},
+        "status": {"operation": "in", "lookup": "__in"},
+        "owner": {"operation": "in", "lookup": "_id__in"},
+        "created_by": {"operation": "in", "lookup": "_id__in"},
+        "created_at_from": {"operation": "from_to", "lookup": "__gte"},
+        "created_at_to": {"operation": "from_to", "lookup": "__lte"},
+    }
+    sorting = ["created_at"]
+    pagination = True
     user_permissions = {
         "get": ["pipedrive.view_lead"],
         "post": ["pipedrive.add_lead"],
@@ -357,6 +369,18 @@ class ProspectViewSet(ModelViewSet):
     )
     serializer_class = ProspectSerializer
     permission_classes = [IsAuthenticated]
+    filtering = {
+        "lead__title": {"operation": "contains", "lookup": "__contains"},
+        "lead__role__region": {"operation": "in", "lookup": "__in"},
+        "lead__source": {"operation": "in", "lookup": "__in"},
+        "status": {"operation": "in", "lookup": "__in"},
+        "owner": {"operation": "in", "lookup": "_id__in"},
+        "created_by": {"operation": "in", "lookup": "_id__in"},
+        "created_at_from": {"operation": "from_to", "lookup": "__gte"},
+        "created_at_to": {"operation": "from_to", "lookup": "__lte"},
+    }
+    sorting = ["created_at"]
+    pagination = True
     user_permissions = {
         "get": ["pipedrive.view_prospect"],
         "post": ["pipedrive.add_prospect"],
@@ -456,6 +480,17 @@ class DealViewSet(ModelViewSet):
     serializer_class = DealSerializer
     permission_classes = [IsAuthenticated]
     response_serializer = DealSerializer
+    filtering = {
+        "lead__title": {"operation": "contains", "lookup": "__contains"},
+        "lead__fullfilled_by": {"operation": "in", "lookup": "__in"},
+        "lead__source": {"operation": "in", "lookup": "__in"},
+        "status": {"operation": "in", "lookup": "__in"},
+        "owner": {"operation": "in", "lookup": "_id__in"},
+        "created_at_from": {"operation": "from_to", "lookup": "__gte"},
+        "created_at_to": {"operation": "from_to", "lookup": "__lte"},
+    }
+    sorting = ["created_at"]
+    pagination = True
     user_permissions = {
         "get": ["pipedrive.view_deal"],
         "post": ["pipedrive.add_deal"],
