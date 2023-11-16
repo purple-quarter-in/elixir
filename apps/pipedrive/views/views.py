@@ -325,7 +325,10 @@ class LeadViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
-        if lead.owner_id != serializer._validated_data["owner"].id:
+        if (
+            "owner" in serializer._validated_data
+            and lead.owner_id != serializer._validated_data["owner"].id
+        ):
             Notification.objects.create(
                 type="Lead Owner Assigned",
                 description=f"{request.user.get_full_name()} assigned Ownership for Lead {lead.title} to {serializer.validated_data['owner'].get_full_name()}",
