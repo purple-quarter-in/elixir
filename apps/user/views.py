@@ -111,6 +111,7 @@ class UserViewSet(ModelViewSet):
                 "user": user,
                 "uid": urlsafe_base64_encode(force_bytes(user.username)),
                 "token": account_activation_token.make_token(user),
+                "domain": settings.SITE_URL,
             },
         )
         email = send_mail(
@@ -220,6 +221,7 @@ class UserViewSet(ModelViewSet):
                             "user": user,
                             "uid": urlsafe_base64_encode(force_bytes(user.username)),
                             "token": token,
+                            "domain": settings.SITE_URL,
                         },
                     )
                     context = {
