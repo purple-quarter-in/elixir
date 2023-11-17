@@ -55,15 +55,15 @@ def contact_import(request):
             # designation  & email cant be empty
             contact_list.append(
                 Contact(
-                    organisation_id=org.id,
+                    organisation_id=org[0].id,
                     name=row[1],
                     email=row[2],
                     std_code=row[3],
                     phone=row[4],
                     designation=row[5],
                     type=row[6],
-                    created_by_id=1,
-                    updated_by_id=1,
+                    created_by_id=row[8],
+                    updated_by_id=row[8],
                 )
             )
         else:
@@ -81,7 +81,7 @@ def contact_import(request):
                 )
             )
             print(row[0])
-    Contact.objects.bulk_create(contact_import)
+    Contact.objects.bulk_create(contact_list)
     return custom_success_response({})
 
 

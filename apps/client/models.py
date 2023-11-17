@@ -73,10 +73,10 @@ class Contact(models.Model):
         Organisation, on_delete=models.DO_NOTHING, related_name="contact_organisation"
     )
     name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
+    email = models.EmailField(max_length=100, blank=True, null=True)
     std_code = models.CharField(max_length=5, blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
-    designation = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(max_length=100)
     archived = models.BooleanField(default=False)
     created_by = models.ForeignKey(
