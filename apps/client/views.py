@@ -105,7 +105,9 @@ class OrganisationViewSet(ModelViewSet):
         )
         if "contact_details" in request.data:
             for contact in request.data.get("contact_details"):
-                Contact.objects.create(organisation=org, **contact)
+                Contact.objects.create(
+                    organisation=org, **contact, **set_crated_by_updated_by(request.user)
+                )
         return custom_success_response(
             self.serializer_class(org).data, status=status.HTTP_201_CREATED
         )

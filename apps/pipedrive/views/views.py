@@ -50,7 +50,7 @@ def contact_import(request):
         # fp_write.write(str(len(row)) + " " + str(row[0]) + "\n")
         if not Organisation.objects.filter(name=row[0]).exists():
             org = Organisation.objects.update_or_create(
-                name=row[0], defaults={"created_by_id": 1, "updated_by_id": 1}
+                name=row[0], defaults={"created_by_id": row[8], "updated_by_id": row[8]}
             )
             # designation  & email cant be empty
             contact_list.append(
@@ -76,8 +76,8 @@ def contact_import(request):
                     phone=row[4],
                     designation=row[5],
                     type=row[6],
-                    created_by_id=1,
-                    updated_by_id=1,
+                    created_by_id=row[8],
+                    updated_by_id=row[8],
                 )
             )
             print(row[0])
