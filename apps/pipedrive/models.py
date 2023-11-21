@@ -56,6 +56,8 @@ class Lead(models.Model):
     currency = models.CharField(max_length=3, blank=True, null=True)  # discuss with abhinav
     service_fee = models.CharField(max_length=50, blank=True, null=True)
     service_fee_range = models.CharField(max_length=100, blank=True, null=True)
+    flat_fee = models.CharField(max_length=100, blank=True, null=True, default=None)
+    equity_fee = models.CharField(max_length=100, blank=True, null=True, default=None)
     retainer_advance = models.BooleanField(blank=True, null=True)
     exclusivity = models.BooleanField(blank=True, null=True)
     source = models.CharField(max_length=100)
