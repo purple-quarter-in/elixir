@@ -127,7 +127,7 @@ class Lead(models.Model):
                 "Director of Engineering": "DOE",
                 "Site Lead": "SL",
                 "Head of Data Science": "HODS",
-                "CISO": "ciso",
+                "CISO": "CISO",
                 "Principal Architect": "PA",
                 "Principal Engineer": "PE",
                 "VP of Data Science": "VPODS",
