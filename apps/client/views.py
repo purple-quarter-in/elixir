@@ -55,6 +55,10 @@ class OrganisationViewSet(ModelViewSet):
                 "type": "Field Update",
                 "description": "Industry Updated",
             },
+            "name": {
+                "type": "Field Update",
+                "description": "Name Updated",
+            },
             "billing_address": {
                 "type": "Field Update",
                 "description": "Billing Address Updated",
@@ -126,6 +130,13 @@ class OrganisationViewSet(ModelViewSet):
             name_split[0] = request.data.get("name")
             lead.title = " - ".join(name_split)
             lead.save()
+        changelog(
+            self.changelog,
+            obj,
+            {"name": request.data.get("name")},
+            "update",
+            request.user.id,
+        )
         obj.name = request.data.get("name")
         obj.save()
         return custom_success_response({"message": "Organisatiomn name updates successfully"})
