@@ -179,6 +179,14 @@ class LeadViewSet(ModelViewSet):
                 "type": "Field Update",
                 "description": "Service Fee Updated",
             },
+            "flat_fee": {
+                "type": "Field Update",
+                "description": "Flat Fee Updated",
+            },
+            "equity_fee": {
+                "type": "Field Update",
+                "description": "Equity Fee Updated",
+            },
             "owner": {
                 "field_to_get": "get_full_name",
                 "type": "Field Update",
