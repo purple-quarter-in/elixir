@@ -559,6 +559,21 @@ class DealViewSet(ModelViewSet):
         else:
             raise ValidationError({"message": ["Technical error"]})
 
+    @action(detail=False, methods=["get"])
+    def cummulative_summary(self, request):
+        deals = Deal.objects.all()
+        mapping = {"created_at_from": "created_at__gte", "created_at_to": "created_at__lte"}
+        _filters = {}
+        for key, value in request.query_params.items():
+            _filters[mapping[key] if key in mapping else key] = value
+        deals = deals.filter(**_filters).values_list("deal_value")
+        cummulative_summary = {"INR": 0, "USD": 0, "EUR": 0}
+        for deal_value in deals:
+            currency, value = deal_value[0].split(" ")
+            cummulative_summary.setdefault(currency, 0)
+            cummulative_summary[currency] += float(value.replace(",", ""))
+        return custom_success_response(cummulative_summary)
+
 
 class CreateLandingPageLead(CreateAPIView):
     changelog = {
