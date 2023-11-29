@@ -91,7 +91,7 @@ class OrganisationViewSet(ModelViewSet):
         check_permisson(self, request)
         serializer = OrganisationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if Organisation.objects.filter(name=serializer.validated_data["name"]).exists():
+        if Organisation.objects.filter(name__iexact=serializer.validated_data["name"]).exists():
             raise ValidationError(
                 {
                     "already_exists": [
@@ -210,7 +210,7 @@ class ContactViewSet(ModelViewSet):
                 )
             elif "organisation_name" in request.data:
                 if Organisation.objects.filter(
-                    name=request.data.get("organisation_name")
+                    name__iexact=request.data.get("organisation_name")
                 ).exists():
                     raise ValidationError(
                         {
