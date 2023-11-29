@@ -87,7 +87,7 @@ def view_document(service_contract):
     if not integration_docusign:
         raise ValidationError({"integration": "Doccusign integration required!!!"})
     account_info = integration_docusign.userinfo["accounts"][0]
-    url = f"{account_info['base_uri']}/restapi/v2.1/accounts/{account_info['account_id']}{service_contract.docusign.file_url}/documents/201"
+    url = f"{account_info['base_uri']}/restapi/v2.1/accounts/{account_info['account_id']}{service_contract.docusign.file_url}/documents/{service_contract.id}"
 
     headers = {"Authorization": f"Bearer {integration_docusign.access_token}"}
     response = requests.get(url, headers=headers)
