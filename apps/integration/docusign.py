@@ -171,7 +171,7 @@ def oauth(request, *args, **kwargs):
     return custom_success_response({"code": request.query_params.get("code")})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def listen_event(request, *args, **kwargs):
     data = request.data["data"]
     accountId = data["accountId"]
