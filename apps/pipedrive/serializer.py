@@ -12,8 +12,11 @@ from apps.pipedrive.models import (
     RDCapsule,
     RoleDetail,
     ServiceContract,
+    ServiceContractDocuSignDetail,
+    ServiceProposal,
     changelog,
 )
+from elixir.utils import sizeof_fmt
 
 
 class CreateLeadSerializer(serializers.Serializer):
@@ -252,11 +255,51 @@ class ChangelogSerializer(serializers.ModelSerializer):
         return instance.changed_by.get_dict_name_id() if instance.changed_by is not None else None
 
 
+class ServiceContractDocuSignDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceContractDocuSignDetail
+        fields = "__all__"
+
+
 class ServiceContractSerializer(serializers.ModelSerializer):
     uploaded_by = serializers.SerializerMethodField()
+    docusign = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceContract
+        fields = "__all__"
+        extra_kwargs = {
+            "uploaded_by": {"read_only": True},
+            "file_name": {"read_only": True},
+            "file_size": {"read_only": True},
+            "file_type": {"read_only": True},
+            "docusign": {"read_only": True},
+        }
+
+    def create(self, validated_data):
+        file = validated_data["file"]
+        file_name, file_type = (file.name).split(".")
+        validated_data["file_name"] = file_name
+        validated_data["file_type"] = file_type
+        validated_data["file_size"] = sizeof_fmt(file.size)
+        return super().create(validated_data)
+
+    def get_uploaded_by(self, instance):
+        return instance.uploaded_by.get_dict_name_id()
+
+    def get_docusign(self, instance):
+        return (
+            ServiceContractDocuSignDetailSerializer(instance.docusign).data
+            if instance.docusign
+            else None
+        )
+
+
+class ServiceProposalSerializer(serializers.ModelSerializer):
+    uploaded_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ServiceProposal
         fields = "__all__"
         extra_kwargs = {"uploaded_by": {"read_only": True}}
 

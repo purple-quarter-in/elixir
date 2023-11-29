@@ -10,6 +10,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django.conf import settings
+from django.db import connection
 from sqlalchemy import Connection
 
 from apps.notification.models import Notification
@@ -36,6 +37,14 @@ class Schedular:
             print(f"The job {event.job_id} crashed with execption:- {event.exception}:(")
         else:
             print(f"The job {event.job_id} worked :)")
+        if connection.connection:
+            # Check the connection's status
+            if connection.is_usable():
+                print("The database connection is fresh.")
+                connection.close()
+            else:
+                connection.close()
+                connection.connect()
 
     def __init__(self):
         executors = {"default": ThreadPoolExecutor(20), "processpool": ProcessPoolExecutor(5)}
@@ -79,6 +88,14 @@ def schedule_create_notification(instance, type, description, user, model_name):
             "model_name": model_name,
             "object_id": instance.id if instance else None,
         },
+    )
+    print(response.json())
+
+
+def schedule_refresh_docusign_token(instance):
+    response = requests.post(
+        f"{request_domain}/docusign_refresh_token",
+        json={"instance": instance},
     )
     print(response.json())
 

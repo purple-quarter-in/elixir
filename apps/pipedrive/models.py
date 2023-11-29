@@ -2,7 +2,11 @@ from django.db import models
 from django.utils import timezone
 
 from apps.client.models import Organisation
-from apps.pipedrive.helper import upload_path_rdcapsule, upload_path_service_contract
+from apps.pipedrive.helper import (
+    upload_path_rdcapsule,
+    upload_path_service_contract,
+    upload_path_serviceproposal,
+)
 from apps.user.models import User
 
 # Create your models here.
@@ -376,18 +380,50 @@ class changelog(models.Model):
         return self.type + " : " + (self.description or "")
 
 
+# Create your models here.
+class ServiceContractDocuSignDetail(models.Model):
+    """Model definition for ServiceContractDocuSignDetail."""
+
+    status = models.CharField(max_length=50, default="Draft")
+    file_url = models.TextField()
+    envelop_id = models.CharField(max_length=250)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    response = models.JSONField()
+
+    class Meta:
+        """Meta definition for ServiceContractDocuSignDetail."""
+
+        verbose_name = "ServiceContractDocuSignDetail"
+        verbose_name_plural = "ServiceContractDocuSignDetails"
+
+    def __str__(self):
+        """Unicode representation of ServiceContractDocuSignDetail."""
+        pass
+
+
 class ServiceContract(models.Model):
     """Model definition for ServiceContract."""
 
-    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name="contract_deal_service")
     file = models.FileField(upload_to=upload_path_service_contract)
+    file_name = models.CharField(max_length=50)
+    file_size = models.CharField(max_length=250)
+    file_type = models.CharField(max_length=150)
     uploaded_at = models.DateTimeField(
         auto_now_add=True,
         editable=False,
     )
-    sent_on = models.DateTimeField(default=None, blank=True, null=True)
+    status = models.CharField(max_length=50, default="Draft")
+    event_date = models.DateTimeField(default=None, blank=True, null=True)
     uploaded_by = models.ForeignKey(
         User, related_name="contract_uploaded_by", on_delete=models.DO_NOTHING
+    )
+    docusign = models.ForeignKey(
+        ServiceContractDocuSignDetail,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="contract_docusign_service",
     )
 
     class Meta:
@@ -398,6 +434,28 @@ class ServiceContract(models.Model):
 
     def __str__(self):
         """Unicode representation of ServiceContract."""
+        return self.file.url
+
+
+class ServiceProposal(models.Model):
+    """Model definition for ServiceProposal."""
+
+    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE, default=None)
+    file = models.FileField(upload_to=upload_path_serviceproposal)
+    uploaded_at = models.DateTimeField(auto_now_add=True, editable=False)
+    sent_on = models.DateTimeField(default=None, blank=True, null=True)
+    uploaded_by = models.ForeignKey(
+        User, related_name="ServiceProposal_uploaded_by", on_delete=models.DO_NOTHING
+    )
+
+    class Meta:
+        """Meta definition for ServiceProposal."""
+
+        verbose_name = "ServiceProposal"
+        verbose_name_plural = "ServiceProposals"
+
+    def __str__(self):
+        """Unicode representation of ServiceProposal."""
         return self.file.url
 
 

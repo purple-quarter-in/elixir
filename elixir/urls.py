@@ -22,6 +22,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
 from apps.django_rest_passwordreset.urls import urlpatterns as reset_urlpatterns
+from apps.integration.urls import url_pattern as integration_urlpatterns
 from apps.pipedrive.urls import urlpatterns as pipedrive_urlpatterns
 from apps.user.urls import urlpatterns as user_urlpatterns
 
@@ -31,6 +32,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 ]
 from apps.client.urls import router as client_router
+from apps.integration.urls import router as integration_router
 from apps.notification.urls import router as notification_router
 from apps.pipedrive.urls import router as pipedrive_router
 from apps.rbac.urls import router as rbac_router
@@ -43,6 +45,7 @@ router.registry.extend(pipedrive_router.registry)
 router.registry.extend(client_router.registry)
 router.registry.extend(user_router.registry)
 router.registry.extend(notification_router.registry)
+router.registry.extend(integration_router.registry)
 urlpatterns = [
     path("jet/", include("jet.urls", "jet")),
     path("jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")),
@@ -67,5 +70,6 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(template_name="swagger-ui.html", url_name="schema"),
         name="swagger-ui",
     ),
+    path("", include(integration_urlpatterns)),
 ]
 urlpatterns += static(base.STATIC_URL, document_root=base.STATIC_ROOT)

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "apps.pipedrive",
     "apps.client",
     "apps.notification",
+    "apps.integration",
 ]
 
 MIDDLEWARE = [
@@ -171,3 +172,6 @@ logging.config.dictConfig(LOGGING)
 LOGGEER = logging.getLogger("elixir")
 
 API_URL = ENV.str("API_URL")
+DOCUSIGN_INTEGRATION_KEY = ENV.str("DOCUSIGN_INTEGRATION_KEY")
+DOCUSIGN_SECRET_KEY = ENV.str("DOCUSIGN_SECRET_KEY")
+DOCUSIGN_DOMAIN = ENV.str("DOCUSIGN_DOMAIN")

@@ -16,6 +16,7 @@ from .views.views import (
     RDCapsuleViewSet,
     RoleDetailViewSet,
     ServiceContractViewSet,
+    ServiceProposalViewSet,
 )
 
 router = DefaultRouter()
@@ -27,6 +28,7 @@ router.register("note", NoteViewSet)
 router.register("activity", ActivityViewSet)
 router.register("contract", ServiceContractViewSet)
 router.register("rdcapsule", RDCapsuleViewSet)
+router.register("proposal", ServiceProposalViewSet)
 urlpatterns = [
     path("import-organisation", views.org_import),
     path("import-contact", views.contact_import),

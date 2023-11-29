@@ -1,7 +1,9 @@
+import base64
 import os
 from datetime import date, datetime
 from urllib import request
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import action
@@ -11,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from yaml import serialize
 
 from apps.client.models import Contact, Organisation
+from apps.integration.docusign import create_envelop, view_document
 from apps.notification.models import Notification
 from apps.pipedrive.models import (
     Deal,
@@ -19,6 +22,8 @@ from apps.pipedrive.models import (
     RDCapsule,
     RoleDetail,
     ServiceContract,
+    ServiceContractDocuSignDetail,
+    ServiceProposal,
 )
 from apps.pipedrive.serializer import (
     CreateLeadSerializer,
@@ -28,6 +33,7 @@ from apps.pipedrive.serializer import (
     RDCapsuleSerializer,
     RoleDetailSerializer,
     ServiceContractSerializer,
+    ServiceProposalSerializer,
     UpdateDealSerializer,
     UpdateLeadSerializer,
     UpdateProspectSerializer,
@@ -219,7 +225,9 @@ class LeadViewSet(ModelViewSet):
             if "contact_details" in dto["organisation"]:
                 for contact in dto["organisation"]["contact_details"]:
                     Contact.objects.create(
-                        organisation_id=org_id, **contact, **set_crated_by_updated_by(request.user)
+                        organisation_id=org_id,
+                        **contact,
+                        **set_crated_by_updated_by(request.user),
                     )
         elif "id" not in dto["organisation"] and "name" in dto["organisation"]:
             # case of create
@@ -232,7 +240,9 @@ class LeadViewSet(ModelViewSet):
                     }
                 )
             org = Organisation.objects.create(
-                name=dto["organisation"]["name"], created_by=request.user, updated_by=request.user
+                name=dto["organisation"]["name"],
+                created_by=request.user,
+                updated_by=request.user,
             )
             changelog(
                 {
@@ -240,7 +250,10 @@ class LeadViewSet(ModelViewSet):
                     "mapping_obj": "id",
                     "is_mapping_obj_func": False,
                     "create": {
-                        "is_created": {"type": "Entity Created", "description": "Account Created"},
+                        "is_created": {
+                            "type": "Entity Created",
+                            "description": "Account Created",
+                        },
                     },
                 },
                 org,
@@ -252,7 +265,9 @@ class LeadViewSet(ModelViewSet):
             if "contact_details" in dto["organisation"]:
                 for contact in dto["organisation"]["contact_details"]:
                     Contact.objects.create(
-                        organisation_id=org_id, **contact, **set_crated_by_updated_by(request.user)
+                        organisation_id=org_id,
+                        **contact,
+                        **set_crated_by_updated_by(request.user),
                     )
             pass
         role = role_serializer.save()
@@ -284,7 +299,8 @@ class LeadViewSet(ModelViewSet):
         obj.is_converted_to_prospect = True
         obj.updated_by = request.user
         prospect = Prospect.objects.update_or_create(
-            lead=obj, defaults={"owner": obj.owner, **set_crated_by_updated_by(request.user)}
+            lead=obj,
+            defaults={"owner": obj.owner, **set_crated_by_updated_by(request.user)},
         )
         if prospect:
             changelog(
@@ -407,7 +423,10 @@ class ProspectViewSet(ModelViewSet):
         "mapping_obj": "lead_id",
         "is_mapping_obj_func": False,
         "update": {
-            "status": {"type": "Status Update", "description": "Prospect State Updated"},
+            "status": {
+                "type": "Status Update",
+                "description": "Prospect State Updated",
+            },
             "is_converted_to_deal": {
                 "type": "State Update",
                 "description": "Prospect Converted to Deal",
@@ -631,10 +650,10 @@ class CreateLandingPageLead(CreateAPIView):
         )
 
 
-class ServiceContractViewSet(ModelViewSet):
-    queryset = ServiceContract.objects.all()
+class ServiceProposalViewSet(ModelViewSet):
+    queryset = ServiceProposal.objects.all()
     permission_classes = [IsAuthenticated]
-    serializer_class = ServiceContractSerializer
+    serializer_class = ServiceProposalSerializer
     http_method_names = ["post", "get"]
 
     def list(self, request, *args, **kwargs):
@@ -648,6 +667,62 @@ class ServiceContractViewSet(ModelViewSet):
 
     def perform_create(self, serializer, **kwargs):
         self._instance = serializer.save(uploaded_by=self.request.user)
+
+
+class ServiceContractViewSet(ModelViewSet):
+    queryset = ServiceContract.objects.all().select_related("docusign")
+    permission_classes = [IsAuthenticated]
+    serializer_class = ServiceContractSerializer
+    http_method_names = ["post", "get"]
+
+    def list(self, request, *args, **kwargs):
+        deal = request.query_params.get("deal", None)
+        if deal:
+            return custom_success_response(
+                self.get_serializer(self.queryset.filter(deal=deal), many=True).data
+            )
+        else:
+            raise ValidationError({"deal": ["This field is required"]})
+
+    def perform_create(self, serializer, **kwargs):
+        self._instance = serializer.save(uploaded_by=self.request.user)
+
+    @action(detail=False, methods=["post"])
+    def export_zoho(self, request):
+        pass
+
+    @action(detail=True, methods=["post"])
+    def docu_esign(self, request, pk):
+        """
+        1-Api to send envelop to docusign
+        2-update the linked docusign field in service contract obj
+        3- update status and event_date field
+        """
+        obj = self.get_object()
+        docusign_envelop = create_envelop(obj)
+        if "errorCode" not in docusign_envelop:
+            scdd = ServiceContractDocuSignDetail.objects.create(
+                status=docusign_envelop["status"],
+                file_url=docusign_envelop["uri"],
+                envelop_id=docusign_envelop["envelopeId"],
+                response=docusign_envelop,
+            )
+            obj.docusign = scdd
+            obj.event_date = docusign_envelop["statusDateTime"]
+            obj.save()
+        else:
+            raise ValidationError(detail={"errorCode": [docusign_envelop["errorCode"]]})
+
+        return custom_success_response({"messsage": ["E-sign successful."]})
+
+    @action(detail=True, methods=["get"])
+    def docu_view_document(self, request, pk):
+        obj = self.get_object()
+        if obj.docusign:
+            docusign_envelop = view_document(obj)
+            return HttpResponse(docusign_envelop, content_type="application/pdf")
+        else:
+            raise ValidationError({"document": "No document has been esigned to Docusign"})
 
 
 class RDCapsuleViewSet(ModelViewSet):

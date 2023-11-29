@@ -80,8 +80,14 @@ class OrganisationViewSet(ModelViewSet):
     # X assigned Ownership for Lead Zomato-IND-HOE-1 to Y
 
     def __init__(self, **kwargs: Any) -> None:
-        self.user_permissions["get"] = ["client.access_organisation", "client.view_organisation"]
-        self.user_permissions["post"] = ["client.access_organisation", "client.add_organisation"]
+        self.user_permissions["get"] = [
+            "client.access_organisation",
+            "client.view_organisation",
+        ]
+        self.user_permissions["post"] = [
+            "client.access_organisation",
+            "client.add_organisation",
+        ]
         self.user_permissions["patch"] = [
             "client.access_organisation",
             "client.change_organisation",
@@ -110,7 +116,9 @@ class OrganisationViewSet(ModelViewSet):
         if "contact_details" in request.data:
             for contact in request.data.get("contact_details"):
                 Contact.objects.create(
-                    organisation=org, **contact, **set_crated_by_updated_by(request.user)
+                    organisation=org,
+                    **contact,
+                    **set_crated_by_updated_by(request.user),
                 )
         return custom_success_response(
             self.serializer_class(org).data, status=status.HTTP_201_CREATED
@@ -225,7 +233,9 @@ class ContactViewSet(ModelViewSet):
                 )
                 request.data.pop("organisation_name")
                 contact = Contact.objects.create(
-                    **request.data, **set_crated_by_updated_by(request.user), organisation=org
+                    **request.data,
+                    **set_crated_by_updated_by(request.user),
+                    organisation=org,
                 )
                 return custom_success_response(self.get_serializer(contact).data)
         else:
