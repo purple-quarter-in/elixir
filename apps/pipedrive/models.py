@@ -408,9 +408,9 @@ class ServiceContract(models.Model):
         Deal, on_delete=models.CASCADE, related_name="contract_deal_service", null=True
     )
     file = models.FileField(upload_to=upload_path_service_contract)
-    file_name = models.CharField(max_length=50)
-    file_size = models.CharField(max_length=250)
-    file_type = models.CharField(max_length=150)
+    file_name = models.CharField(max_length=50, default="")
+    file_size = models.CharField(max_length=250, default="")
+    file_type = models.CharField(max_length=150, default="")
     uploaded_at = models.DateTimeField(
         auto_now_add=True,
         editable=False,
@@ -426,6 +426,7 @@ class ServiceContract(models.Model):
         null=True,
         blank=True,
         related_name="contract_docusign_service",
+        default=None,
     )
 
     class Meta:
