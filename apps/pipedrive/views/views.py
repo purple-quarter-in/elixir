@@ -567,7 +567,7 @@ class DealViewSet(ModelViewSet):
         for key, value in request.query_params.items():
             _filters[mapping[key] if key in mapping else key] = value
         deals = deals.filter(**_filters).values_list("deal_value")
-        cummulative_summary = {"INR": 0, "USD": 0, "EUR": 0}
+        cummulative_summary = {"INR": 0, "USD": 0, "EUR": 0, "SGD": 0}
         for deal_value in deals:
             currency, value = deal_value[0].split(" ")
             cummulative_summary.setdefault(currency, 0)
