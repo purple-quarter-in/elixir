@@ -193,7 +193,7 @@ class UserViewSet(ModelViewSet):
     )
     def dropdown_list(self, request):
         return custom_success_response(
-            GetUserDropDownSerializer(self.get_queryset(), many=True).data
+            GetUserDropDownSerializer((self.get_queryset()).filter(is_active=True), many=True).data
         )
 
     @action(detail=False, methods=["post"], permission_classes=AllowAny)
