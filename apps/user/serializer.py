@@ -70,6 +70,17 @@ class GetUserSerializer(serializers.ModelSerializer):
         return {"id": instance.profile_id, "name": instance.profile.name}
 
 
+class GetUserDropDownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "function",
+        )
+
+
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

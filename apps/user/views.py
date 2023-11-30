@@ -30,6 +30,7 @@ from .serializer import (
     CreateUserSerializer,
     CustomAuthTokenSerializer,
     GetTeamSerializer,
+    GetUserDropDownSerializer,
     GetUserSerializer,
     TeamSerializer,
 )
@@ -182,6 +183,18 @@ class UserViewSet(ModelViewSet):
     )
     def my_account(self, request):
         return custom_success_response(self.get_serializer(request.user).data)
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[
+            IsAuthenticated,
+        ],
+    )
+    def dropdown_list(self, request):
+        return custom_success_response(
+            GetUserDropDownSerializer(self.get_queryset(), many=True).data
+        )
 
     @action(detail=False, methods=["post"], permission_classes=AllowAny)
     def verify_token(self, request):
