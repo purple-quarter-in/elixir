@@ -10,7 +10,7 @@ from elixir.viewsets import ModelViewSet
 
 
 class IntegrationViewSet(ModelViewSet):
-    queryset = Integration.objects.all()
+    queryset = Integration.objects.all().filter(archived=False)
     permission_classes = [IsAuthenticated]
     serializer_class = IntegrationSerializer
     user_permissions = {}
