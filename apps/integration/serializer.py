@@ -6,4 +6,4 @@ from apps.integration.models import Integration
 class IntegrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Integration
-        fields = ["service_name", "archived", "user_email", "created_at", "auth_type"]
+        fields = ["id", "service_name", "archived", "user_email", "created_at", "auth_type"]
