@@ -14,7 +14,7 @@ class IntegrationViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = IntegrationSerializer
     user_permissions = {}
-    http_method_names = ["post", "get"]
+    http_method_names = ["post", "get", "patch"]
 
     def __init__(self, **kwargs: Any) -> None:
         self.user_permissions["get"] = ["integration.view_integration"]
