@@ -407,7 +407,7 @@ class ServiceContract(models.Model):
     deal = models.ForeignKey(
         Deal, on_delete=models.CASCADE, related_name="contract_deal_service", null=True
     )
-    file = models.FileField(upload_to=upload_path_service_contract)
+    file = models.FileField(upload_to=upload_path_service_contract, max_length=250)
     file_name = models.CharField(max_length=50, default="")
     file_size = models.CharField(max_length=250, default="")
     file_type = models.CharField(max_length=150, default="")
@@ -444,7 +444,7 @@ class ServiceProposal(models.Model):
     """Model definition for ServiceProposal."""
 
     prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE, default=None)
-    file = models.FileField(upload_to=upload_path_serviceproposal)
+    file = models.FileField(upload_to=upload_path_serviceproposal, max_length=250)
     uploaded_at = models.DateTimeField(auto_now_add=True, editable=False)
     sent_on = models.DateTimeField(default=None, blank=True, null=True)
     uploaded_by = models.ForeignKey(
@@ -466,7 +466,7 @@ class RDCapsule(models.Model):
     """Model definition for RDCapsule."""
 
     deal = models.ForeignKey(Deal, on_delete=models.CASCADE, default=None)
-    file = models.FileField(upload_to=upload_path_rdcapsule)
+    file = models.FileField(upload_to=upload_path_rdcapsule, max_length=250)
     uploaded_at = models.DateTimeField(auto_now_add=True, editable=False)
     sent_on = models.DateTimeField(default=None, blank=True, null=True)
     uploaded_by = models.ForeignKey(
