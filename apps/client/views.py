@@ -59,14 +59,6 @@ class OrganisationViewSet(ModelViewSet):
                 "type": "Field Update",
                 "description": "Name Updated",
             },
-            "billing_address": {
-                "type": "Field Update",
-                "description": "Billing Address Updated",
-            },
-            "shipping_address": {
-                "type": "Field Update",
-                "description": "Shipping Address Updated",
-            },
             "govt_id": {
                 "type": "Field Update",
                 "description": " GSTIN/VAT/GST Updated",
