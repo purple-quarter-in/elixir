@@ -14,6 +14,7 @@ from yaml import serialize
 
 from apps.client.models import Contact, Organisation
 from apps.integration.docusign import create_envelop, view_document
+from apps.integration.slack import slack_send_message
 from apps.notification.models import Notification
 from apps.pipedrive.models import (
     Deal,
@@ -278,6 +279,7 @@ class LeadViewSet(ModelViewSet):
             title=dto["title"],
             created_by=request.user,
             updated_by=request.user,
+            owner=request.user,
         )
         changelog(
             self.changelog,
@@ -644,6 +646,16 @@ class CreateLandingPageLead(CreateAPIView):
             {"is_created": None},
             "create",
             None,
+        )
+        slack_send_message(
+            "elixir-stage-alerts",
+            [
+                f"** 🚨 Elixir Alert Triggered **",
+                f"*Related to*: Lead Creation",
+                f"*For*: <!channel>",
+                f"*Entity*: {lead.title}",
+                f"*Required Action*: Lead Ownership Assignment",
+            ],
         )
         return custom_success_response(
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
