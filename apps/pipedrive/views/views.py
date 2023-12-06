@@ -685,6 +685,8 @@ class ServiceContractViewSet(ModelViewSet):
             raise ValidationError({"deal": ["This field is required"]})
 
     def perform_create(self, serializer, **kwargs):
+        if serializer.validated_data["document_type"] == "Signed Contract":
+            serializer.validated_data["status"] = "Completed"
         self._instance = serializer.save(uploaded_by=self.request.user)
 
     @action(detail=False, methods=["post"])
@@ -718,9 +720,11 @@ class ServiceContractViewSet(ModelViewSet):
     @action(detail=True, methods=["get"])
     def docu_view_document(self, request, pk):
         obj = self.get_object()
-        if obj.docusign:
+        if obj.docusign and obj.document_type == "Draft Contract":
             docusign_envelop = view_document(obj)
             return HttpResponse(docusign_envelop, content_type="application/pdf")
+        elif obj.document_type == "Signed Contract":
+            return HttpResponse(obj.file, content_type="application/pdf")
         else:
             raise ValidationError({"document": "No document has been esigned to Docusign"})
 

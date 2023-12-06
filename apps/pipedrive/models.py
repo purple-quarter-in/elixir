@@ -137,6 +137,7 @@ class Lead(models.Model):
                 "VP of Data Science": "VPODS",
                 "Director of Data Science": "DODS",
                 "Board Member": "BM",
+                "Engineering Manager": "EM",
             }
 
             REGION = {"India": "IND", "USA": "USA", "APAC": "APAC", "MENA": "MENA", "Europe": "EU"}
@@ -408,9 +409,10 @@ class ServiceContract(models.Model):
         Deal, on_delete=models.CASCADE, related_name="contract_deal_service", null=True
     )
     file = models.FileField(upload_to=upload_path_service_contract, max_length=250)
-    file_name = models.CharField(max_length=50, default="")
+    file_name = models.CharField(max_length=250, default="")
     file_size = models.CharField(max_length=250, default="")
     file_type = models.CharField(max_length=150, default="")
+    document_type = models.CharField(max_length=50, default="Draft Contract")
     uploaded_at = models.DateTimeField(
         auto_now_add=True,
         editable=False,
