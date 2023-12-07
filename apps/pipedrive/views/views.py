@@ -651,7 +651,7 @@ class CreateLandingPageLead(CreateAPIView):
             "elixir-stage-alerts",
             [
                 f"** 🚨 Elixir Alert Triggered **",
-                f"*Related to*: Lead Creation",
+                f"*Related to*: Auto Lead Onboarding",
                 f"*For*: <!channel>",
                 f"*Entity*: {lead.title}",
                 f"*Required Action*: Lead Ownership Assignment",

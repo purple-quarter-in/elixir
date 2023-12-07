@@ -43,7 +43,7 @@ def create_envelop(service_contract):
         service_name="docusign", archived=False
     ).last()
     if not integration_docusign:
-        raise ValidationError({"integration": "Doccusign integration required!!!"})
+        raise ValidationError({"integration": ["Doccusign integration required!!!"]})
     account_info = integration_docusign.userinfo["accounts"][0]
     url = (
         f"{account_info['base_uri']}/restapi/v2.1/accounts/{account_info['account_id']}/envelopes/"
@@ -85,7 +85,7 @@ def view_document(service_contract):
         service_name="docusign", archived=False
     ).last()
     if not integration_docusign:
-        raise ValidationError({"integration": "Doccusign integration required!!!"})
+        raise ValidationError({"integration": ["Doccusign integration required!!!"]})
     account_info = integration_docusign.userinfo["accounts"][0]
     url = f"{account_info['base_uri']}/restapi/v2.1/accounts/{account_info['account_id']}{service_contract.docusign.file_url}/documents/{service_contract.id}"
 
