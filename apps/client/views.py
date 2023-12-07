@@ -197,55 +197,10 @@ class ContactViewSet(ModelViewSet):
             else ContactSerializer
         )
 
-    def create(self, request, *args, **kwargs):
-        check_permisson(self, request)
-        if request.user.has_perms(self.user_permissions["post"]):
-            if "organisation" in request.data:
-                serializer = CreateContactSerializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save(**set_crated_by_updated_by(request.user))
-                return custom_success_response(
-                    serializer.data,
-                    status=status.HTTP_201_CREATED,
-                )
-            elif "organisation_name" in request.data:
-                if Organisation.objects.filter(
-                    name__iexact=request.data.get("organisation_name")
-                ).exists():
-                    raise ValidationError(
-                        {
-                            "already_exists": [
-                                f'Organisation with name {request.data.get("organisation_name")} already exists'
-                            ]
-                        }
-                    )
-                org = Organisation.objects.create(
-                    name=request.data.get("organisation_name"),
-                    **set_crated_by_updated_by(request.user),
-                )
-                request.data.pop("organisation_name")
-                contact = Contact.objects.create(
-                    **request.data,
-                    **set_crated_by_updated_by(request.user),
-                    organisation=org,
-                )
-                return custom_success_response(self.get_serializer(contact).data)
-        else:
-            raise PermissionDenied()
-
-    def perform_update(self, serializer):
-        self._instance = serializer.save(**(set_crated_by_updated_by(self.request.user)))
-
-    @action(detail=False, methods=["get"])
-    def is_duplicate(self, request):
-        check_permisson(self, request)
-        phone = request.query_params.get("phone", None)
-        email = request.query_params.get("email", None)
+    def check_duplicate(self, std, number, email):
         errors = {}
-        if phone:
+        if number:
             is_duplicate = False
-            std, number = phone.split("-")
-            std = "+" + std[1:]
             is_phone = Contact.objects.filter(phone=number, std_code=std).exists()
             is_duplicate = is_duplicate or is_phone
             errors["phone"] = is_duplicate
@@ -255,4 +210,65 @@ class ContactViewSet(ModelViewSet):
             is_duplicate = is_duplicate or is_email
             errors["email"] = is_duplicate
         errors["is_duplicate"] = is_duplicate
+        return errors
+
+    def create(self, request, *args, **kwargs):
+        check_permisson(self, request)
+        errors = self.check_duplicate(
+            request.data.get("std_code", None),
+            request.data.get("phone", None),
+            request.data.get("email", None),
+        )
+        if errors and errors["is_duplicate"]:
+            raise ValidationError(errors)
+        if "organisation" in request.data:
+            serializer = CreateContactSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            serializer.save(**set_crated_by_updated_by(request.user))
+            return custom_success_response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+            )
+        elif "organisation_name" in request.data:
+            if Organisation.objects.filter(
+                name__iexact=request.data.get("organisation_name")
+            ).exists():
+                raise ValidationError(
+                    {
+                        "already_exists": [
+                            f'Organisation with name {request.data.get("organisation_name")} already exists'
+                        ]
+                    }
+                )
+            org = Organisation.objects.create(
+                name=request.data.get("organisation_name"),
+                **set_crated_by_updated_by(request.user),
+            )
+            request.data.pop("organisation_name")
+            contact = Contact.objects.create(
+                **request.data,
+                **set_crated_by_updated_by(request.user),
+                organisation=org,
+            )
+            return custom_success_response(self.get_serializer(contact).data)
+
+    def perform_update(self, serializer):
+        errors = self.check_duplicate(
+            serializer.validated_data.get("std_code", None),
+            serializer.validated_data.get("phone", None),
+            serializer.validated_data.get("email", None),
+        )
+        if errors and errors["is_duplicate"]:
+            raise ValidationError(errors)
+        self._instance = serializer.save(**(set_crated_by_updated_by(self.request.user)))
+
+    @action(detail=False, methods=["get"])
+    def is_duplicate(self, request):
+        check_permisson(self, request)
+        phone = request.query_params.get("phone", None)
+        email = request.query_params.get("email", None)
+        std, number = phone.split("-")
+        std = "+" + std[1:]
+        errors = self.check_duplicate(std, phone, email)
         return custom_success_response(errors)

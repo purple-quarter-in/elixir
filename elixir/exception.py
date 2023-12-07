@@ -28,7 +28,11 @@ def my_exception_handler(exc, context):
     if response is not None:
         if isinstance(exc, ValidationError):
             for err in response.data:
-                response.data[err] = response.data[err][0]
+                response.data[err] = (
+                    response.data[err][0]
+                    if isinstance(response.data[err], list)
+                    else response.data[err]
+                )
             custom_response["error"] = response.data
 
     return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
