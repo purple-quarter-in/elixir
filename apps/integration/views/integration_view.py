@@ -17,10 +17,10 @@ class IntegrationViewSet(ModelViewSet):
     http_method_names = ["post", "get", "patch"]
 
     def __init__(self, **kwargs: Any) -> None:
-        self.user_permissions["get"] = ["integration.view_integration"]
-        self.user_permissions["post"] = ["integration.add_integration"]
-        self.user_permissions["patch"] = ["integration.change_integration"]
-        self.user_permissions["delete"] = ["integration.delete_integration"]
+        self.user_permissions["get"] = ["user.view_user"]
+        self.user_permissions["post"] = ["user.add_user"]
+        self.user_permissions["patch"] = ["user.change_user"]
+        self.user_permissions["delete"] = ["user.delete_user"]
 
     def perform_create(self, serializer, **kwargs):
         self._instance = serializer.save(uploaded_by=self.request.user)
