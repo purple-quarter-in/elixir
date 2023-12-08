@@ -20,12 +20,6 @@ class ModelViewSet(viewsets.ModelViewSet):
         self._instance = serializer.save(**kwargs)
 
     def list(self, request, *args, **kwargs):
-        print(
-            not request.user.is_superuser,
-            len(self.user_permissions["get"]),
-            (request.user).has_perms(tuple(self.user_permissions["get"])),
-            self.user_permissions["get"],
-        )
         if (
             (not request.user.is_superuser)
             and len(self.user_permissions["get"]) > 0

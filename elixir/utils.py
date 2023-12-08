@@ -56,8 +56,6 @@ def set_crated_by_updated_by(user):
 def check_permisson(self, request):
     method = (request.method).lower()
     method = "patch" if method == "put" else method
-    print(self.user_permissions[method])
-    print(request.user.has_perms(tuple(self.user_permissions[method])))
     if (
         (not request.user.is_superuser)
         and len(self.user_permissions[method]) > 0

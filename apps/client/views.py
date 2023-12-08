@@ -199,6 +199,7 @@ class ContactViewSet(ModelViewSet):
 
     def check_duplicate(self, std, number, email):
         errors = {}
+        is_duplicate = False
         if number:
             is_duplicate = False
             is_phone = Contact.objects.filter(phone=number, std_code=std).exists()
