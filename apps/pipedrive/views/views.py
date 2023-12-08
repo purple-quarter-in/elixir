@@ -685,7 +685,7 @@ class CreateLandingPageLead(CreateAPIView):
         Apschedular.scheduler.add_job(
             schedule_slack_lead_ownership_assign,
             trigger="date",
-            run_date=lead.created_at + timedelta(minutes=60),
+            run_date=lead.created_at + timedelta(days=1),
             id=f"schedule_slack_lead_ownership_assign-{lead.id}",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             kwargs={"instance": lead.id},
