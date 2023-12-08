@@ -1,6 +1,6 @@
 import base64
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from urllib import request
 
 from django.http import HttpResponse
@@ -39,6 +39,11 @@ from apps.pipedrive.serializer import (
     UpdateLeadSerializer,
     UpdateProspectSerializer,
 )
+from apps.pipedrive.views.slack_alert import (
+    schedule_slack_lead_ownership_assign,
+    schedule_slack_lead_to_prospect,
+    schedule_slack_lead_verification,
+)
 from elixir.changelog import changelog
 from elixir.settings.base import BASE_DIR
 from elixir.utils import (
@@ -47,6 +52,7 @@ from elixir.utils import (
     set_crated_by_updated_by,
 )
 from elixir.viewsets import ModelViewSet
+from elixir.wsgi import Apschedular
 
 
 def contact_import(request):
@@ -288,6 +294,15 @@ class LeadViewSet(ModelViewSet):
             "create",
             request.user.id,
         )
+        Apschedular.scheduler.add_job(
+            schedule_slack_lead_verification,
+            trigger="date",
+            run_date=lead.created_at + timedelta(days=10),
+            id=f"schedule_slack_schedule_slack_lead_verification-{lead.id}",  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            kwargs={"instance": lead.id},
+            replace_existing=True,
+        )
         return custom_success_response(
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
         )
@@ -367,6 +382,16 @@ class LeadViewSet(ModelViewSet):
             and "status" in serializer.validated_data
             and serializer.validated_data["status"] != "Unverified"
         ):
+            if serializer.validated_data["status"] == "Verified":
+                Apschedular.scheduler.add_job(
+                    schedule_slack_lead_to_prospect,
+                    trigger="date",
+                    run_date=datetime.now() + timedelta(days=10),
+                    id=f"schedule_slack_lead_to_prospect-{lead.id}",  # The `id` assigned to each job MUST be unique
+                    max_instances=1,
+                    kwargs={"instance": lead.id},
+                    replace_existing=True,
+                )
             serializer.save(updated_by=request.user, verification_time=datetime.now())
         else:
             serializer.save(updated_by=request.user)
@@ -656,6 +681,15 @@ class CreateLandingPageLead(CreateAPIView):
                 f"*Entity*: {lead.title}",
                 f"*Required Action*: Lead Ownership Assignment",
             ],
+        )
+        Apschedular.scheduler.add_job(
+            schedule_slack_lead_ownership_assign,
+            trigger="date",
+            run_date=lead.created_at + timedelta(minutes=60),
+            id=f"schedule_slack_lead_ownership_assign-{lead.id}",  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            kwargs={"instance": lead.id},
+            replace_existing=True,
         )
         return custom_success_response(
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
