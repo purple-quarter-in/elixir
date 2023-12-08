@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import connection
 from rest_framework import serializers
 
@@ -282,6 +284,9 @@ class ServiceContractSerializer(serializers.ModelSerializer):
         validated_data["file_name"] = file_name
         validated_data["file_type"] = file_type
         validated_data["file_size"] = sizeof_fmt(file.size)
+        validated_data["event_date"] = (
+            validated_data["event_date"] if "event_date" in validated_data else datetime.now()
+        )
         return super().create(validated_data)
 
     def get_uploaded_by(self, instance):
