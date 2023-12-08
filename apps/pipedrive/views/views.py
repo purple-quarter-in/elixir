@@ -1,6 +1,6 @@
 import base64
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from urllib import request
 
 from django.http import HttpResponse
@@ -39,6 +39,7 @@ from apps.pipedrive.serializer import (
     UpdateLeadSerializer,
     UpdateProspectSerializer,
 )
+from apps.pipedrive.views.slack_alert import schedule_slack_lead_ownership_assign
 from elixir.changelog import changelog
 from elixir.settings.base import BASE_DIR
 from elixir.utils import (
@@ -47,6 +48,7 @@ from elixir.utils import (
     set_crated_by_updated_by,
 )
 from elixir.viewsets import ModelViewSet
+from elixir.wsgi import Apschedular
 
 
 def contact_import(request):
@@ -647,15 +649,24 @@ class CreateLandingPageLead(CreateAPIView):
             "create",
             None,
         )
-        slack_send_message(
-            "elixir-stage-alerts",
-            [
-                f"** 🚨 Elixir Alert Triggered **",
-                f"*Related to*: Auto Lead Onboarding",
-                f"*For*: <!channel>",
-                f"*Entity*: {lead.title}",
-                f"*Required Action*: Lead Ownership Assignment",
-            ],
+        # slack_send_message(
+        #     "elixir-stage-alerts",
+        #     [
+        #         f"** 🚨 Elixir Alert Triggered **",
+        #         f"*Related to*: Auto Lead Onboarding",
+        #         f"*For*: <!channel>",
+        #         f"*Entity*: {lead.title}",
+        #         f"*Required Action*: Lead Ownership Assignment",
+        #     ],
+        # )
+        Apschedular.scheduler.add_job(
+            schedule_slack_lead_ownership_assign,
+            trigger="date",
+            run_date=lead.created_at + timedelta(minutes=1),
+            id=f"schedule_slack_lead_ownership_assign-{lead.id}",  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            kwargs={"instance": lead.id},
+            replace_existing=True,
         )
         return custom_success_response(
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
