@@ -271,5 +271,5 @@ class ContactViewSet(ModelViewSet):
         email = request.query_params.get("email", None)
         std, number = phone.split("-")
         std = "+" + std[1:]
-        errors = self.check_duplicate(std, phone, email)
+        errors = self.check_duplicate(std, number, email)
         return custom_success_response(errors)
