@@ -691,6 +691,15 @@ class CreateLandingPageLead(CreateAPIView):
             kwargs={"instance": lead.id},
             replace_existing=True,
         )
+        Apschedular.scheduler.add_job(
+            schedule_slack_lead_verification,
+            trigger="date",
+            run_date=lead.created_at + timedelta(days=10),
+            id=f"schedule_slack_schedule_slack_lead_verification-{lead.id}",  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            kwargs={"instance": lead.id},
+            replace_existing=True,
+        )
         return custom_success_response(
             {"message": "Lead created Successfully"}, status=status.HTTP_201_CREATED
         )
