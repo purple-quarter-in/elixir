@@ -179,11 +179,13 @@ class ActivitySerializer(serializers.ModelSerializer):
             count = Activity.objects.filter(
                 lead=self.context["request"].data["lead"], type=validated_data["type"]
             ).count()
+            validated_data["lead_id"] = self.context["request"].data["lead"]
         elif "organisation" in self.context["request"].data:
             count = Activity.objects.filter(
                 organisation=self.context["request"].data["organisation"],
                 type=validated_data["type"],
             ).count()
+            validated_data["organisation_id"] = self.context["request"].data["organisation"]
         validated_data["title"] = validated_data["type"] + " - " + f"{count+1}".zfill(2)
         return super().create(validated_data)
 
