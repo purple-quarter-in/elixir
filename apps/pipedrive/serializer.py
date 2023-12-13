@@ -160,6 +160,8 @@ class ActivitySerializer(serializers.ModelSerializer):
     assigned_to = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
+    lead = serializers.SerializerMethodField()
+    organisation = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
@@ -201,6 +203,18 @@ class ActivitySerializer(serializers.ModelSerializer):
         return (
             ActivityNoteSerializer(instance.notes_activity.first()).data
             if instance.notes_activity.first()
+            else None
+        )
+
+    def get_lead(self, instance):
+        return (
+            {"id": instance.lead_id, "entity_name": instance.lead.title} if instance.lead else None
+        )
+
+    def get_organisation(self, instance):
+        return (
+            {"id": instance.organisation_id, "entity_name": instance.organisation.name}
+            if instance.organisation
             else None
         )
 

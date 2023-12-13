@@ -48,7 +48,11 @@ x = {
 
 # Create your views here.
 class ActivityViewSet(ModelViewSet):
-    queryset = Activity.objects.all().prefetch_related("notes_activity", "contact")
+    queryset = (
+        Activity.objects.all()
+        .prefetch_related("notes_activity", "contact")
+        .select_related("lead", "organisation")
+    )
     serializer_class = ActivitySerializer
     # permission_classes = [IsAuthenticated]
     user_permissions = {
