@@ -159,6 +159,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     assigned_to = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    notes = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
@@ -196,6 +197,13 @@ class ActivitySerializer(serializers.ModelSerializer):
             status = None
         return status
 
+    def get_notes(self, instance):
+        return (
+            ActivityNoteSerializer(instance.notes_activity.first()).data
+            if instance.notes_activity.first()
+            else None
+        )
+
 
 class NotesContactSerializer(serializers.ModelSerializer):
     class Meta:
@@ -224,6 +232,18 @@ class NoteSerializer(serializers.ModelSerializer):
         return (
             ActivitySerializer(instance.activity).data if instance.activity is not None else None
         )
+
+
+class ActivityNoteSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Note
+        fields = "__all__"
+        extra_kwargs = {"created_by": {"read_only": True}}
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
 
 
 class HistoryNoteSerializer(serializers.ModelSerializer):
