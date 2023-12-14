@@ -1,4 +1,5 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Q
 from rest_framework import status, viewsets
 from rest_framework.exceptions import PermissionDenied
 
@@ -40,6 +41,13 @@ class ModelViewSet(viewsets.ModelViewSet):
                         if self.filtering[key]["operation"] == "in":
                             data = (request.GET[key]).split(",")
                             _filter[key + self.filtering[key]["lookup"]] = data
+                        elif self.filtering[key]["operation"] == "search":
+                            if self.filtering[key]["query"] == "or":
+                                Q_filters = Q()
+                                for field in self.filtering[key]["fields"]:
+                                    param = f'{field}{self.filtering[key]["lookup"]}'
+                                    Q_filters |= Q(**{param: data})
+                                queryset = queryset.filter(Q_filters)
                         elif self.filtering[key]["operation"] == "from_to":
                             key_array = key.split("_")
                             data = request.GET[key]
@@ -57,6 +65,7 @@ class ModelViewSet(viewsets.ModelViewSet):
             #     _filter[key]=request.GET[key]
 
             queryset = queryset.filter(**(_filter))
+            print(queryset.query)
             if len(_sorting) > 0:
                 for sort_key in _sorting:
                     queryset = queryset.order_by(sort_key)

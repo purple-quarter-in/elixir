@@ -61,6 +61,12 @@ class ActivityViewSet(ModelViewSet):
         "patch": ["pipedrive.change_lead"],
     }
     filtering = {
+        "q": {
+            "operation": "search",
+            "lookup": "__icontains",
+            "query": "or",
+            "fields": ["lead__title", "organisation__name"],
+        },
         "title": {"operation": "contains", "lookup": "__icontains"},
         "mode": {"operation": "in", "lookup": "__in"},
         "assigned_to": {"operation": "in", "lookup": "_id__in"},
