@@ -65,7 +65,6 @@ class ModelViewSet(viewsets.ModelViewSet):
             #     _filter[key]=request.GET[key]
 
             queryset = queryset.filter(**(_filter))
-            print(queryset.query)
             if len(_sorting) > 0:
                 for sort_key in _sorting:
                     queryset = queryset.order_by(sort_key)

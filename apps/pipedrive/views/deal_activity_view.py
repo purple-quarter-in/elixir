@@ -52,6 +52,7 @@ class ActivityViewSet(ModelViewSet):
         Activity.objects.all()
         .prefetch_related("notes_activity", "contact")
         .select_related("lead", "organisation")
+        .order_by("-due_date")
     )
     serializer_class = ActivitySerializer
     # permission_classes = [IsAuthenticated]
