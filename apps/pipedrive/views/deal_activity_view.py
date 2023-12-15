@@ -48,7 +48,12 @@ x = {
 
 # Create your views here.
 class ActivityViewSet(ModelViewSet):
-    queryset = Activity.objects.all().prefetch_related("contact")
+    queryset = (
+        Activity.objects.all()
+        .prefetch_related("notes_activity", "contact")
+        .select_related("lead", "organisation")
+        .order_by("-due_date")
+    )
     serializer_class = ActivitySerializer
     # permission_classes = [IsAuthenticated]
     user_permissions = {
@@ -56,6 +61,22 @@ class ActivityViewSet(ModelViewSet):
         "post": ["pipedrive.add_lead"],
         "patch": ["pipedrive.change_lead"],
     }
+    filtering = {
+        "q": {
+            "operation": "search",
+            "lookup": "__icontains",
+            "query": "or",
+            "fields": ["lead__title", "organisation__name"],
+        },
+        "title": {"operation": "contains", "lookup": "__icontains"},
+        "mode": {"operation": "in", "lookup": "__in"},
+        "assigned_to": {"operation": "in", "lookup": "_id__in"},
+        "created_by": {"operation": "in", "lookup": "_id__in"},
+        "created_at_from": {"operation": "from_to", "lookup": "__gte"},
+        "created_at_to": {"operation": "from_to", "lookup": "__lte"},
+    }
+    sorting = ["due_date"]
+    pagination = True
 
     def perform_create(self, serializer, **kwargs):
         super().perform_create(serializer, **kwargs)

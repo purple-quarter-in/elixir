@@ -159,23 +159,33 @@ class ActivitySerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     assigned_to = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    notes = serializers.SerializerMethodField()
+    lead = serializers.SerializerMethodField()
+    organisation = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
         fields = "__all__"
-        extra_kwargs = {"created_by": {"read_only": True}}
+        extra_kwargs = {
+            "created_by": {"read_only": True},
+            "lead": {"read_only": True},
+            "organisation": {"read_only": True},
+        }
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
         validated_data["assigned_to_id"] = self.context["request"].data.get("assigned_to", None)
         if "lead" in self.context["request"].data:
             count = Activity.objects.filter(
-                lead=validated_data["lead"], type=validated_data["type"]
+                lead=self.context["request"].data["lead"], type=validated_data["type"]
             ).count()
+            validated_data["lead_id"] = self.context["request"].data["lead"]
         elif "organisation" in self.context["request"].data:
             count = Activity.objects.filter(
-                organisation=validated_data["organisation"], type=validated_data["type"]
+                organisation=self.context["request"].data["organisation"],
+                type=validated_data["type"],
             ).count()
+            validated_data["organisation_id"] = self.context["request"].data["organisation"]
         validated_data["title"] = validated_data["type"] + " - " + f"{count+1}".zfill(2)
         return super().create(validated_data)
 
@@ -195,6 +205,25 @@ class ActivitySerializer(serializers.ModelSerializer):
         if not instance.closed_at:
             status = None
         return status
+
+    def get_notes(self, instance):
+        return (
+            ActivityNoteSerializer(instance.notes_activity.first()).data
+            if instance.notes_activity.first()
+            else None
+        )
+
+    def get_lead(self, instance):
+        return (
+            {"id": instance.lead_id, "entity_name": instance.lead.title} if instance.lead else None
+        )
+
+    def get_organisation(self, instance):
+        return (
+            {"id": instance.organisation_id, "entity_name": instance.organisation.name}
+            if instance.organisation
+            else None
+        )
 
 
 class NotesContactSerializer(serializers.ModelSerializer):
@@ -224,6 +253,18 @@ class NoteSerializer(serializers.ModelSerializer):
         return (
             ActivitySerializer(instance.activity).data if instance.activity is not None else None
         )
+
+
+class ActivityNoteSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Note
+        fields = "__all__"
+        extra_kwargs = {"created_by": {"read_only": True}}
+
+    def get_created_by(self, instance):
+        return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
 
 
 class HistoryNoteSerializer(serializers.ModelSerializer):
