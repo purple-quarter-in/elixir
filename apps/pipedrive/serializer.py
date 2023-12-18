@@ -172,6 +172,7 @@ class ActivitySerializer(serializers.ModelSerializer):
             "lead": {"read_only": True},
             "organisation": {"read_only": True},
             "entity_type": {"read_only": True},
+            "assigned_to": {"read_only": True},
         }
 
     def create(self, validated_data):
@@ -190,6 +191,12 @@ class ActivitySerializer(serializers.ModelSerializer):
             validated_data["organisation_id"] = self.context["request"].data["organisation"]
         validated_data["title"] = validated_data["type"] + " - " + f"{count+1}".zfill(2)
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        assigned_to = self.context["request"].data.get("assigned_to", None)
+        if assigned_to:
+            validated_data["assigned_to_id"] = assigned_to
+        return super().update(instance, validated_data)
 
     def get_created_by(self, instance):
         return instance.created_by.get_dict_name_id() if instance.created_by is not None else None

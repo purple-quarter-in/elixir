@@ -133,6 +133,29 @@ class ActivityViewSet(ModelViewSet):
                     },
                     replace_existing=True,
                 )
+        elif "assigned_to" in serializer.initial_data:
+            self._instance = serializer.save()
+            Notification.objects.create(
+                type="Activity Assigned",
+                description=" X Activity has been reassined to you",
+                user=self._instance.assigned_to,
+                model_name="Activity",
+                object_id=self._instance.id,
+            )
+            if Apschedular.scheduler.get_job(
+                f"schedule_create_notification-activity_reminder-{self._instance.id}"
+            ):
+                Apschedular.scheduler.modify_job(
+                    f"schedule_create_notification-activity_reminder-{self._instance.id}",
+                    jobstore="default",
+                    kwargs={
+                        "instance": self._instance,
+                        "type": "Activity Reminder",
+                        "description": " X Activity is due in x mins",
+                        "user": self._instance.assigned_to,
+                        "model_name": "Activity",
+                    },
+                )
         else:
             self._instance = serializer.save()
 
