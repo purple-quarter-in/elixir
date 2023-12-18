@@ -160,6 +160,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     assigned_to = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
+    entity_type = serializers.SerializerMethodField()
     lead = serializers.SerializerMethodField()
     organisation = serializers.SerializerMethodField()
 
