@@ -170,6 +170,7 @@ class ActivitySerializer(serializers.ModelSerializer):
             "created_by": {"read_only": True},
             "lead": {"read_only": True},
             "organisation": {"read_only": True},
+            "entity_type": {"read_only": True},
         }
 
     def create(self, validated_data):
@@ -217,6 +218,12 @@ class ActivitySerializer(serializers.ModelSerializer):
         return (
             {"id": instance.lead_id, "entity_name": instance.lead.title} if instance.lead else None
         )
+
+    def get_entity_type(self, instance):
+        if instance.lead:
+            return "Prospect" if instance.lead.is_converted_to_prospect else "Lead"
+        elif instance.organisation:
+            return "Account"
 
     def get_organisation(self, instance):
         return (
