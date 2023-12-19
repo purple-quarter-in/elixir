@@ -1,4 +1,5 @@
 from datetime import datetime, time, timedelta
+from urllib import request
 
 from django.shortcuts import render
 from rest_framework.decorators import action
@@ -55,7 +56,7 @@ class ActivityViewSet(ModelViewSet):
         .order_by("-due_date")
     )
     serializer_class = ActivitySerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     user_permissions = {
         "get": ["pipedrive.view_lead"],
         "post": ["pipedrive.add_lead"],
@@ -136,11 +137,12 @@ class ActivityViewSet(ModelViewSet):
         elif "assigned_to" in serializer.initial_data:
             self._instance = serializer.save()
             Notification.objects.create(
-                type="Activity Assigned",
+                type="Activity Reassigned",
                 description=" X Activity has been reassined to you",
                 user=self._instance.assigned_to,
                 model_name="Activity",
                 object_id=self._instance.id,
+                data_json={"reassigned_by": self._instance.updated_by.get_full_name()},
             )
             if Apschedular.scheduler.get_job(
                 f"schedule_create_notification-activity_reminder-{self._instance.id}"
@@ -176,6 +178,7 @@ class ActivityViewSet(ModelViewSet):
         obj = self.get_object()
         obj.status = request.data.get("status")
         obj.closed_at = datetime.now()
+        obj.updated_by = request.user
         obj.save()
         if Apschedular.scheduler.get_job(
             f"schedule_create_notification-activity_reminder-{obj.id}"

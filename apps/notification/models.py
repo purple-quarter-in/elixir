@@ -15,6 +15,7 @@ class Notification(models.Model):
     model_name = models.CharField(max_length=50, blank=True, null=True)
     object_id = models.IntegerField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    data_json = models.JSONField(default=dict, blank=True, null=True)
 
     class Meta:
         """Meta definition for Notification."""

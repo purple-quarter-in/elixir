@@ -179,6 +179,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {
             "created_by": {"read_only": True},
+            "updated_by": {"read_only": True},
             "lead": {"read_only": True},
             "organisation": {"read_only": True},
             "entity_type": {"read_only": True},
@@ -187,6 +188,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
+        validated_data["updated_by"] = self.context["request"].user
         validated_data["assigned_to_id"] = self.context["request"].data.get("assigned_to", None)
         if "lead" in self.context["request"].data:
             count = Activity.objects.filter(
@@ -203,6 +205,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        validated_data["updated_by"] = self.context["request"].user
         assigned_to = self.context["request"].data.get("assigned_to", None)
         if assigned_to:
             validated_data["assigned_to_id"] = assigned_to

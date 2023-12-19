@@ -290,6 +290,13 @@ class Activity(models.Model):
     created_by = models.ForeignKey(
         User, related_name="activity_created_by", on_delete=models.DO_NOTHING
     )
+    updated_by = models.ForeignKey(
+        User,
+        related_name="activity_updated_by",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
+    )
     assigned_to = models.ForeignKey(
         User,
         related_name="activity_assigned_to",
