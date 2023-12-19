@@ -59,6 +59,7 @@ class LeadSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
     organisation = serializers.SerializerMethodField()
+    lead_aging = serializers.SerializerMethodField()
 
     class Meta:
         model = Lead
@@ -88,6 +89,15 @@ class LeadSerializer(serializers.ModelSerializer):
 
     def get_organisation(self, instance):
         return OrganisationSerializer(instance.organisation).data
+
+    def get_lead_aging(self, instance):
+        days = days = (datetime.now().date() - instance.created_at.date()).days
+        res = "-"
+        if instance.status in ["Lost", "Junk"]:
+            days = (instance.verification_time.date() - instance.created_at.date()).days
+        if days > 0:
+            res = f"{days} day" if days == 1 else f"{days} days"
+        return res
 
 
 class ProspectSerializer(serializers.ModelSerializer):
