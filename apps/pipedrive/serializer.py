@@ -59,6 +59,7 @@ class LeadSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
     organisation = serializers.SerializerMethodField()
+    lead_aging = serializers.SerializerMethodField()
 
     class Meta:
         model = Lead
@@ -89,12 +90,22 @@ class LeadSerializer(serializers.ModelSerializer):
     def get_organisation(self, instance):
         return OrganisationSerializer(instance.organisation).data
 
+    def get_lead_aging(self, instance):
+        days = days = (datetime.now().date() - instance.created_at.date()).days
+        if instance.ageing:
+            days = (instance.ageing - instance.created_at.date()).days
+        res = "-"
+        if days > 0:
+            res = f"{days} day" if days == 1 else f"{days} days"
+        return res
+
 
 class ProspectSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     updated_by = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     lead = serializers.SerializerMethodField()
+    prospect_aging = serializers.SerializerMethodField()
 
     class Meta:
         model = Prospect
@@ -113,12 +124,22 @@ class ProspectSerializer(serializers.ModelSerializer):
     def get_lead(self, instance):
         return LeadSerializer(instance.lead).data
 
+    def get_prospect_aging(self, instance):
+        days = days = (datetime.now().date() - instance.created_at.date()).days
+        if instance.ageing:
+            days = (instance.ageing - instance.created_at.date()).days
+        res = "-"
+        if days > 0:
+            res = f"{days} day" if days == 1 else f"{days} days"
+        return res
+
 
 class DealSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     updated_by = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     prospect = serializers.SerializerMethodField()
+    deal_aging = serializers.SerializerMethodField()
 
     class Meta:
         model = Deal
@@ -135,6 +156,15 @@ class DealSerializer(serializers.ModelSerializer):
 
     def get_prospect(self, instance):
         return ProspectSerializer(instance.prospect).data
+
+    def get_deal_aging(self, instance):
+        days = days = (datetime.now().date() - instance.created_at.date()).days
+        if instance.ageing:
+            days = (instance.ageing - instance.created_at.date()).days
+        res = "-"
+        if days > 0:
+            res = f"{days} day" if days == 1 else f"{days} days"
+        return res
 
 
 # not used
@@ -160,6 +190,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     assigned_to = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
+    entity_type = serializers.SerializerMethodField()
     lead = serializers.SerializerMethodField()
     organisation = serializers.SerializerMethodField()
 
@@ -168,12 +199,16 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {
             "created_by": {"read_only": True},
+            "updated_by": {"read_only": True},
             "lead": {"read_only": True},
             "organisation": {"read_only": True},
+            "entity_type": {"read_only": True},
+            "assigned_to": {"read_only": True},
         }
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
+        validated_data["updated_by"] = self.context["request"].user
         validated_data["assigned_to_id"] = self.context["request"].data.get("assigned_to", None)
         if "lead" in self.context["request"].data:
             count = Activity.objects.filter(
@@ -188,6 +223,13 @@ class ActivitySerializer(serializers.ModelSerializer):
             validated_data["organisation_id"] = self.context["request"].data["organisation"]
         validated_data["title"] = validated_data["type"] + " - " + f"{count+1}".zfill(2)
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data["updated_by"] = self.context["request"].user
+        assigned_to = self.context["request"].data.get("assigned_to", None)
+        if assigned_to:
+            validated_data["assigned_to_id"] = assigned_to
+        return super().update(instance, validated_data)
 
     def get_created_by(self, instance):
         return instance.created_by.get_dict_name_id() if instance.created_by is not None else None
@@ -217,6 +259,12 @@ class ActivitySerializer(serializers.ModelSerializer):
         return (
             {"id": instance.lead_id, "entity_name": instance.lead.title} if instance.lead else None
         )
+
+    def get_entity_type(self, instance):
+        if instance.lead:
+            return "Prospect" if instance.lead.is_converted_to_prospect else "Lead"
+        elif instance.organisation:
+            return "Account"
 
     def get_organisation(self, instance):
         return (

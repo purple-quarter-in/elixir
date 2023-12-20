@@ -71,6 +71,7 @@ class Lead(models.Model):
     archived = models.BooleanField(default=0)
     created_at = models.DateTimeField(editable=False, db_index=True)
     updated_at = models.DateTimeField()
+    ageing = models.DateField(default=None, null=True, blank=True)
     owner = models.ForeignKey(
         "user.User",
         on_delete=models.DO_NOTHING,
@@ -168,6 +169,9 @@ class Prospect(models.Model):
     archived = models.BooleanField(default=0)
     created_at = models.DateTimeField(editable=False, db_index=True)
     updated_at = models.DateTimeField()
+    ageing = models.DateField(default=None, null=True, blank=True)
+    closure_time = models.DateTimeField(default=None, blank=True, null=True)
+
     owner = models.ForeignKey(
         "user.User",
         on_delete=models.DO_NOTHING,
@@ -225,6 +229,9 @@ class Deal(models.Model):
     archived = models.BooleanField(default=0)
     created_at = models.DateTimeField(editable=False, db_index=True)
     updated_at = models.DateTimeField()
+    ageing = models.DateField(default=None, null=True, blank=True)
+    fullfilled_time = models.DateTimeField(default=None, blank=True, null=True)
+
     owner = models.ForeignKey(
         "user.User",
         on_delete=models.DO_NOTHING,
@@ -289,6 +296,13 @@ class Activity(models.Model):
     rescheduled = models.IntegerField(default=0)
     created_by = models.ForeignKey(
         User, related_name="activity_created_by", on_delete=models.DO_NOTHING
+    )
+    updated_by = models.ForeignKey(
+        User,
+        related_name="activity_updated_by",
+        on_delete=models.DO_NOTHING,
+        default=None,
+        null=True,
     )
     assigned_to = models.ForeignKey(
         User,
