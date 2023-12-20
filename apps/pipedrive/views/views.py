@@ -314,6 +314,7 @@ class LeadViewSet(ModelViewSet):
         if obj.is_converted_to_prospect:
             raise ValidationError({"message": ["Lead already converted to prospect"]})
         obj.is_converted_to_prospect = True
+        obj.ageing = date.today()
         obj.updated_by = request.user
         prospect = Prospect.objects.update_or_create(
             lead=obj,
@@ -357,7 +358,7 @@ class LeadViewSet(ModelViewSet):
         lead = Lead.objects.get(id=pk)
         serializer = UpdateLeadSerializer(lead, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-
+        kwargs = {"updated_by": request.user}
         if self.changelog and ("update" in self.changelog):
             changelog(
                 self.changelog,
@@ -377,24 +378,24 @@ class LeadViewSet(ModelViewSet):
                 model_name="Lead",
                 object_id=lead.id,
             )
-        if (
-            not lead.verification_time
-            and "status" in serializer.validated_data
-            and serializer.validated_data["status"] != "Unverified"
-        ):
-            if serializer.validated_data["status"] == "Verified":
-                Apschedular.scheduler.add_job(
-                    schedule_slack_lead_to_prospect,
-                    trigger="date",
-                    run_date=datetime.now() + timedelta(days=10),
-                    id=f"schedule_slack_lead_to_prospect-{lead.id}",  # The `id` assigned to each job MUST be unique
-                    max_instances=1,
-                    kwargs={"instance": lead.id},
-                    replace_existing=True,
-                )
-            serializer.save(updated_by=request.user, verification_time=datetime.now())
-        else:
-            serializer.save(updated_by=request.user)
+        # logic on status update
+        if "status" in serializer.validated_data:
+            if serializer.validated_data["status"] != "Unverified":
+                if not lead.verification_time:
+                    kwargs["verification_time"] = datetime.now()
+                if serializer.validated_data["status"] == "Verified":
+                    Apschedular.scheduler.add_job(
+                        schedule_slack_lead_to_prospect,
+                        trigger="date",
+                        run_date=datetime.now() + timedelta(days=10),
+                        id=f"schedule_slack_lead_to_prospect-{lead.id}",  # The `id` assigned to each job MUST be unique
+                        max_instances=1,
+                        kwargs={"instance": lead.id},
+                        replace_existing=True,
+                    )
+                if serializer.validated_data["status"] in ["Lost", "Junk"]:
+                    kwargs["ageing"] = date.today()
+        serializer.save(**kwargs)
         return custom_success_response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -471,6 +472,8 @@ class ProspectViewSet(ModelViewSet):
         prospect = self.get_object()
         serializer = UpdateProspectSerializer(prospect, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        kwargs = {"updated_by": request.user}
+
         if self.changelog and ("update" in self.changelog):
             changelog(
                 self.changelog,
@@ -479,7 +482,10 @@ class ProspectViewSet(ModelViewSet):
                 "update",
                 request.user.id,
             )
-        if prospect.owner_id != serializer._validated_data["owner"].id:
+        if (
+            "owner" in serializer._validated_data
+            and prospect.owner_id != serializer._validated_data["owner"].id
+        ):
             Notification.objects.create(
                 type="Lead Owner Assigned",
                 description=f"{request.user.get_full_name()} assigned Ownership for Prospect {prospect.lead.title} to {serializer.validated_data['owner'].get_full_name()}",
@@ -487,7 +493,13 @@ class ProspectViewSet(ModelViewSet):
                 model_name="Prospect",
                 object_id=prospect.id,
             )
-        prospect = serializer.save(updated_by=request.user)
+        if "status" in serializer.validated_data and serializer.validated_data["status"] in [
+            "Disqualified",
+            "Lost",
+        ]:
+            kwargs["ageing"] = date.today()
+
+        prospect = serializer.save(**kwargs)
         return custom_success_response(
             ProspectSerializer(prospect).data, status=status.HTTP_200_OK
         )
@@ -500,6 +512,8 @@ class ProspectViewSet(ModelViewSet):
             raise ValidationError({"message": ["Prospect already converted to deal"]})
         obj.is_converted_to_deal = True
         obj.updated_by = request.user
+        obj.closure_time = datetime.now()
+        obj.ageing = date.today()
         deal = Deal.objects.update_or_create(
             lead=obj.lead,
             prospect=obj,
@@ -582,6 +596,15 @@ class DealViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return UpdateDealSerializer if self.request.method in ["PATCH"] else DealSerializer
+
+    def perform_update(self, serializer):
+        if (
+            "status" in serializer.validated_data
+            and serializer.validated_data["status"] != "In Progress"
+        ):
+            serializer.validated_data["ageing"] = date.today()
+            serializer.validated_data["fullfilled_time"] = datetime.now()
+        return super().perform_update(serializer)
 
     @action(detail=False, methods=["patch"])
     def bulk_archive(self, request):

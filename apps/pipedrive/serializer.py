@@ -92,9 +92,9 @@ class LeadSerializer(serializers.ModelSerializer):
 
     def get_lead_aging(self, instance):
         days = days = (datetime.now().date() - instance.created_at.date()).days
+        if instance.ageing:
+            days = (instance.ageing - instance.created_at.date()).days
         res = "-"
-        if instance.status in ["Lost", "Junk"]:
-            days = (instance.verification_time.date() - instance.created_at.date()).days
         if days > 0:
             res = f"{days} day" if days == 1 else f"{days} days"
         return res
@@ -105,6 +105,7 @@ class ProspectSerializer(serializers.ModelSerializer):
     updated_by = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     lead = serializers.SerializerMethodField()
+    prospect_aging = serializers.SerializerMethodField()
 
     class Meta:
         model = Prospect
@@ -123,12 +124,22 @@ class ProspectSerializer(serializers.ModelSerializer):
     def get_lead(self, instance):
         return LeadSerializer(instance.lead).data
 
+    def get_prospect_aging(self, instance):
+        days = days = (datetime.now().date() - instance.created_at.date()).days
+        if instance.ageing:
+            days = (instance.ageing - instance.created_at.date()).days
+        res = "-"
+        if days > 0:
+            res = f"{days} day" if days == 1 else f"{days} days"
+        return res
+
 
 class DealSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     updated_by = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     prospect = serializers.SerializerMethodField()
+    deal_aging = serializers.SerializerMethodField()
 
     class Meta:
         model = Deal
@@ -145,6 +156,15 @@ class DealSerializer(serializers.ModelSerializer):
 
     def get_prospect(self, instance):
         return ProspectSerializer(instance.prospect).data
+
+    def get_deal_aging(self, instance):
+        days = days = (datetime.now().date() - instance.created_at.date()).days
+        if instance.ageing:
+            days = (instance.ageing - instance.created_at.date()).days
+        res = "-"
+        if days > 0:
+            res = f"{days} day" if days == 1 else f"{days} days"
+        return res
 
 
 # not used
