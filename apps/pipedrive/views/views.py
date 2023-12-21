@@ -645,12 +645,20 @@ class DealViewSet(ModelViewSet):
 
 
 class CreateLandingPageLead(CreateAPIView):
-    changelog = {
+    lead_changelog = {
         "model": "Lead",
         "mapping_obj": "id",
         "is_mapping_obj_func": False,
         "create": {
             "is_created": {"type": "Entity Created", "description": "Lead Created"},
+        },
+    }
+    org_changelog = changelog = {
+        "model": "Organisation",
+        "mapping_obj": "id",
+        "is_mapping_obj_func": False,
+        "create": {
+            "is_created": {"type": "Entity Created", "description": "Account Created"},
         },
     }
 
@@ -666,7 +674,14 @@ class CreateLandingPageLead(CreateAPIView):
             org = Organisation.objects.filter(name=dto["organisation"]["name"]).last()
 
         else:
-            org = Organisation.objects.create(name=dto["organisation"]["name"])
+            org: Organisation = Organisation.objects.create(name=dto["organisation"]["name"])
+            changelog(
+                self.org_changelog,
+                org,
+                {"is_created": None},
+                "create",
+                None,
+            )
         org_id = org.id
         role = role_serializer.save()
         if "contact_details" in dto["organisation"]:
@@ -689,7 +704,7 @@ class CreateLandingPageLead(CreateAPIView):
             updated_by=None,
         )
         changelog(
-            self.changelog,
+            self.lead_changelog,
             lead,
             {"is_created": None},
             "create",
