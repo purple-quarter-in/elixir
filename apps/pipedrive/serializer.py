@@ -94,10 +94,7 @@ class LeadSerializer(serializers.ModelSerializer):
         days = days = (datetime.now().date() - instance.created_at.date()).days
         if instance.ageing:
             days = (instance.ageing - instance.created_at.date()).days
-        res = "-"
-        if days > 0:
-            res = f"{days} day" if days == 1 else f"{days} days"
-        return res
+        return days
 
 
 class ProspectSerializer(serializers.ModelSerializer):
@@ -128,10 +125,7 @@ class ProspectSerializer(serializers.ModelSerializer):
         days = days = (datetime.now().date() - instance.created_at.date()).days
         if instance.ageing:
             days = (instance.ageing - instance.created_at.date()).days
-        res = "-"
-        if days > 0:
-            res = f"{days} day" if days == 1 else f"{days} days"
-        return res
+        return days
 
 
 class DealSerializer(serializers.ModelSerializer):
@@ -161,10 +155,7 @@ class DealSerializer(serializers.ModelSerializer):
         days = days = (datetime.now().date() - instance.created_at.date()).days
         if instance.ageing:
             days = (instance.ageing - instance.created_at.date()).days
-        res = "-"
-        if days > 0:
-            res = f"{days} day" if days == 1 else f"{days} days"
-        return res
+        return days
 
 
 # not used
