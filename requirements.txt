@@ -14,3 +14,6 @@ pyyaml
 drf-spectacular
 APScheduler==3.10.4
 SQLAlchemy==2.0.22
+pymongo[gssapi,srv,tls]
+dnspython
+fiscalyear
