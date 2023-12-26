@@ -52,7 +52,7 @@ class DashboardLeadViewSet(ModelViewSet):
         return (
             Lead.objects.filter(
                 created_at__gte=from_date.date(),
-                created_at__lte=to_date.date(),
+                created_at__lte=to_date,
                 is_converted_to_prospect=False,
             )
             .filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
@@ -176,7 +176,7 @@ class DashboardProspectViewSet(ModelViewSet):
         return (
             Prospect.objects.filter(
                 created_at__gte=from_date.date(),
-                created_at__lte=to_date.date(),
+                created_at__lte=to_date,
                 is_converted_to_deal=False,
             )
             .filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
