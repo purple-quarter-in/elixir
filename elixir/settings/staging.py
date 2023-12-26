@@ -14,6 +14,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://api.elixir.stage.purplequarter.co",
     "https://staging-api.elixir.purplequarter.co",
     "http://localhost:3000",
+    "http://localhost:4200",
     "https://elixir.purplequarter.co",
     "https://elixir-staging.purplequarter.co",
 ]

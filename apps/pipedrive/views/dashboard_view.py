@@ -21,7 +21,6 @@ from elixir.utils import (
     get_current_quarter_range,
     get_start_end_month,
     get_start_end_week,
-    quarter_start_end,
 )
 from elixir.viewsets import ModelViewSet
 
@@ -47,7 +46,9 @@ class DashboardLeadViewSet(ModelViewSet):
         self, from_date=(datetime.now() - timedelta(days=180)), to_date=datetime.now(), limit=5
     ):
         return Lead.objects.filter(
-            created_at__gte=from_date.date(), created_at__lte=to_date.date()
+            created_at__gte=from_date.date(),
+            created_at__lte=to_date.date(),
+            is_converted_to_prospect=False,
         ).order_by("-created_at")[:limit]
 
     def calc_lead_verificarion_closure_conversion_rate(self, leads):
@@ -160,7 +161,9 @@ class DashboardProspectViewSet(ModelViewSet):
     ):
         return (
             Prospect.objects.filter(
-                created_at__gte=from_date.date(), created_at__lte=to_date.date()
+                created_at__gte=from_date.date(),
+                created_at__lte=to_date.date(),
+                is_converted_to_deal=False,
             )
             .select_related("lead", "lead__role")
             .order_by("-created_at")[:limit]
