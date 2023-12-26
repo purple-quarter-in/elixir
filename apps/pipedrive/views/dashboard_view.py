@@ -43,13 +43,21 @@ class DashboardLeadViewSet(ModelViewSet):
         return data
 
     def recent_leads(
-        self, from_date=(datetime.now() - timedelta(days=180)), to_date=datetime.now(), limit=5
+        self,
+        user_id,
+        from_date=(datetime.now() - timedelta(days=180)),
+        to_date=datetime.now(),
+        limit=5,
     ):
-        return Lead.objects.filter(
-            created_at__gte=from_date.date(),
-            created_at__lte=to_date.date(),
-            is_converted_to_prospect=False,
-        ).order_by("-created_at")[:limit]
+        return (
+            Lead.objects.filter(
+                created_at__gte=from_date.date(),
+                created_at__lte=to_date.date(),
+                is_converted_to_prospect=False,
+            )
+            .filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
+            .order_by("-created_at")[:limit]
+        )
 
     def calc_lead_verificarion_closure_conversion_rate(self, leads):
         res = {"avt": "-", "act": "-", "lpcr": "-"}
@@ -81,7 +89,9 @@ class DashboardLeadViewSet(ModelViewSet):
     @action(methods=["get"], detail=False)
     def summary_with_recent_leads(self, request):
         # self.required_check(request.query_params, ["created_at_from", "created_at_to"])
-        recent_leads = DashboardRecentLeadSerializer(self.recent_leads(), many=True).data
+        recent_leads = DashboardRecentLeadSerializer(
+            self.recent_leads(request.user.id), many=True
+        ).data
         year_now = date.today().year
         fiscal_start = date(year=year_now, month=4, day=1)
         fiscal_end = date(year=year_now + 1, month=3, day=31)
@@ -157,7 +167,11 @@ class DashboardProspectViewSet(ModelViewSet):
         return data
 
     def recent_prospects(
-        self, from_date=(datetime.now() - timedelta(days=180)), to_date=datetime.now(), limit=5
+        self,
+        user_id,
+        from_date=(datetime.now() - timedelta(days=180)),
+        to_date=datetime.now(),
+        limit=5,
     ):
         return (
             Prospect.objects.filter(
@@ -165,7 +179,8 @@ class DashboardProspectViewSet(ModelViewSet):
                 created_at__lte=to_date.date(),
                 is_converted_to_deal=False,
             )
-            .select_related("lead", "lead__role")
+            .filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
+            .select_related("lead")
             .order_by("-created_at")[:limit]
         )
 
@@ -191,7 +206,7 @@ class DashboardProspectViewSet(ModelViewSet):
     def summary_with_recent_prospects(self, request):
         # self.required_check(request.query_params, ["created_at_from", "created_at_to"])
         recent_prospects = DashboardRecentProspectSerializer(
-            self.recent_prospects(), many=True
+            self.recent_prospects(request.user.id), many=True
         ).data
         year_now = date.today().year
         fiscal_start = date(year=year_now, month=4, day=1)
