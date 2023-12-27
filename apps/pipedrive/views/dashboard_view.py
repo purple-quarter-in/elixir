@@ -80,11 +80,11 @@ class DashboardLeadViewSet(ModelViewSet):
                 ).days
 
         res["avt"] = (
-            str(verification_days // verification_lead_count)
+            str(round(verification_days / verification_lead_count))
             if verification_lead_count > 0
             else "-"
         )
-        res["act"] = str(closure_days // promoted_count) if promoted_count > 0 else "-"
+        res["act"] = str(round(closure_days / promoted_count)) if promoted_count > 0 else "-"
         res["lpcr"] = str(round((promoted_count / total_leads) * 100, 1))
         return res
 
@@ -202,7 +202,7 @@ class DashboardProspectViewSet(ModelViewSet):
                 closure_days += (
                     prospect["closure_time"].date() - prospect["created_at"].date()
                 ).days
-        res["act"] = str(closure_days // promoted_count) if promoted_count > 0 else "-"
+        res["act"] = str(round(closure_days / promoted_count)) if promoted_count > 0 else "-"
         res["pdcr"] = str(round((promoted_count / total_prospects) * 100, 1))
         return res
 
