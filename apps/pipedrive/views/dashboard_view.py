@@ -49,6 +49,8 @@ class DashboardLeadViewSet(ModelViewSet):
         to_date=datetime.now(),
         limit=5,
     ):
+        from_date = datetime.now() - timedelta(days=180)
+        to_date = datetime.now()
         return (
             Lead.objects.filter(
                 created_at__gte=from_date.date(),
@@ -173,6 +175,8 @@ class DashboardProspectViewSet(ModelViewSet):
         to_date=datetime.now(),
         limit=5,
     ):
+        from_date = datetime.now() - timedelta(days=180)
+        to_date = datetime.now()
         return (
             Prospect.objects.filter(
                 created_at__gte=from_date.date(),
