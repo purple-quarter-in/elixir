@@ -1,19 +1,14 @@
 import logging
-from datetime import datetime
-from urllib import request
+from datetime import datetime, timedelta
 
 import requests
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
-from apscheduler.job import Job
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 from django.conf import settings
 from django.db import connection
-from sqlalchemy import Connection
 
-from apps.notification.models import Notification
 from elixir.settings.base import DATABASES
 
 logging.basicConfig()
@@ -59,23 +54,163 @@ class Schedular:
         self.scheduler.add_jobstore(
             SQLAlchemyJobStore(
                 db_url,
-                engine_options={
-                    "pool_pre_ping": True,
-                    "pool_recycle": 3600,
-                    "echo": True,
-                    "echo_pool": True,
-                },
+                engine_options={"pool_pre_ping": True, "pool_recycle": 3600},
             ),
             "default",
         )
-        # self.scheduler.add_job(
-        #     my_job,
-        #     trigger=CronTrigger(second="*/4"),  # Every 10 seconds
-        #     id="my_job",  # The `id` assigned to each job MUST be unique
-        #     max_instances=1,
-        #     replace_existing=True,
-        # )
         self.scheduler.start()
+        if not self.scheduler.get_job("lead_aggregate_weekly"):
+            self.scheduler.add_job(
+                schedule_lead_aggregate_weekly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="lead_aggregate_weekly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        if not self.scheduler.get_job("lead_aggregate_monthly"):
+            self.scheduler.add_job(
+                schedule_lead_aggregate_monthly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="lead_aggregate_monthly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        if not self.scheduler.get_job("lead_aggregate_quarterly"):
+            self.scheduler.add_job(
+                schedule_lead_aggregate_quarterly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="lead_aggregate_quarterly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        if not self.scheduler.get_job("lead_aggregate_yearly"):
+            self.scheduler.add_job(
+                schedule_lead_aggregate_yearly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="lead_aggregate_yearly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        if not self.scheduler.get_job("prospect_aggregate_weekly"):
+            self.scheduler.add_job(
+                schedule_prospect_aggregate_weekly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="prospect_aggregate_weekly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        if not self.scheduler.get_job("prospect_aggregate_monthly"):
+            self.scheduler.add_job(
+                schedule_prospect_aggregate_monthly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="prospect_aggregate_monthly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        if not self.scheduler.get_job("prospect_aggregate_quarterly"):
+            self.scheduler.add_job(
+                schedule_prospect_aggregate_quarterly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="prospect_aggregate_quarterly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        if not self.scheduler.get_job("prospect_aggregate_yearly"):
+            self.scheduler.add_job(
+                schedule_prospect_aggregate_yearly,
+                trigger="date",  # Every 10 seconds
+                run_date=datetime.now() + timedelta(seconds=5),
+                id="lead_aggregate_yearly",  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+
+
+def schedule_lead_aggregate_weekly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/lead/weekly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
+
+
+def schedule_lead_aggregate_yearly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/lead/yearly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
+
+
+def schedule_lead_aggregate_quarterly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/lead/quarterly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
+
+
+def schedule_lead_aggregate_monthly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/lead/monthly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
+
+
+def schedule_prospect_aggregate_weekly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/prospect/weekly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
+
+
+def schedule_prospect_aggregate_yearly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/prospect/yearly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
+
+
+def schedule_prospect_aggregate_quarterly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/prospect/quarterly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
+
+
+def schedule_prospect_aggregate_monthly():
+    response = requests.post(
+        f"{request_domain}/v1/api/schedular/aggregation/prospect/monthly/",
+    )
+    if response.status_code != 200:
+        print(response.json())
+        raise Exception
+    print(response.json())
 
 
 def schedule_create_notification(instance, type, description, user, model_name):
