@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from rest_framework.decorators import api_view
 
+from apps.pipedrive.aggregations.helper import (
+    calc_lead_verificarion_closure_conversion_rate,
+)
 from apps.pipedrive.models import Lead
 from apps.user.models import User
 from elixir.mongo_client import get_db_handle_conn_string
@@ -41,6 +44,13 @@ def lead_aggregate_weekly(request):
             update=update,
             upsert=upsert,
         )
+    filter, update, upsert, json = lead_aggregate("weekly", start_week, end_week)
+    db.update_one(
+        filter=filter,
+        update=update,
+        upsert=upsert,
+    )
+
     start_week, end_week = get_start_end_week(datetime.now() + timedelta(days=1))
     Apschedular.scheduler.add_job(
         schedule_lead_aggregate_weekly,
@@ -72,6 +82,12 @@ def lead_aggregate_monthly(request):
             update=update,
             upsert=upsert,
         )
+    filter, update, upsert, json = lead_aggregate("monthly", day_one_month, last_day_month)
+    db.update_one(
+        filter=filter,
+        update=update,
+        upsert=upsert,
+    )
     day_one_month, last_day_month = get_start_end_month(datetime.now() + timedelta(days=1))
     Apschedular.scheduler.add_job(
         schedule_lead_aggregate_monthly,
@@ -103,6 +119,12 @@ def lead_aggregate_quarterly(request):
             update=update,
             upsert=upsert,
         )
+    filter, update, upsert, json = lead_aggregate("quarterly", day_one_quarter, last_day_quarter)
+    db.update_one(
+        filter=filter,
+        update=update,
+        upsert=upsert,
+    )
     day_one_quarter, last_day_quarter = get_current_quarter_range(
         datetime.now() + timedelta(days=1)
     )
@@ -136,6 +158,16 @@ def lead_aggregate_yearly(request):
             update=update,
             upsert=upsert,
         )
+    filter, update, upsert, json = lead_aggregate(
+        "yearly",
+        day_one_fiscal_year,
+        last_day_fiscal_year,
+    )
+    db.update_one(
+        filter=filter,
+        update=update,
+        upsert=upsert,
+    )
     day_one_fiscal_year, last_day_fiscal_year = get_current_fiscal_year_range(
         datetime.now() + timedelta(days=1)
     )
@@ -151,12 +183,20 @@ def lead_aggregate_yearly(request):
     return custom_success_response({"message": "Lead yearly aggregation done successfully"})
 
 
-def lead_aggregate(type, date_from, date_to, user_id):
-    leads = (
-        Lead.objects.filter(created_at__gte=date_from, created_at__lte=date_to)
-        .filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
-        .values("status", "created_by_id", "owner_id")
+def lead_aggregate(type, date_from, date_to, user_id=None):
+    user_name = User.objects.get(pk=user_id).get_full_name() if user_id else "Purple Quarter"
+    leads = Lead.objects.filter(created_at__gte=date_from, created_at__lte=date_to).values(
+        "status",
+        "created_by_id",
+        "owner_id",
+        "is_converted_to_prospect",
+        "source",
+        "verification_time",
+        "closure_time",
+        "created_at",
     )
+    if user_id:
+        leads = leads.filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
     status = {
         "Unverified": 0,
         "Verified": 0,
@@ -164,23 +204,46 @@ def lead_aggregate(type, date_from, date_to, user_id):
         "Junk": 0,
         "Deferred": 0,
     }
+    inbound_source = {"Referral": 0, "LinkedIn": 0, "Social Media": 0}
+    outbound_source = {
+        "Events": 0,
+        "Email Campaign": 0,
+        "LinkedIn": 0,
+        "Hoardings/Billboards": 0,
+        "RA/BDA": 0,
+        "VC/PE": 0,
+        "Lead Gen Partner": 0,
+    }
     leads_created = 0
     leads_owned = 0
+    total_leads = leads.count()
+    lptp = 0
+    lead_v_c_c = calc_lead_verificarion_closure_conversion_rate(leads)
     for lead in leads:
+        # status
         status[lead["status"]] += 1
-        if lead["created_by_id"] == user_id:
-            leads_created += 1
-        if lead["owner_id"] == user_id:
-            leads_owned += 1
-    json = {
-        "type": type,
-        "user": user_id,
-        "date_from": str(date_from.date()),
-        "date_to": str(date_to.date()),
-        "status": status,
-        "leads_created": leads_created,
-        "leads_owned": leads_owned,
-    }
+        # converted to prospect
+        if lead["is_converted_to_prospect"] == 1:
+            lptp += 1
+        # inbound outbound lead
+        if lead["source"] == "LinkedIn":
+            if lead["created_by_id"] == None:
+                inbound_source[lead["source"]] += 1
+            else:
+                outbound_source[lead["source"]] += 1
+        elif lead["source"] in inbound_source:
+            inbound_source[lead["source"]] += 1
+        elif lead["source"] in outbound_source:
+            outbound_source[lead["source"]] += 1
+
+        if user_id:
+            if lead["created_by_id"] == user_id:
+                leads_created += 1
+            if lead["owner_id"] == user_id:
+                leads_owned += 1
+        else:
+            leads_created = total_leads
+            leads_owned = total_leads
 
     filter = {
         "type": type,
@@ -190,7 +253,18 @@ def lead_aggregate(type, date_from, date_to, user_id):
     }
 
     update = {
-        "$set": {"status": status, "leads_created": leads_created, "leads_owned": leads_owned}
+        "$set": {
+            "user_name": user_name,
+            "status": status,
+            "created": leads_created,
+            "owned": leads_owned,
+            "total_leads": total_leads,
+            "lptp": lptp,
+            "inbound_source": inbound_source,
+            "outbound_source": outbound_source,
+            **lead_v_c_c,
+        }
     }
+
     upsert = True
-    return filter, update, upsert, json
+    return filter, update, upsert, update["$set"]

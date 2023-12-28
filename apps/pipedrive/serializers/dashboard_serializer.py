@@ -15,3 +15,15 @@ class DashboardRecentProspectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prospect
         fields = ["status", "created_at", "title"]
+
+
+class DashboardLeadSerializer(serializers.Serializer):
+    status = serializers.DictField()
+    created = serializers.IntegerField()
+    owned = serializers.IntegerField()
+
+
+class DashboardProspectSerializer(serializers.Serializer):
+    status = serializers.DictField()
+    created = serializers.IntegerField()
+    owned = serializers.IntegerField()
