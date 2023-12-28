@@ -74,7 +74,7 @@ class InsightLeadViewSet(ModelViewSet):
             "quarterly": get_current_quarter_range,
             "yearly": get_current_fiscal_year_range,
         }
-        res = {"lb": []}
+        res = {"pb": []}
         # {'org':{},"user": User.objects.get(pk=user).get_full_name() if user else user}
         start, end = mapping[dto["date_filter"]](datetime.now())
         org_filter, org_update, org_upsert, org_json = lead_aggregate(
@@ -153,7 +153,7 @@ class InsightProspectViewSet(ModelViewSet):
             "quarterly": get_current_quarter_range,
             "yearly": get_current_fiscal_year_range,
         }
-        res = {"lb": []}
+        res = {"pb": []}
         start, end = mapping[dto["date_filter"]](datetime.now())
         org_filter, org_update, org_upsert, org_json = prospect_aggregate(
             dto["date_filter"], start, end, None
