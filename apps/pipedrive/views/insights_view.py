@@ -80,11 +80,11 @@ class InsightLeadViewSet(ModelViewSet):
         org_filter, org_update, org_upsert, org_json = lead_aggregate(
             dto["date_filter"], start, end, None
         )
-        res["lb"].append(InsightsLLBSerializer(org_json).data)
+        res["pb"].append(InsightsLLBSerializer(org_json).data)
         filter, update, upsert, json = lead_aggregate(
             dto["date_filter"], start, end, user if user else request.user.id
         )
-        res["lb"].append(InsightsLLBSerializer(json).data)
+        res["pb"].append(InsightsLLBSerializer(json).data)
         serialized_json = InsightsLeadSerializer(json if user else org_json).data
         for key in serialized_json:
             res.setdefault(key, [serialized_json.get(key, {})])
@@ -158,12 +158,12 @@ class InsightProspectViewSet(ModelViewSet):
         org_filter, org_update, org_upsert, org_json = prospect_aggregate(
             dto["date_filter"], start, end, None
         )
-        res["lb"].append(InsightsPLBSerializer(org_json).data)
+        res["pb"].append(InsightsPLBSerializer(org_json).data)
 
         filter, update, upsert, json = prospect_aggregate(
             dto["date_filter"], start, end, user if user else request.user.id
         )
-        res["lb"].append(InsightsPLBSerializer(json).data)
+        res["pb"].append(InsightsPLBSerializer(json).data)
 
         serialized_json = InsightsProspectSerializer(json if user else org_json).data
         for key in serialized_json:
