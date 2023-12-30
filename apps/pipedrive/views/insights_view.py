@@ -57,7 +57,7 @@ class InsightLeadViewSet(ModelViewSet):
             created_at__lte=fiscal_end,
         ).values("created_at", "verification_time", "closure_time", "is_converted_to_prospect")
         if user:
-            Leads.filter(Q(created_by_id=user) | Q(owner_id=user))
+            Leads = Leads.filter(Q(created_by_id=user) | Q(owner_id=user))
         data = calc_lead_verificarion_closure_conversion_rate(Leads)
         return custom_success_response({"recent_leads": rl, **data})
 

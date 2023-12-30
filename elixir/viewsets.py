@@ -57,6 +57,10 @@ class ModelViewSet(viewsets.ModelViewSet):
                         else:
                             _filter[key + self.filtering[key]["lookup"]] = data
                     else:
+                        if data == "true":
+                            data = True
+                        elif data == "false":
+                            data = False
                         _filter[key] = data
                 elif self.sorting and key in self.sorting:
                     _sorting.append(("-" if request.GET[key] == "1" else "") + key)

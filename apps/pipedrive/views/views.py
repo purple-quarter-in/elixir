@@ -120,26 +120,6 @@ def org_import(request):
     return custom_success_response({})
 
 
-x = {
-    "organisation": {
-        "id": 1,
-        "name": "",
-        "contact_details": [
-            {
-                "name": "",
-                "email": "",
-                "std_code": "",
-                "phone": "",
-                "designation": "",
-                "type": "",
-            }
-        ],
-    },
-    "role_details": {"region": "" "role_type" "budget_range"},
-    "source": "",
-}
-
-
 # Create your views here.
 class LeadViewSet(ModelViewSet):
     queryset = (
