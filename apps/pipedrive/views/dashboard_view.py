@@ -49,8 +49,7 @@ class DashboardLeadViewSet(ModelViewSet):
     def summary_with_recent_leads(self, request):
         rl = DashboardRecentLeadSerializer(get_recent_leads(request.user.id), many=True).data
         year_now = date.today().year
-        fiscal_start = date(year=year_now, month=4, day=1)
-        fiscal_end = date(year=year_now + 1, month=3, day=31)
+        fiscal_start, fiscal_end = get_current_fiscal_year_range(datetime.now())
         Leads = (
             Lead.objects.filter(
                 created_at__gte=fiscal_start,
@@ -123,8 +122,7 @@ class DashboardProspectViewSet(ModelViewSet):
     def summary_with_recent_prospects(self, request):
         rp = DashboardRecentProspectSerializer(recent_prospects(request.user.id), many=True).data
         year_now = date.today().year
-        fiscal_start = date(year=year_now, month=4, day=1)
-        fiscal_end = date(year=year_now + 1, month=3, day=31)
+        fiscal_start, fiscal_end = get_current_fiscal_year_range(datetime.now())
         Prospects = (
             Prospect.objects.filter(
                 created_at__gte=fiscal_start,

@@ -49,9 +49,7 @@ class InsightLeadViewSet(ModelViewSet):
     def summary_with_recent_leads(self, request):
         user = request.query_params.get("user", None)
         rl = InsightsRecentLeadSerializer(get_recent_leads(user), many=True).data
-        year_now = date.today().year
-        fiscal_start = date(year=year_now, month=4, day=1)
-        fiscal_end = date(year=year_now + 1, month=3, day=31)
+        fiscal_start, fiscal_end = get_current_fiscal_year_range(datetime.now())
         Leads = Lead.objects.filter(
             created_at__gte=fiscal_start,
             created_at__lte=fiscal_end,
@@ -128,9 +126,7 @@ class InsightProspectViewSet(ModelViewSet):
     def summary_with_recent_prospects(self, request):
         user = request.query_params.get("user", None)
         rp = InsightsRecentProspectSerializer(recent_prospects(user), many=True).data
-        year_now = date.today().year
-        fiscal_start = date(year=year_now, month=4, day=1)
-        fiscal_end = date(year=year_now + 1, month=3, day=31)
+        fiscal_start, fiscal_end = get_current_fiscal_year_range(datetime.now())
         Prospects = Prospect.objects.filter(
             created_at__gte=fiscal_start,
             created_at__lte=fiscal_end,
