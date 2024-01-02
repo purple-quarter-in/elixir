@@ -132,7 +132,7 @@ class InsightProspectViewSet(ModelViewSet):
             created_at__lte=fiscal_end,
         ).values("created_at", "closure_time", "is_converted_to_deal")
         if user:
-            Prospects = Prospects.filter(Q(created_by=request.user) | Q(owner=request.user))
+            Prospects = Prospects.filter(Q(created_by_id=user) | Q(owner_id=user))
         data = calc_prospect_closure_conversion_rate(Prospects)
         return custom_success_response({"recent_prospects": rp, **data})
 
