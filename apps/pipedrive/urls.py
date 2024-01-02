@@ -23,6 +23,10 @@ from apps.pipedrive.views.deal_activity_view import (
     History,
     NoteViewSet,
 )
+from apps.pipedrive.views.insights_view import (
+    InsightLeadViewSet,
+    InsightProspectViewSet,
+)
 
 from .views.views import (
     CreateLandingPageLead,
@@ -47,7 +51,9 @@ router.register("rdcapsule", RDCapsuleViewSet)
 router.register("proposal", ServiceProposalViewSet)
 ## dashboard
 router.register("dashboard/lead", DashboardLeadViewSet)
+router.register("insight/lead", InsightLeadViewSet)
 router.register("dashboard/prospect", DashboardProspectViewSet)
+router.register("insight/prospect", InsightProspectViewSet)
 urlpatterns = [
     path("import-organisation", views.org_import),
     path("import-contact", views.contact_import),

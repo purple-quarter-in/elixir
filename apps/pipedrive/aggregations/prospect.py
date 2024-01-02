@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+from urllib.parse import uses_relative
 
 from django.db.models import Q
 from rest_framework.decorators import api_view
 
+from apps.pipedrive.aggregations.helper import calc_prospect_closure_conversion_rate
 from apps.pipedrive.models import Prospect
 from apps.user.models import User
 from elixir.mongo_client import get_db_handle_conn_string
@@ -150,12 +152,14 @@ def prospect_aggregate_yearly(request):
     return custom_success_response({"message": "prospect yearly aggregation done successfully"})
 
 
-def prospect_aggregate(type, date_from, date_to, user_id):
-    prospects = (
-        Prospect.objects.filter(created_at__gte=date_from, created_at__lte=date_to)
-        .filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
-        .values("status", "created_by_id", "owner_id")
+def prospect_aggregate(type, date_from, date_to, user_id=None):
+    user_name = User.objects.get(pk=user_id).get_full_name() if user_id else "Purple Quarter"
+
+    prospects = Prospect.objects.filter(created_at__gte=date_from, created_at__lte=date_to).values(
+        "status", "created_by_id", "owner_id", "closure_time", "is_converted_to_deal", "created_at"
     )
+    if user_id:
+        prospects = prospects.filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
     status = {
         "Qualified": 0,
         "Disqualified": 0,
@@ -164,22 +168,22 @@ def prospect_aggregate(type, date_from, date_to, user_id):
     }
     prospects_created = 0
     prospects_owned = 0
+    pptd = 0
+    total_prospects = prospects.count()
+    prospect_c_c = calc_prospect_closure_conversion_rate(prospects)
     for prospect in prospects:
         status[prospect["status"]] += 1
-        if prospect["created_by_id"] == user_id:
-            prospects_created += 1
-        if prospect["owner_id"] == user_id:
-            prospects_owned += 1
-    json = {
-        "type": type,
-        "user": user_id,
-        "date_from": str(date_from.date()),
-        "date_to": str(date_to.date()),
-        "status": status,
-        "prospects_created": prospects_created,
-        "prospects_owned": prospects_owned,
-    }
-
+        # converted to prospect
+        if prospect["is_converted_to_deal"] == 1:
+            pptd += 1
+        if user_id:
+            if prospect["created_by_id"] == user_id:
+                prospects_created += 1
+            if prospect["owner_id"] == user_id:
+                prospects_owned += 1
+        else:
+            prospects_created = total_prospects
+            prospects_owned = total_prospects
     filter = {
         "type": type,
         "user": user_id,
@@ -189,10 +193,14 @@ def prospect_aggregate(type, date_from, date_to, user_id):
 
     update = {
         "$set": {
+            "user_name": user_name,
             "status": status,
-            "prospects_created": prospects_created,
-            "prospects_owned": prospects_owned,
+            "created": prospects_created,
+            "owned": prospects_owned,
+            "pptd": pptd,
+            "total_prospects": total_prospects,
+            **prospect_c_c,
         }
     }
     upsert = True
-    return filter, update, upsert, json
+    return filter, update, upsert, update["$set"]
