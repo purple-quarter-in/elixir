@@ -56,7 +56,7 @@ def calc_lead_verificarion_closure_conversion_rate(leads):
         if verification_lead_count > 0
         else "-"
     )
-    res["act"] = str(round(closure_days / promoted_count), 1) if promoted_count > 0 else "-"
+    res["act"] = str(round(closure_days / promoted_count, 1)) if promoted_count > 0 else "-"
     res["lpcr"] = str(round((promoted_count / total_leads) * 100, 1))
     return res
 
