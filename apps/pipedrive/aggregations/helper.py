@@ -52,11 +52,11 @@ def calc_lead_verificarion_closure_conversion_rate(leads):
             ).days
 
     res["avt"] = (
-        str(round(verification_days / verification_lead_count))
+        str(round(verification_days / verification_lead_count, 1))
         if verification_lead_count > 0
         else "-"
     )
-    res["act"] = str(round(closure_days / promoted_count)) if promoted_count > 0 else "-"
+    res["act"] = str(round(closure_days / promoted_count), 1) if promoted_count > 0 else "-"
     res["lpcr"] = str(round((promoted_count / total_leads) * 100, 1))
     return res
 
@@ -92,6 +92,6 @@ def calc_prospect_closure_conversion_rate(prospects):
             promoted_count += 1
         if prospect["closure_time"]:
             closure_days += (prospect["closure_time"].date() - prospect["created_at"].date()).days
-    res["act"] = str(round(closure_days / promoted_count)) if promoted_count > 0 else "-"
+    res["act"] = str(round(closure_days / promoted_count, 1)) if promoted_count > 0 else "-"
     res["pdcr"] = str(round((promoted_count / total_prospects) * 100, 1))
     return res
