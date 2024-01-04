@@ -53,7 +53,9 @@ class InsightLeadViewSet(ModelViewSet):
         Leads = Lead.objects.filter(
             created_at__gte=fiscal_start,
             created_at__lte=fiscal_end,
-        ).values("created_at", "verification_time", "closure_time", "is_converted_to_prospect")
+        ).values(
+            "created_at", "verification_time", "closure_time", "is_converted_to_prospect", "ageing"
+        )
         if user:
             Leads = Leads.filter(Q(created_by_id=user) | Q(owner_id=user))
         data = calc_lead_verificarion_closure_conversion_rate(Leads)
@@ -79,6 +81,7 @@ class InsightLeadViewSet(ModelViewSet):
             dto["date_filter"], start, end, None
         )
         res["pb"].append(InsightsLLBSerializer(org_json).data)
+        res["lb"] = org_json["lb"]
         filter, update, upsert, json = lead_aggregate(
             dto["date_filter"], start, end, user if user else request.user.id
         )
@@ -130,7 +133,7 @@ class InsightProspectViewSet(ModelViewSet):
         Prospects = Prospect.objects.filter(
             created_at__gte=fiscal_start,
             created_at__lte=fiscal_end,
-        ).values("created_at", "closure_time", "is_converted_to_deal")
+        ).values("created_at", "closure_time", "is_converted_to_deal", "ageing")
         if user:
             Prospects = Prospects.filter(Q(created_by_id=user) | Q(owner_id=user))
         data = calc_prospect_closure_conversion_rate(Prospects)
@@ -155,7 +158,7 @@ class InsightProspectViewSet(ModelViewSet):
             dto["date_filter"], start, end, None
         )
         res["pb"].append(InsightsPLBSerializer(org_json).data)
-
+        res["lb"] = org_json["lb"]
         filter, update, upsert, json = prospect_aggregate(
             dto["date_filter"], start, end, user if user else request.user.id
         )
