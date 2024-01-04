@@ -256,7 +256,7 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
                     owner,
                     {
                         "created_owned": 0,
-                        "converted": 0,
+                        "promoted": 0,
                         "rate": 0,
                         "name": User.objects.get(pk=lead["owner_id"]).get_full_name(),
                     },
@@ -266,7 +266,7 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
                     creater,
                     {
                         "created_owned": 0,
-                        "converted": 0,
+                        "promoted": 0,
                         "rate": 0,
                         "name": User.objects.get(pk=lead["created_by_id"]).get_full_name(),
                     },
@@ -298,8 +298,7 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
         for person in leaderboard:
             leaderboard[person]["rate"] = str(
                 round(
-                    (leaderboard[person]["converted"] / leaderboard[person]["created_owned"])
-                    * 100,
+                    (leaderboard[person]["promoted"] / leaderboard[person]["created_owned"]) * 100,
                     2,
                 )
             )
