@@ -277,23 +277,23 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
                     leaderboard[owner]["created_owned"] += 1
                     leaderboard[owner]["created_owned"] += 1
                     if lead["is_converted_to_prospect"]:
-                        leaderboard[owner]["converted"] += 1
+                        leaderboard[owner]["promoted"] += 1
                 if creater:
                     leaderboard[creater]["created_owned"] += 1
                     leaderboard[creater]["created_owned"] += 1
                     if lead["is_converted_to_prospect"]:
-                        leaderboard[creater]["converted"] += 1
+                        leaderboard[creater]["promoted"] += 1
             else:
                 if owner:
                     leaderboard[owner]["created_owned"] += 1
                     leaderboard[owner]["created_owned"] += 1
                     if lead["is_converted_to_prospect"]:
-                        leaderboard[owner]["converted"] += 1
+                        leaderboard[owner]["promoted"] += 1
                 elif creater:
                     leaderboard[creater]["created_owned"] += 1
                     leaderboard[creater]["created_owned"] += 1
                     if lead["is_converted_to_prospect"]:
-                        leaderboard[creater]["converted"] += 1
+                        leaderboard[creater]["promoted"] += 1
     if not user_id:
         for person in leaderboard:
             leaderboard[person]["rate"] = str(
