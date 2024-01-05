@@ -156,7 +156,13 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
     user_name = User.objects.get(pk=user_id).get_full_name() if user_id else "Purple Quarter"
 
     prospects = Prospect.objects.filter(created_at__gte=date_from, created_at__lte=date_to).values(
-        "status", "created_by_id", "owner_id", "closure_time", "is_converted_to_deal", "created_at"
+        "status",
+        "created_by_id",
+        "owner_id",
+        "closure_time",
+        "is_converted_to_deal",
+        "created_at",
+        "ageing",
     )
     if user_id:
         prospects = prospects.filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
@@ -171,6 +177,8 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
     pptd = 0
     total_prospects = prospects.count()
     prospect_c_c = calc_prospect_closure_conversion_rate(prospects)
+    leaderboard = {}
+    lb = []
     for prospect in prospects:
         status[prospect["status"]] += 1
         # converted to prospect
@@ -184,6 +192,63 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
         else:
             prospects_created = total_prospects
             prospects_owned = total_prospects
+
+        ## calc  prospect leaderboard
+        if not user_id:
+            owner = prospect["owner_id"]
+            creater = prospect["created_by_id"]
+            if owner and owner not in leaderboard:
+                leaderboard.setdefault(
+                    owner,
+                    {
+                        "created_owned": 0,
+                        "promoted": 0,
+                        "rate": 0,
+                        "name": User.objects.get(pk=prospect["owner_id"]).get_full_name(),
+                    },
+                )
+            if creater:
+                leaderboard.setdefault(
+                    creater,
+                    {
+                        "created_owned": 0,
+                        "promoted": 0,
+                        "rate": 0,
+                        "name": User.objects.get(pk=prospect["created_by_id"]).get_full_name(),
+                    },
+                )
+
+            if owner != creater:
+                if owner:
+                    leaderboard[owner]["created_owned"] += 1
+                    leaderboard[owner]["created_owned"] += 1
+                    if prospect["is_converted_to_deal"]:
+                        leaderboard[owner]["promoted"] += 1
+                if creater:
+                    leaderboard[creater]["created_owned"] += 1
+                    leaderboard[creater]["created_owned"] += 1
+                    if prospect["is_converted_to_deal"]:
+                        leaderboard[creater]["promoted"] += 1
+            else:
+                if owner:
+                    leaderboard[owner]["created_owned"] += 1
+                    leaderboard[owner]["created_owned"] += 1
+                    if prospect["is_converted_to_deal"]:
+                        leaderboard[owner]["promoted"] += 1
+                elif creater:
+                    leaderboard[creater]["created_owned"] += 1
+                    leaderboard[creater]["created_owned"] += 1
+                    if prospect["is_converted_to_deal"]:
+                        leaderboard[creater]["promoted"] += 1
+    if not user_id:
+        for person in leaderboard:
+            leaderboard[person]["rate"] = str(
+                round(
+                    (leaderboard[person]["promoted"] / leaderboard[person]["created_owned"]) * 100,
+                    2,
+                )
+            )
+            lb.append(leaderboard[person])
     filter = {
         "type": type,
         "user": user_id,
@@ -199,6 +264,7 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
             "owned": prospects_owned,
             "pptd": pptd,
             "total_prospects": total_prospects,
+            "lb": lb,
             **prospect_c_c,
         }
     }

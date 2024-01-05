@@ -194,6 +194,7 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
         "verification_time",
         "closure_time",
         "created_at",
+        "ageing",
     )
     if user_id:
         leads = leads.filter(Q(created_by_id=user_id) | Q(owner_id=user_id))
@@ -219,6 +220,8 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
     total_leads = leads.count()
     lptp = 0
     lead_v_c_c = calc_lead_verificarion_closure_conversion_rate(leads)
+    leaderboard = {}
+    lb = []
     for lead in leads:
         # status
         status[lead["status"]] += 1
@@ -244,7 +247,62 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
         else:
             leads_created = total_leads
             leads_owned = total_leads
+        ## calc  lead leaderboard
+        if not user_id:
+            owner = lead["owner_id"]
+            creater = lead["created_by_id"]
+            if owner and owner not in leaderboard:
+                leaderboard.setdefault(
+                    owner,
+                    {
+                        "created_owned": 0,
+                        "promoted": 0,
+                        "rate": 0,
+                        "name": User.objects.get(pk=lead["owner_id"]).get_full_name(),
+                    },
+                )
+            if creater:
+                leaderboard.setdefault(
+                    creater,
+                    {
+                        "created_owned": 0,
+                        "promoted": 0,
+                        "rate": 0,
+                        "name": User.objects.get(pk=lead["created_by_id"]).get_full_name(),
+                    },
+                )
 
+            if owner != creater:
+                if owner:
+                    leaderboard[owner]["created_owned"] += 1
+                    leaderboard[owner]["created_owned"] += 1
+                    if lead["is_converted_to_prospect"]:
+                        leaderboard[owner]["promoted"] += 1
+                if creater:
+                    leaderboard[creater]["created_owned"] += 1
+                    leaderboard[creater]["created_owned"] += 1
+                    if lead["is_converted_to_prospect"]:
+                        leaderboard[creater]["promoted"] += 1
+            else:
+                if owner:
+                    leaderboard[owner]["created_owned"] += 1
+                    leaderboard[owner]["created_owned"] += 1
+                    if lead["is_converted_to_prospect"]:
+                        leaderboard[owner]["promoted"] += 1
+                elif creater:
+                    leaderboard[creater]["created_owned"] += 1
+                    leaderboard[creater]["created_owned"] += 1
+                    if lead["is_converted_to_prospect"]:
+                        leaderboard[creater]["promoted"] += 1
+    if not user_id:
+        for person in leaderboard:
+            leaderboard[person]["rate"] = str(
+                round(
+                    (leaderboard[person]["promoted"] / leaderboard[person]["created_owned"]) * 100,
+                    2,
+                )
+            )
+            lb.append(leaderboard[person])
     filter = {
         "type": type,
         "user": user_id,
@@ -262,6 +320,7 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
             "lptp": lptp,
             "inbound_source": inbound_source,
             "outbound_source": outbound_source,
+            "lb": lb,
             **lead_v_c_c,
         }
     }
