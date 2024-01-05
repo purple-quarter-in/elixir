@@ -231,17 +231,17 @@ class ContactViewSet(ModelViewSet):
             )
         elif "organisation_name" in request.data:
             if Organisation.objects.filter(
-                name__iexact=request.data.get("organisation_name")
+                name__iexact=(request.data.get("organisation_name")).strip()
             ).exists():
                 raise ValidationError(
                     {
                         "already_exists": [
-                            f'Organisation with name {request.data.get("organisation_name")} already exists'
+                            f'Organisation with name {(request.data.get("organisation_name")).strip()} already exists'
                         ]
                     }
                 )
             org = Organisation.objects.create(
-                name=request.data.get("organisation_name"),
+                name=(request.data.get("organisation_name")).strip(),
                 **set_crated_by_updated_by(request.user),
             )
             request.data.pop("organisation_name")
