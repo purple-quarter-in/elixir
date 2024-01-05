@@ -205,6 +205,8 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
                         "promoted": 0,
                         "rate": 0,
                         "name": User.objects.get(pk=prospect["owner_id"]).get_full_name(),
+                        "created": 0,
+                        "owned": 0,
                     },
                 )
             if creater and creater not in leaderboard:
@@ -215,6 +217,8 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
                         "promoted": 0,
                         "rate": 0,
                         "name": User.objects.get(pk=prospect["created_by_id"]).get_full_name(),
+                        "created": 0,
+                        "owned": 0,
                     },
                 )
             if owner:
