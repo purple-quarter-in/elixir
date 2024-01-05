@@ -218,16 +218,18 @@ class LeadViewSet(ModelViewSet):
                     )
         elif "id" not in dto["organisation"] and "name" in dto["organisation"]:
             # case of create
-            if Organisation.objects.filter(name__iexact=dto["organisation"]["name"]).exists():
+            if Organisation.objects.filter(
+                name__iexact=(dto["organisation"]["name"]).strip()
+            ).exists():
                 raise ValidationError(
                     {
                         "already_exists": [
-                            f'Organisation with name {dto["organisation"]["name"]} already exists'
+                            f'Organisation with name {(dto["organisation"]["name"]).strip()} already exists'
                         ]
                     }
                 )
             org = Organisation.objects.create(
-                name=dto["organisation"]["name"],
+                name=(dto["organisation"]["name"]).strip(),
                 created_by=request.user,
                 updated_by=request.user,
             )
