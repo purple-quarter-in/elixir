@@ -207,7 +207,7 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
                         "name": User.objects.get(pk=prospect["owner_id"]).get_full_name(),
                     },
                 )
-            if creater:
+            if creater and creater not in leaderboard:
                 leaderboard.setdefault(
                     creater,
                     {
@@ -217,7 +217,10 @@ def prospect_aggregate(type, date_from, date_to, user_id=None):
                         "name": User.objects.get(pk=prospect["created_by_id"]).get_full_name(),
                     },
                 )
-
+            if owner:
+                leaderboard[owner]["owned"] += 1
+            if creater:
+                leaderboard[creater]["created"] += 1
             if owner != creater:
                 if owner:
                     leaderboard[owner]["created_owned"] += 1
