@@ -56,7 +56,13 @@ class DashboardLeadViewSet(ModelViewSet):
                 created_at__lte=fiscal_end,
             )
             .filter(Q(created_by=request.user) | Q(owner=request.user))
-            .values("created_at", "verification_time", "closure_time", "is_converted_to_prospect")
+            .values(
+                "created_at",
+                "verification_time",
+                "closure_time",
+                "is_converted_to_prospect",
+                "ageing",
+            )
         )
         data = calc_lead_verificarion_closure_conversion_rate(Leads)
         return custom_success_response({"recent_leads": rl, **data})
@@ -129,7 +135,7 @@ class DashboardProspectViewSet(ModelViewSet):
                 created_at__lte=fiscal_end,
             )
             .filter(Q(created_by=request.user) | Q(owner=request.user))
-            .values("created_at", "closure_time", "is_converted_to_deal")
+            .values("created_at", "closure_time", "is_converted_to_deal", "ageing")
         )
         data = calc_prospect_closure_conversion_rate(Prospects)
         return custom_success_response({"recent_prospects": rp, **data})
