@@ -23,6 +23,8 @@ class InsightsLeadSerializer(serializers.Serializer):
     outbound_source = serializers.DictField()
     lptp = serializers.IntegerField()
     total_leads = serializers.IntegerField()
+    created = serializers.IntegerField()
+    owned = serializers.IntegerField()
 
 
 class InsightsLLBSerializer(serializers.Serializer):
@@ -37,6 +39,8 @@ class InsightsProspectSerializer(serializers.Serializer):
     status = serializers.DictField()
     pptd = serializers.IntegerField()
     total_prospects = serializers.IntegerField()
+    created = serializers.IntegerField()
+    owned = serializers.IntegerField()
 
 
 class InsightsPLBSerializer(serializers.Serializer):
