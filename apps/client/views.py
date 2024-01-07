@@ -260,7 +260,7 @@ class ContactViewSet(ModelViewSet):
         )
         if errors and errors["is_duplicate"]:
             raise ValidationError(errors)
-        self._instance = serializer.save(**(set_crated_by_updated_by(self.request.user)))
+        self._instance = serializer.save(updated_by=self.request.user)
 
     @action(detail=False, methods=["get"])
     def is_duplicate(self, request):
