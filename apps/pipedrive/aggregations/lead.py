@@ -302,7 +302,7 @@ def lead_aggregate(type, date_from, date_to, user_id=None):
             leaderboard[person]["rate"] = str(
                 round(
                     (leaderboard[person]["promoted"] / leaderboard[person]["created_owned"]) * 100,
-                    2,
+                    1,
                 )
             )
             lb.append(leaderboard[person])
