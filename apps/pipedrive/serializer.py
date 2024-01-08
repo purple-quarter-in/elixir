@@ -152,9 +152,15 @@ class DealSerializer(serializers.ModelSerializer):
         return ProspectSerializer(instance.prospect).data
 
     def get_deal_aging(self, instance):
-        days = days = (datetime.now().date() - instance.created_at.date()).days
-        if instance.ageing:
-            days = (instance.ageing - instance.created_at.date()).days
+        # days = days = (datetime.now().date() - instance.created_at.date()).days
+        # if instance.ageing:
+        #     days = (instance.ageing - instance.created_at.date()).days
+        days = 0
+        for cds in instance.contract_deal_service.all().order_by("-event_date"):
+            if cds.status == "Completed":
+                end_date = instance.ageing if instance.ageing else datetime.now().date()
+                days = (end_date - cds.event_date.date()).days
+                pass
         return days
 
 
