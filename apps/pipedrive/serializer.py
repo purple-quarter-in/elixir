@@ -156,11 +156,12 @@ class DealSerializer(serializers.ModelSerializer):
         # if instance.ageing:
         #     days = (instance.ageing - instance.created_at.date()).days
         days = 0
+        count = instance.contract_deal_service.all().count()
         for cds in instance.contract_deal_service.all().order_by("-event_date"):
             if cds.status == "Completed":
                 end_date = instance.ageing if instance.ageing else datetime.now().date()
                 days = (end_date - cds.event_date.date()).days
-                pass
+                break
         return days
 
 
