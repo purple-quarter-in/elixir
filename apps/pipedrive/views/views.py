@@ -542,7 +542,7 @@ class ProspectViewSet(ModelViewSet):
 
 
 class DealViewSet(ModelViewSet):
-    queryset = Deal.objects.all().order_by("-created_at")
+    queryset = Deal.objects.all().prefetch_related("contract_deal_service").order_by("-created_at")
     serializer_class = DealSerializer
     permission_classes = [IsAuthenticated]
     response_serializer = DealSerializer

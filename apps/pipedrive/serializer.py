@@ -152,9 +152,16 @@ class DealSerializer(serializers.ModelSerializer):
         return ProspectSerializer(instance.prospect).data
 
     def get_deal_aging(self, instance):
-        days = days = (datetime.now().date() - instance.created_at.date()).days
-        if instance.ageing:
-            days = (instance.ageing - instance.created_at.date()).days
+        # days = days = (datetime.now().date() - instance.created_at.date()).days
+        # if instance.ageing:
+        #     days = (instance.ageing - instance.created_at.date()).days
+        days = 0
+        count = instance.contract_deal_service.all().count()
+        for cds in instance.contract_deal_service.all().order_by("-event_date"):
+            if cds.status == "Completed":
+                end_date = instance.ageing if instance.ageing else datetime.now().date()
+                days = (end_date - cds.event_date.date()).days
+                break
         return days
 
 
@@ -253,7 +260,16 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     def get_entity_type(self, instance):
         if instance.lead:
-            return "Prospect" if instance.lead.is_converted_to_prospect else "Lead"
+            entity_type = "Lead"
+            if instance.lead.is_converted_to_prospect:
+                entity_type = (
+                    "Deal"
+                    if Prospect.objects.filter(
+                        is_converted_to_deal=True, lead_id=instance.id
+                    ).exists()
+                    else "Prospect"
+                )
+            return entity_type
         elif instance.organisation:
             return "Account"
 
