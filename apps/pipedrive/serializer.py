@@ -260,7 +260,16 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     def get_entity_type(self, instance):
         if instance.lead:
-            return "Prospect" if instance.lead.is_converted_to_prospect else "Lead"
+            entity_type = "Lead"
+            if instance.lead.is_converted_to_prospect:
+                entity_type = (
+                    "Deal"
+                    if Prospect.objects.filter(
+                        is_converted_to_deal=True, lead_id=instance.id
+                    ).exists()
+                    else "Prospect"
+                )
+            return entity_type
         elif instance.organisation:
             return "Account"
 
