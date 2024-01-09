@@ -265,7 +265,7 @@ class ActivitySerializer(serializers.ModelSerializer):
                 entity_type = (
                     "Deal"
                     if Prospect.objects.filter(
-                        is_converted_to_deal=True, lead_id=instance.id
+                        is_converted_to_deal=True, lead_id=instance.lead_id
                     ).exists()
                     else "Prospect"
                 )
