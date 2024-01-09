@@ -126,7 +126,7 @@ class OrganisationViewSet(ModelViewSet):
             raise ValidationError({"message": ["No change in Name detected"]})
         leads = Lead.objects.filter(organisation=obj)
         for lead in leads:
-            name_split = (lead.title).split("-")
+            name_split = (lead.title).split(" - ")
             name_split[0] = request.data.get("name")
             lead.title = " - ".join(name_split)
             lead.save()
